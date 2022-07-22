@@ -40,7 +40,7 @@ async function main(_url: string) {
     const txReceipt = await sentTxResponse.wait(1);
     console.log(txReceipt);
 }
-main(sendTradeUrl) // pass in different urls with query strings for route types
+main(tradeSendUrl) // pass in different urls with query strings for route types
     .then(() => process.exit(0))
     .catch((error) => {
         console.error(error);
