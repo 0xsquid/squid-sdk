@@ -1,17 +1,22 @@
 import axios from "axios";
 import { BigNumber, BytesLike, ethers } from "ethers";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const sendAmount: BigNumber = ethers.utils.parseEther('0.1'); //0.1 WETH
 const aUSDC: BigNumber = ethers.utils.parseUnits("20", 6); // 1 aUSDC
 
-//route types
-const tradeSendUrl: string = `http://localhost:3000/api/transaction?recipientAddress=0x5F88eC396607Fc3edb0424E8E6061949e6b624e7&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=aUSDC&slippage=1`;
-const tradeSendTradeUrl: string = `http://localhost:3000/api/transaction?recipientAddress=0x5F88eC396607Fc3edb0424E8E6061949e6b624e7&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
-const sendTradeUrl: string = `http://localhost:3000/api/transaction?recipientAddress=0x5F88eC396607Fc3edb0424E8E6061949e6b624e7&srcChain=ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
 
 const squidContractAddress = process.env.squidContractAddress!
 const privateKey = process.env.privateKey!
 const ethRpcEndPoint = process.env.ethRpcEndPoint!
+const recipientAddress = process.env.recipientAddress!
+
+//route types
+const tradeSendUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=aUSDC&slippage=1`;
+const tradeSendTradeUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
+const sendTradeUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
+
 
 async function main(_url: string) {
     console.log("starting script");

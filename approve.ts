@@ -9,8 +9,8 @@ const aUSDContractAddress = process.env.aUSDContractAddress!
 const ethRpcEndPoint = process.env.ethRpcEndPoint!
 const avaxRpcEndPoint = process.env.avaxRpcEndPoint!
 
-const wethApprovalAmmont: BigNumber = parseUnits("100", 18)
-const ausdcApprovalAmmont: BigNumber = parseUnits("100", 6)
+const wethApprovalAmmont: BigNumber = parseUnits("1000000000000000000000", 18)
+const ausdcApprovalAmmont: BigNumber = parseUnits("100000000000000000000", 6)
 
 const privateKey = process.env.privateKey!
 const squidContractAddress = process.env.squidContractAddress!
