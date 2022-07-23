@@ -6,7 +6,7 @@ API endpoint documentation
 https://app.gitbook.com/o/bX90yMGYDBu3T1Hqg4EA/s/tXbXyuWIO2PwzNc5Dets/integrate-squid/api
 
 - install package dependancies "yarn install"
-- configuration in .env file
+- configuration in .env file (rename example to .env)
 - explore the /api/quotes & api/tokens endpoints for supported chains and tokens
 - run approval.ts to approve tokens before any transactions eg "yarn ts-node approve.ts"
 - run transaction.ts to query /api/transaction endpoint and send tokens cross chain ✨
