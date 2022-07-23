@@ -1,6 +1,6 @@
 # api-sdk
 
-## Examples to interact with the Squid API
+## Examples to interact with the Squid API - testnet supported
 
 API endpoint documentation
 https://app.gitbook.com/o/bX90yMGYDBu3T1Hqg4EA/s/tXbXyuWIO2PwzNc5Dets/integrate-squid/api
