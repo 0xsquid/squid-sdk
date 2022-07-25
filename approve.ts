@@ -31,7 +31,7 @@ async function approveToken(_tokenAddress: string, _rpc: string, _approvalAmount
     ];
 
     const contract = new ethers.Contract(
-        WETHContractAddress,
+        _tokenAddress,
         abi,
         signer
     );
