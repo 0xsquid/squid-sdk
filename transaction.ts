@@ -2,6 +2,12 @@ import axios from "axios";
 import { BigNumber, BytesLike, ethers } from "ethers";
 import * as dotenv from "dotenv";
 import erc20Abi from "./abi/erc20.json";
+import {
+  AxelarQueryAPI,
+  AxelarQueryAPIConfig,
+  EvmChain,
+  GasToken,
+} from "@axelar-network/axelarjs-sdk";
 
 dotenv.config();
 
@@ -15,9 +21,9 @@ const ethRpcEndPoint = process.env.ethRpcEndPoint!;
 const recipientAddress = process.env.recipientAddress!;
 
 //route types
-const tradeSendUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=aUSDC&slippage=1`;
-const tradeSendTradeUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
-const sendTradeUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
+const tradeSendUrl: string = `http://host.docker.internal:3000/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=aUSDC&slippage=1`;
+const tradeSendTradeUrl: string = `http://host.docker.internal:3000/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
+const sendTradeUrl: string = `http://host.docker.internal:3000/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
 
 async function main(_url: string) {
   console.log("starting script");
@@ -29,6 +35,20 @@ async function main(_url: string) {
 
   let wallet = new ethers.Wallet(privateKey, provider);
 
+  // Set AxelarQueryAPI
+  const sdk = new AxelarQueryAPI({
+    environment: "testnet",
+  } as AxelarQueryAPIConfig);
+
+  console.log(`Dest gas: ${response.data.destChainGas}`);
+  const gasFee = await sdk.estimateGasFee(
+    EvmChain.ETHEREUM,
+    EvmChain.AVALANCHE,
+    GasToken.ETH,
+    response.data.destChainGas
+  );
+
+  console.log(`Gas Fee: ${gasFee}`);
   //Construct transaction object with encoded data
   const tx: any = {
     to: squidContractAddress,
