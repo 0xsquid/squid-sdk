@@ -12,7 +12,7 @@ import {
 dotenv.config();
 
 const sendAmount: BigNumber = ethers.utils.parseEther("0.1"); //0.1 WETH
-const aUSDC: BigNumber = ethers.utils.parseUnits("20", 6); // 1 aUSDC
+const aUSDC: BigNumber = ethers.utils.parseUnits("1", 6); // 1 aUSDC
 
 const wethSrcTokenAddress = process.env.WETHContractAddress as string;
 const squidContractAddress = process.env.squidContractAddress!;
@@ -30,7 +30,7 @@ async function main(_url: string) {
   console.log("calling: ", _url);
   const response = await axios.get(_url);
   console.log("route type: ", response.data.routeType);
-
+  console.log("Response: ", response.data);
   const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint);
 
   let wallet = new ethers.Wallet(privateKey, provider);
@@ -53,7 +53,7 @@ async function main(_url: string) {
   const tx: any = {
     to: squidContractAddress,
     data: response!.data.data,
-    value: response!.data.gasReceiver ? BigInt(5e6) : null, //this will need to be calculated, maybe by the api
+    value: response!.data.gasReceiver ? BigInt(gasFee) : null, //this will need to be calculated, maybe by the api
   };
 
   const srcTokenContract = new ethers.Contract(
