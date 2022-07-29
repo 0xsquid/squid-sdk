@@ -21,9 +21,9 @@ const ethRpcEndPoint = process.env.ethRpcEndPoint!;
 const recipientAddress = process.env.recipientAddress!;
 
 //route types
-const tradeSendUrl: string = `http://host.docker.internal:3000/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=aUSDC&slippage=1`;
-const tradeSendTradeUrl: string = `http://host.docker.internal:3000/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
-const sendTradeUrl: string = `http://host.docker.internal:3000/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
+const tradeSendUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=aUSDC&slippage=1`;
+const tradeSendTradeUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
+const sendTradeUrl: string = `http://testnet.0xsquid.com/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
 
 async function main(_url: string) {
   console.log("starting script");
