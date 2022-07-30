@@ -5,6 +5,7 @@
   "author": "koda@0xsquid.com",
   "license": "MIT",
   "dependencies": {
+    "@axelar-network/axelarjs-sdk": "^0.6.18",
     "@types/node": "^18.0.6",
     "axios": "^0.27.2",
     "dotenv": "^16.0.1",
