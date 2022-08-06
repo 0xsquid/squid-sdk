@@ -74,10 +74,17 @@ async function main(_url: string) {
             `Error: Approved amount ${allowance} is less than send amount ${sendAmount}`
         );
     } else {
+        console.log("> tx: ", tx);
         //sign and submit transaction
-        let resp = await wallet.signTransaction(tx);
+        const signTxResponse = await wallet.signTransaction(tx);
+        console.log("> signTxResponse: ", signTxResponse);
         const sentTxResponse = await wallet.sendTransaction(tx);
+        console.log("> sentTxResponse: ", sentTxResponse.hash);
         const txReceipt = await sentTxResponse.wait(1);
+        console.log("> txReceipt: ", txReceipt.transactionHash);
+        // let resp = await wallet.signTransaction(tx);
+        // const sentTxResponse = await wallet.sendTransaction(tx);
+        // const txReceipt = await sentTxResponse.wait(1);
         //console.log(txReceipt);
     }
 }
