@@ -26,7 +26,6 @@ const recipientAddress = process.env.recipientAddress!;
 const sendAmount = ETH;
 
 //route types
-const tradeSendUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=Avalanche&dstTokenOut=axlUSDC&slippage=1`;
 const tradeSendTradeUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=Avalanche&dstTokenOut=WAVAX&slippage=1`;
 
 interface tradeParams  {
@@ -41,7 +40,7 @@ interface tradeParams  {
     slippage: number;
 }
 
-const testParams: tradeParams = {
+const sendTradeParams: tradeParams = {
     sourceChain: "Ethereum",
     sourceToken: "USDC",
 
@@ -53,12 +52,24 @@ const testParams: tradeParams = {
     slippage: 1,
 }
 
-const getSendTradeURL = (p: tradeParams) =>
+const tradeSendParams: tradeParams = {
+    sourceChain: "Ethereum",
+    sourceToken: "WETH",
+
+    destChain: "Avalanche",
+    destAddress: recipientAddress,
+    destToken: "axlUSDC",
+
+    amount: aUSDC,
+    slippage: 1,
+}
+
+const getTradeURL = (p: tradeParams) =>
     `${baseUrl}/api/transaction?recipientAddress=${p.destAddress}&srcChain=${p.sourceChain}&srcTokenIn=${p.sourceToken}&srcInAmount=${aUSDC}&dstChain=${p.destChain}&dstTokenOut=${p.destToken}&slippage=${p.slippage}`;
 
-
 async function main() {
-    executeSwap(getSendTradeURL(testParams))
+    const url = getTradeURL(tradeSendParams)
+    await executeSwap(url)
 }
 
 async function executeSwap(_url: string) {
