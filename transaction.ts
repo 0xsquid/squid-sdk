@@ -81,7 +81,7 @@ async function main(_url: string) {
         //console.log(txReceipt);
     }
 }
-main(tradeSendTradeUrl) // pass in different urls with query strings for route types
+main(tradeSendUrl) // pass in different urls with query strings for route types
     .then(() => process.exit(0))
     .catch((error) => {
         console.error(error);
