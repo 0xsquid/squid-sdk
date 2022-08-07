@@ -78,10 +78,10 @@ async function main(_url: string) {
         let resp = await wallet.signTransaction(tx);
         const sentTxResponse = await wallet.sendTransaction(tx);
         const txReceipt = await sentTxResponse.wait(1);
-        //console.log(txReceipt);
+        console.log(txReceipt);
     }
 }
-main(tradeSendUrl) // pass in different urls with query strings for route types
+main(sendTradeUrl) // pass in different urls with query strings for route types
     .then(() => process.exit(0))
     .catch((error) => {
         console.error(error);
