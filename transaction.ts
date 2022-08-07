@@ -24,7 +24,7 @@ const baseUrl = process.env.baseUrl!;
 //route types
 const tradeSendUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=Avalanche&dstTokenOut=axlUSDC&slippage=1`;
 const tradeSendTradeUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=Avalanche&dstTokenOut=WAVAX&slippage=1`;
-const sendTradeUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=avalanche&dstTokenOut=WAVAX&slippage=1`;
+const sendTradeUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=USDC&srcInAmount=${aUSDC}&dstChain=Avalanche&dstTokenOut=WAVAX&slippage=1`;
 
 async function main(_url: string) {
     console.log("starting script");
