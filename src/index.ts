@@ -3,16 +3,16 @@ import {
   AxelarQueryAPIConfig,
   EvmChain,
   GasToken,
-} from "@axelar-network/axelarjs-sdk"
-import axios, { AxiosInstance } from "axios"
-import { ethers } from "ethers"
-import * as dotenv from "dotenv"
+} from '@axelar-network/axelarjs-sdk'
+import axios, { AxiosInstance } from 'axios'
+import { ethers } from 'ethers'
+import * as dotenv from 'dotenv'
 
-import { getTokenDataBySymbol } from "./utils/getTokenDataBySymbol"
+import { getTokenDataBySymbol } from './utils/getTokenDataBySymbol'
 import { Environments, IConfig, IGetTx, ITransaction } from './types'
 
-import erc20Abi from "../abi/erc20.json"
-import { getChainDataByName } from "./utils/getChainDataByName"
+import erc20Abi from './abi/erc20.json'
+import { getChainDataByName } from './utils/getChainDataByName'
 
 dotenv.config()
 
@@ -27,8 +27,8 @@ class SquidSdk {
     this.axiosInstance = axios.create({
       baseURL: baseUrl,
       headers: {
-        // 'api-key': config.apiKey 
-      }
+        // 'api-key': config.apiKey
+      },
     })
     this.environment = config.environment
   }
@@ -43,7 +43,9 @@ class SquidSdk {
     console.log('> srcChain: ', srcChain)
 
     if (!tokenIn || !tokenOut) {
-      throw new Error(`Error: Token not found, srcTokenIn ${tokenIn?.name} dstTokenOut ${tokenOut?.name}`)
+      throw new Error(
+        `Error: Token not found, srcTokenIn ${tokenIn?.name} dstTokenOut ${tokenOut?.name}`
+      )
     }
 
     if (!srcChain) {
@@ -51,12 +53,12 @@ class SquidSdk {
     }
 
     const response = await this.axiosInstance.get('/api/transaction', {
-      params
+      params,
     })
 
-    console.log("> Route type: ", response.data.routeType)
-    console.log("> Response: ", response.data)
-    console.log("> Destination gas: ", response.data.destChainGas)
+    console.log('> Route type: ', response.data.routeType)
+    console.log('> Response: ', response.data)
+    console.log('> Destination gas: ', response.data.destChainGas)
 
     // Set AxelarQueryAPI
     const sdk = new AxelarQueryAPI({
@@ -70,7 +72,7 @@ class SquidSdk {
       response.data.destChainGas
     )
 
-    console.log("> Gas Fee: ", gasFee)
+    console.log('> Gas Fee: ', gasFee)
 
     const provider = new ethers.providers.JsonRpcProvider(srcChain.rpc)
     const srcTokenContract = new ethers.Contract(
@@ -85,10 +87,12 @@ class SquidSdk {
       squidContractAddress
     )
 
-    console.log("> Source token allowance: ", allowance.toString())
+    console.log('> Source token allowance: ', allowance.toString())
 
     if (allowance < params.srcInAmount) {
-      throw new Error(`Error: Approved amount ${allowance} is less than send amount ${params.srcInAmount}`)
+      throw new Error(
+        `Error: Approved amount ${allowance} is less than send amount ${params.srcInAmount}`
+      )
     }
 
     // Construct transaction object with encoded data
