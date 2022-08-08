@@ -1,6 +1,7 @@
 export enum Environments {
   LOCAL = 'local',
-  TESTNET = 'testnet'
+  TESTNET = 'testnet',
+  MAINNET = 'mainnet'
 }
 
 export interface ITokenData {
