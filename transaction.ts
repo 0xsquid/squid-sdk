@@ -12,7 +12,7 @@ import {
 dotenv.config();
 
 const sendAmount: BigNumber = ethers.utils.parseEther("1"); //0.1 WETH
-const aUSDC: BigNumber = ethers.utils.parseUnits("1", 6); // 1 aUSDC
+const aUSDC: BigNumber = ethers.utils.parseUnits("10", 6); // 1 aUSDC
 
 const wethSrcTokenAddress = process.env.WETHContractAddress as string;
 const squidContractAddress = process.env.squidContractAddress!;
