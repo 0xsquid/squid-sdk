@@ -1,3 +1,5 @@
+import { ChainName } from "../contants/chains";
+
 export enum Environments {
   LOCAL = 'local',
   TESTNET = 'testnet',
@@ -22,15 +24,15 @@ export interface IConfig {
 
 export interface IGetTx {
   recipientAddress: string;
-  srcChain: string;
+  srcChain: ChainName;
   srcTokenIn: string;
   srcInAmount: string;
-  dstChain: string;
+  dstChain: ChainName;
   dstTokenOut: string;
   slippage: number; // validate usage
 }
 
-// this interface should be imported from ethers
+// this interface should be imported from ethers?
 export interface ITransaction {
   to?: string,
   data?: ArrayLike<number>,
