@@ -30,7 +30,7 @@ const moonbeamBase = {
   estimatedGas: 300000,
 }
 
-export const ChainsData = {
+export const chainsData = {
   [ChainName.ETHEREUM]: {
     [Environments.LOCAL]: {
       rpc: "http://localhost:8500/0",
