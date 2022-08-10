@@ -1,9 +1,56 @@
-import { ChainName } from '../contants/chains'
-
 export enum Environments {
   LOCAL = 'local',
   TESTNET = 'testnet',
-  MAINNET = 'mainnet',
+  MAINNET = 'mainnet'
+}
+
+export enum ChainName {
+  ETHEREUM = 'Ethereum',
+  AVALANCHE = 'Avalanche',
+  MOONBEAM = 'Moonbeam'
+}
+
+export type ChainData = {
+  rpc: string
+  networkName: string
+  chainId: number
+  name: string
+  symbol: string
+  decimals: number
+  icon: string
+  estimatedGas: number
+  contracts: {
+    gateway: string // axelar gateway contract
+    swapExecutor: string // squidswap contracts
+    router: string // swap router address uniswap etc
+    axelarDefaultCrosschain: string // USDC
+    wrappedNativeToken: string // WETH
+    distributionEnsExecutable: string // DistributionENSExecutable.sol
+    multicall: string // batch read transactions,
+    ensRegistry: string
+  }
+}
+
+export interface ChainsData {
+  [Environments.LOCAL]: {
+    [ChainName.ETHEREUM]: ChainData
+    [ChainName.AVALANCHE]: ChainData
+    [ChainName.MOONBEAM]: ChainData
+  }
+  [Environments.TESTNET]: {
+    [ChainName.ETHEREUM]: ChainData
+    [ChainName.AVALANCHE]: ChainData
+    [ChainName.MOONBEAM]: ChainData
+  }
+  [Environments.MAINNET]: {
+    [ChainName.ETHEREUM]: ChainData
+    [ChainName.AVALANCHE]: ChainData
+    [ChainName.MOONBEAM]: ChainData
+  }
+}
+
+export type MapChainIdName = {
+  [key: number]: ChainName
 }
 
 export interface ITokenData {
@@ -20,6 +67,14 @@ export interface ITokenData {
 export interface IConfig {
   apiKey?: string
   environment: Environments
+}
+
+export interface IGetRoute {
+  srcChain: string
+  srcToken: string
+  destChain: string
+  destToken: string
+  amount: string
 }
 
 export interface IGetTx {

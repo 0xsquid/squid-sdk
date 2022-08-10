@@ -63,6 +63,20 @@ async function main() {
   console.log('> txReceipt: ', txReceipt.transactionHash)
 }
 
+async function getRoute() {
+  const squidSdk = new SquidSdk({ environment: Environments.LOCAL })
+
+  const data = await squidSdk.getRoute({
+    srcChain: ChainName.ETHEREUM,
+    srcToken: 'WETH',
+    destChain: ChainName.AVALANCHE,
+    destToken: 'WAVAX',
+    amount: sendAmount.toString(),
+  })
+
+  console.log('> data: ', data)
+}
+
 main()
   .then(() => process.exit(0))
   .catch(error => {

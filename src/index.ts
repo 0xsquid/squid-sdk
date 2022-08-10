@@ -2,17 +2,17 @@ import {
   AxelarQueryAPI,
   AxelarQueryAPIConfig,
   EvmChain,
-  GasToken,
+  GasToken
 } from '@axelar-network/axelarjs-sdk'
 import axios, { AxiosInstance } from 'axios'
 import { ethers } from 'ethers'
 import * as dotenv from 'dotenv'
 
-import { getTokenDataBySymbol } from './utils/getTokenDataBySymbol'
-import { Environments, IConfig, IGetTx, ITransaction } from './types'
+import { getTokenData } from './utils/getTokenData'
+import { Environments, IConfig, IGetRoute, IGetTx, ITransaction } from './types'
 
 import erc20Abi from './abi/erc20.json'
-import { getChainDataByName } from './utils/getChainDataByName'
+import { getChainData } from './utils/getChainData'
 
 dotenv.config()
 
@@ -28,15 +28,22 @@ class SquidSdk {
       baseURL: baseUrl,
       headers: {
         // 'api-key': config.apiKey
-      },
+      }
     })
     this.environment = config.environment
   }
 
+  public async getRoute(params: IGetRoute): Promise<unknown> {
+    console.log('> params: ', params)
+    const response = await this.axiosInstance.get('/api/quote', { params })
+
+    return response.data
+  }
+
   public async getTx(params: IGetTx): Promise<ITransaction> {
-    const tokenIn = getTokenDataBySymbol(params.srcTokenIn, this.environment)
-    const tokenOut = getTokenDataBySymbol(params.dstTokenOut, this.environment)
-    const srcChain = getChainDataByName(params.srcChain, this.environment)
+    const tokenIn = getTokenData(params.srcTokenIn, this.environment)
+    const tokenOut = getTokenData(params.dstTokenOut, this.environment)
+    const srcChain = getChainData(params.srcChain, this.environment)
 
     console.log('> tokenIn: ', tokenIn)
     console.log('> tokenOut: ', tokenOut)
@@ -53,7 +60,7 @@ class SquidSdk {
     }
 
     const response = await this.axiosInstance.get('/api/transaction', {
-      params,
+      params
     })
 
     console.log('> Route type: ', response.data.routeType)
@@ -62,7 +69,7 @@ class SquidSdk {
 
     // Set AxelarQueryAPI
     const sdk = new AxelarQueryAPI({
-      environment: this.environment as string,
+      environment: this.environment as string
     } as AxelarQueryAPIConfig)
 
     const gasFee = await sdk.estimateGasFee(
@@ -99,7 +106,7 @@ class SquidSdk {
     const tx: ITransaction = {
       to: squidContractAddress,
       data: response.data.data,
-      value: BigInt(gasFee), // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
+      value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     }
 
     return tx
