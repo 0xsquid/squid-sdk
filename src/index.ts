@@ -4,112 +4,152 @@ import {
   EvmChain,
   GasToken
 } from '@axelar-network/axelarjs-sdk'
-import axios, { AxiosInstance } from 'axios'
 import { ethers } from 'ethers'
+import axios, { AxiosInstance } from 'axios'
 import * as dotenv from 'dotenv'
 
-import { getTokenData } from './utils/getTokenData'
-import { Environments, IConfig, IGetRoute, IGetTx, ITransaction } from './types'
+import {
+  ChainsData,
+  Config,
+  ExecuteRoute,
+  GetRoute,
+  GetRouteResponse,
+  TokenData
+} from './types'
 
 import erc20Abi from './abi/erc20.json'
 import { getChainData } from './utils/getChainData'
+import { getTokenData } from './utils/getTokenData'
 
 dotenv.config()
 
-const squidContractAddress = process.env.squidContractAddress
 const baseUrl = process.env.baseUrl
 
 class SquidSdk {
   private axiosInstance: AxiosInstance
-  private environment: Environments
 
-  constructor(config: IConfig) {
+  public inited = false
+  public config: Config
+  public tokens: TokenData[] | undefined = undefined
+  public chains: ChainsData | undefined = undefined
+
+  constructor(config: Config) {
     this.axiosInstance = axios.create({
-      baseURL: baseUrl,
+      baseURL: config.baseUrl || baseUrl,
       headers: {
         // 'api-key': config.apiKey
       }
     })
-    this.environment = config.environment
+    this.config = config
   }
 
-  public async getRoute(params: IGetRoute): Promise<unknown> {
-    console.log('> params: ', params)
-    const response = await this.axiosInstance.get('/api/quote', { params })
-
-    return response.data
+  public async init() {
+    const response = await this.axiosInstance.get('/api/sdk-info', {
+      params: { env: this.config.environment }
+    })
+    this.tokens = response.data.data.tokens
+    this.chains = response.data.data.chains
+    this.inited = true
   }
 
-  public async getTx(params: IGetTx): Promise<ITransaction> {
-    const tokenIn = getTokenData(params.srcTokenIn, this.environment)
-    const tokenOut = getTokenData(params.dstTokenOut, this.environment)
-    const srcChain = getChainData(params.srcChain, this.environment)
+  public setConfig(config: Config) {
+    this.axiosInstance = axios.create({
+      baseURL: config.baseUrl || baseUrl,
+      headers: {
+        // 'api-key': config.apiKey
+      }
+    })
+    this.config = config
+  }
 
-    console.log('> tokenIn: ', tokenIn)
-    console.log('> tokenOut: ', tokenOut)
-    console.log('> srcChain: ', srcChain)
-
-    if (!tokenIn || !tokenOut) {
+  public async getRoute(params: GetRoute): Promise<GetRouteResponse> {
+    if (!this.inited) {
       throw new Error(
-        `Error: Token not found, srcTokenIn ${tokenIn?.name} dstTokenOut ${tokenOut?.name}`
+        'SquidSdk must be inited! Please call the SquidSdk.init method'
       )
     }
 
-    if (!srcChain) {
-      throw new Error(`Error: Chain not found ${params.srcChain}`)
+    const response = await this.axiosInstance.get('/api/route', { params })
+    return {
+      routeData: response.data.routeData,
+      transactionRequest: response.data.transactionRequest
+    }
+  }
+
+  public async executeRoute({
+    signer,
+    transactionRequest,
+    params
+  }: ExecuteRoute): Promise<ethers.providers.TransactionReceipt> {
+    if (!this.inited) {
+      throw new Error(
+        'SquidSdk must be inited! Please call the SquidSdk.init method'
+      )
     }
 
-    const response = await this.axiosInstance.get('/api/transaction', {
-      params
-    })
+    const srcChain = getChainData(this.chains as ChainsData, params.srcChain)
+    const srcToken = getTokenData(this.tokens as TokenData[], params.srcToken)
 
-    console.log('> Route type: ', response.data.routeType)
-    console.log('> Response: ', response.data)
-    console.log('> Destination gas: ', response.data.destChainGas)
+    if (!srcChain) {
+      throw new Error(`srcChain not found for ${params.srcChain}`)
+    }
 
-    // Set AxelarQueryAPI
+    if (!srcToken) {
+      throw new Error(`srcToken not found for ${params.srcToken}`)
+    }
+
+    const srcProvider = new ethers.providers.JsonRpcProvider(srcChain.rpc)
+
+    if (this.config.shouldApprove) {
+      const contract = new ethers.Contract(srcToken.address, erc20Abi, signer)
+      await contract.approve(srcChain.contracts.swapExecutor, params.amount)
+    }
+
+    if (this.config.shouldValidateApproval) {
+      const srcTokenContract = new ethers.Contract(
+        srcToken.address,
+        erc20Abi,
+        srcProvider
+      )
+
+      const allowance = await srcTokenContract.allowance(
+        params.recipientAddress,
+        srcChain.contracts.swapExecutor
+      )
+
+      console.log('> Source token allowance: ', allowance.toString())
+
+      if (allowance < params.amount) {
+        throw new Error(
+          `Error: Approved amount ${allowance} is less than send amount ${params.amount}`
+        )
+      }
+    }
+
     const sdk = new AxelarQueryAPI({
-      environment: this.environment as string
+      environment: this.config.environment as string
     } as AxelarQueryAPIConfig)
 
     const gasFee = await sdk.estimateGasFee(
       EvmChain.ETHEREUM,
       EvmChain.AVALANCHE,
       GasToken.ETH,
-      response.data.destChainGas
+      transactionRequest.dstChainGas
     )
 
-    console.log('> Gas Fee: ', gasFee)
-
-    const provider = new ethers.providers.JsonRpcProvider(srcChain.rpc)
-    const srcTokenContract = new ethers.Contract(
-      tokenIn.address,
-      erc20Abi,
-      provider
-    )
-
-    // Check source token allowance, needed for best user experience?
-    const allowance = await srcTokenContract.allowance(
-      params.recipientAddress,
-      squidContractAddress
-    )
-
-    console.log('> Source token allowance: ', allowance.toString())
-
-    if (allowance < params.srcInAmount) {
-      throw new Error(
-        `Error: Approved amount ${allowance} is less than send amount ${params.srcInAmount}`
-      )
-    }
-
-    // Construct transaction object with encoded data
-    const tx: ITransaction = {
-      to: squidContractAddress,
-      data: response.data.data,
+    const tx = {
+      to: srcChain.contracts.swapExecutor,
+      data: transactionRequest.data,
       value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     }
 
-    return tx
+    const signTxResponse = await signer.signTransaction(tx)
+    console.log('> signTxResponse: ', signTxResponse)
+    const sentTxResponse = await signer.sendTransaction(tx)
+    console.log('> sentTxResponse: ', sentTxResponse.hash)
+    const txReceipt = await sentTxResponse.wait(1)
+    console.log('> txReceipt: ', txReceipt.transactionHash)
+    return txReceipt
   }
 }
 

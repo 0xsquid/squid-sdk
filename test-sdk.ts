@@ -3,78 +3,78 @@ import { BigNumber, ethers } from 'ethers'
 import * as dotenv from 'dotenv'
 
 import SquidSdk from './src'
-import { Environments } from './src/types'
-import { ChainName } from './src/contants/chains'
+import { Environments, ChainName } from './src/types'
 
 dotenv.config()
 
-const sendAmount: BigNumber = ethers.utils.parseEther('1') //0.1 WETH
+const sendAmount: BigNumber = ethers.utils.parseEther('1') // 0.1 WETH
 // const aUSDC: BigNumber = ethers.utils.parseUnits('1', 6) // 1 aUSDC
 
 const privateKey = process.env.privateKey as string
-const ethRpcEndPoint = process.env.ethRpcEndPoint as string
+const ethRpcEndPoint = process.env.ethRpcEndPoint as string // be sure that rpc corresponds to env
 const recipientAddress = process.env.recipientAddress as string
 const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint)
 
 async function main() {
-  const wallet = new ethers.Wallet(privateKey, provider)
-  const squidSdk = new SquidSdk({ environment: Environments.LOCAL })
+  const signer = new ethers.Wallet(privateKey, provider)
+  const squidSdk = new SquidSdk({
+    environment: Environments.LOCAL,
+    shouldValidateApproval: true,
+    shouldApprove: true
+  })
+
+  await squidSdk.init()
+
+  console.log('> tokens: ', squidSdk.tokens)
+  console.log('> chains: ', squidSdk.chains)
 
   // trade-send
-  // const tx = await squidSdk.getTx({
+  // const params = {
   //   recipientAddress,
   //   srcChain: ChainName.ETHEREUM,
-  //   srcTokenIn: 'WETH',
-  //   srcInAmount: sendAmount,
+  //   srcToken: 'WETH',
+  //   amount: sendAmount.toString(),
   //   dstChain: ChainName.AVALANCHE,
-  //   dstTokenOut: 'axlUSDC',
+  //   dstToken: 'axlUSDC',
   //   slippage: 1,
-  // })
+  //   env: Environments.LOCAL
+  // }
 
   // trade-send-trade
-  const tx = await squidSdk.getTx({
+  const params = {
     recipientAddress,
     srcChain: ChainName.ETHEREUM,
-    srcTokenIn: 'WETH',
-    srcInAmount: sendAmount.toString(),
+    srcToken: 'WETH',
+    amount: sendAmount.toString(),
     dstChain: ChainName.AVALANCHE,
-    dstTokenOut: 'WAVAX',
+    dstToken: 'WAVAX',
     slippage: 1,
-  })
+    env: Environments.LOCAL
+  }
 
   // send-trade
-  // const tx = await squidSdk.getTx({
+  // const params = {
   //   recipientAddress,
   //   srcChain: ChainName.ETHEREUM,
-  //   srcTokenIn: 'aUSDC',
-  //   srcInAmount: aUSDC,
+  //   srcToken: 'aUSDC',
+  //   amount: aUSDC,
   //   dstChain: ChainName.AVALANCHE,
-  //   dstTokenOut: 'axlUSDC',
+  //   dstToken: 'axlUSDC',
   //   slippage: 1,
-  // })
+  //   env: Environments.LOCAL
+  // }
 
-  console.log('> tx: ', tx)
+  const getRouteData = await squidSdk.getRoute(params)
 
-  const signTxResponse = await wallet.signTransaction(tx)
-  console.log('> signTxResponse: ', signTxResponse)
-  const sentTxResponse = await wallet.sendTransaction(tx)
-  console.log('> sentTxResponse: ', sentTxResponse.hash)
-  const txReceipt = await sentTxResponse.wait(1)
-  console.log('> txReceipt: ', txReceipt.transactionHash)
-}
+  console.log('> getRouteData: ', getRouteData)
 
-async function getRoute() {
-  const squidSdk = new SquidSdk({ environment: Environments.LOCAL })
-
-  const data = await squidSdk.getRoute({
-    srcChain: ChainName.ETHEREUM,
-    srcToken: 'WETH',
-    destChain: ChainName.AVALANCHE,
-    destToken: 'WAVAX',
-    amount: sendAmount.toString(),
+  const executedRoute = await squidSdk.executeRoute({
+    signer,
+    transactionRequest: getRouteData.transactionRequest,
+    params
   })
 
-  console.log('> data: ', data)
+  console.log('> executedRoute: ', executedRoute)
 }
 
 main()
