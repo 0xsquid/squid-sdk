@@ -3,7 +3,7 @@ import { BigNumber, ethers } from 'ethers'
 import * as dotenv from 'dotenv'
 
 import SquidSdk from './src'
-import { Environments, ChainName } from './src/types'
+import { Environments } from './src/types'
 
 dotenv.config()
 
@@ -25,17 +25,17 @@ async function main() {
 
   await squidSdk.init()
 
-  console.log('> tokens: ', squidSdk.tokens)
-  console.log('> chains: ', squidSdk.chains)
+  // console.log('> tokens: ', squidSdk.tokens)
+  // console.log('> chains: ', squidSdk.chains)
 
   // trade-send
   // const params = {
   //   recipientAddress,
-  //   srcChain: ChainName.ETHEREUM,
-  //   srcToken: 'WETH',
-  //   amount: sendAmount.toString(),
-  //   dstChain: ChainName.AVALANCHE,
-  //   dstToken: 'axlUSDC',
+  //   sourceChainId: 1, // ChainName.ETHEREUM,
+  //   sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WETH')?.address as string,
+  //   sourceAmount: sendAmount.toString(),
+  //   destinationChainId: 43114, // ChainName.AVALANCHE,
+  //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
   //   slippage: 1,
   //   env: Environments.LOCAL
   // }
@@ -43,11 +43,13 @@ async function main() {
   // trade-send-trade
   const params = {
     recipientAddress,
-    srcChain: ChainName.ETHEREUM,
-    srcToken: 'WETH',
-    amount: sendAmount.toString(),
-    dstChain: ChainName.AVALANCHE,
-    dstToken: 'WAVAX',
+    sourceChainId: 1, // ChainName.ETHEREUM,
+    sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WETH')
+      ?.address as string,
+    sourceAmount: sendAmount.toString(),
+    destinationChainId: 43114, // ChainName.AVALANCHE,
+    destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WAVAX')
+      ?.address as string,
     slippage: 1,
     env: Environments.LOCAL
   }
@@ -55,23 +57,22 @@ async function main() {
   // send-trade
   // const params = {
   //   recipientAddress,
-  //   srcChain: ChainName.ETHEREUM,
-  //   srcToken: 'aUSDC',
-  //   amount: aUSDC,
-  //   dstChain: ChainName.AVALANCHE,
-  //   dstToken: 'axlUSDC',
+  //   sourceChainId: 1, // ChainName.ETHEREUM,
+  //   sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'aUSDC')?.address as string,
+  //   sourceAmount: aUSDC,
+  //   destinationChainId: 43114, // ChainName.AVALANCHE,
+  //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
   //   slippage: 1,
   //   env: Environments.LOCAL
   // }
 
-  const getRouteData = await squidSdk.getRoute(params)
+  const { route } = await squidSdk.getRoute(params)
 
-  console.log('> getRouteData: ', getRouteData)
+  console.log('> route: ', route)
 
   const executedRoute = await squidSdk.executeRoute({
     signer,
-    transactionRequest: getRouteData.transactionRequest,
-    params
+    route
   })
 
   console.log('> executedRoute: ', executedRoute)

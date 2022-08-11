@@ -71,57 +71,70 @@ class SquidSdk {
 
     const response = await this.axiosInstance.get('/api/route', { params })
     return {
-      routeData: response.data.routeData,
-      transactionRequest: response.data.transactionRequest
+      route: response.data.route
     }
   }
 
   public async executeRoute({
     signer,
-    transactionRequest,
-    params
+    route
   }: ExecuteRoute): Promise<ethers.providers.TransactionReceipt> {
+    const { transactionRequest, params } = route
+
     if (!this.inited) {
       throw new Error(
         'SquidSdk must be inited! Please call the SquidSdk.init method'
       )
     }
 
-    const srcChain = getChainData(this.chains as ChainsData, params.srcChain)
-    const srcToken = getTokenData(this.tokens as TokenData[], params.srcToken)
+    const sourceChain = getChainData(
+      this.chains as ChainsData,
+      params.sourceChainId
+    )
+    const sourceToken = getTokenData(
+      this.tokens as TokenData[],
+      params.sourceTokenAddress
+    )
 
-    if (!srcChain) {
-      throw new Error(`srcChain not found for ${params.srcChain}`)
+    if (!sourceChain) {
+      throw new Error(`sourceChain not found for ${params.sourceChainId}`)
     }
 
-    if (!srcToken) {
-      throw new Error(`srcToken not found for ${params.srcToken}`)
+    if (!sourceToken) {
+      throw new Error(`sourceToken not found for ${params.sourceTokenAddress}`)
     }
 
-    const srcProvider = new ethers.providers.JsonRpcProvider(srcChain.rpc)
+    const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc)
 
     if (this.config.shouldApprove) {
-      const contract = new ethers.Contract(srcToken.address, erc20Abi, signer)
-      await contract.approve(srcChain.contracts.swapExecutor, params.amount)
+      const contract = new ethers.Contract(
+        sourceToken.address,
+        erc20Abi,
+        signer
+      )
+      await contract.approve(
+        sourceChain.contracts.swapExecutor,
+        params.sourceAmount
+      )
     }
 
     if (this.config.shouldValidateApproval) {
       const srcTokenContract = new ethers.Contract(
-        srcToken.address,
+        sourceToken.address,
         erc20Abi,
         srcProvider
       )
 
       const allowance = await srcTokenContract.allowance(
         params.recipientAddress,
-        srcChain.contracts.swapExecutor
+        sourceChain.contracts.swapExecutor
       )
 
       console.log('> Source token allowance: ', allowance.toString())
 
-      if (allowance < params.amount) {
+      if (allowance < params.sourceAmount) {
         throw new Error(
-          `Error: Approved amount ${allowance} is less than send amount ${params.amount}`
+          `Error: Approved sourceAmount ${allowance} is less than send sourceAmount ${params.sourceAmount}`
         )
       }
     }
@@ -134,11 +147,11 @@ class SquidSdk {
       EvmChain.ETHEREUM,
       EvmChain.AVALANCHE,
       GasToken.ETH,
-      transactionRequest.dstChainGas
+      transactionRequest.destinationChainGas
     )
 
     const tx = {
-      to: srcChain.contracts.swapExecutor,
+      to: sourceChain.contracts.swapExecutor,
       data: transactionRequest.data,
       value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     }
