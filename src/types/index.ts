@@ -1,3 +1,5 @@
+import { ethers } from 'ethers'
+
 export enum Environments {
   LOCAL = 'local',
   TESTNET = 'testnet',
@@ -8,6 +10,10 @@ export enum ChainName {
   ETHEREUM = 'Ethereum',
   AVALANCHE = 'Avalanche',
   MOONBEAM = 'Moonbeam'
+}
+
+export type MapChainIdName = {
+  [key: number]: ChainName
 }
 
 export type ChainData = {
@@ -31,29 +37,13 @@ export type ChainData = {
   }
 }
 
-export interface ChainsData {
-  [Environments.LOCAL]: {
-    [ChainName.ETHEREUM]: ChainData
-    [ChainName.AVALANCHE]: ChainData
-    [ChainName.MOONBEAM]: ChainData
-  }
-  [Environments.TESTNET]: {
-    [ChainName.ETHEREUM]: ChainData
-    [ChainName.AVALANCHE]: ChainData
-    [ChainName.MOONBEAM]: ChainData
-  }
-  [Environments.MAINNET]: {
-    [ChainName.ETHEREUM]: ChainData
-    [ChainName.AVALANCHE]: ChainData
-    [ChainName.MOONBEAM]: ChainData
-  }
+export type ChainsData = {
+  [ChainName.ETHEREUM]: ChainData
+  [ChainName.AVALANCHE]: ChainData
+  [ChainName.MOONBEAM]: ChainData
 }
 
-export type MapChainIdName = {
-  [key: number]: ChainName
-}
-
-export interface ITokenData {
+export type TokenData = {
   chainId: number
   address: string
   name: string
@@ -64,32 +54,45 @@ export interface ITokenData {
   logoURI: string
 }
 
-export interface IConfig {
+export type Config = {
   apiKey?: string
   environment: Environments
+  shouldApprove?: boolean
+  shouldValidateApproval?: boolean
+  baseUrl?: string
 }
 
-export interface IGetRoute {
-  srcChain: string
+export type GetRoute = {
+  srcChain: ChainName | number
+  dstChain: ChainName | number
   srcToken: string
-  destChain: string
-  destToken: string
+  dstToken: string
   amount: string
-}
-
-export interface IGetTx {
   recipientAddress: string
-  srcChain: ChainName
-  srcTokenIn: string
-  srcInAmount: string
-  dstChain: ChainName
-  dstTokenOut: string
-  slippage: number // validate usage
+  slippage: number
+  env: Environments
 }
 
-// this interface should be imported from ethers?
-export interface ITransaction {
-  to?: string
-  data?: ArrayLike<number>
-  value?: bigint
+export type RouteData = {
+  amount: string
+  sendDstAmount: number
+  swapDstAmount: string
+}
+
+export type TransactionRequest = {
+  routeType: string
+  gasReceiver: boolean
+  data: string
+  dstChainGas: number
+}
+
+export type GetRouteResponse = {
+  routeData: RouteData
+  transactionRequest: TransactionRequest
+}
+
+export type ExecuteRoute = {
+  signer: ethers.Wallet
+  transactionRequest: TransactionRequest
+  params: GetRoute
 }

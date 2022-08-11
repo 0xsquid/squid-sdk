@@ -1,12 +1,11 @@
-import { supportedTokens } from '../contants/tokens'
-import { Environments, ITokenData } from '../types'
+import { TokenData } from '../types'
 
 /**
- * @param {string} symbol could be an enum as it's more rubost validation
- * @param {Environments} env
+ * @param {TokenData} tokens
+ * @param {string} token
  */
 export const getTokenData = (
-  token: string,
-  env: Environments
-): ITokenData | undefined =>
-  supportedTokens[env].find(e => e.symbol === token || e.address === token)
+  tokens: TokenData[],
+  token: string
+): TokenData | undefined =>
+  tokens.find(e => e.symbol === token || e.address === token)
