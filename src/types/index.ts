@@ -63,36 +63,40 @@ export type Config = {
 }
 
 export type GetRoute = {
-  srcChain: ChainName | number
-  dstChain: ChainName | number
-  srcToken: string
-  dstToken: string
-  amount: string
+  sourceChainId: number
+  destinationChainId: number
+  sourceTokenAddress: string
+  destinationTokenAddress: string
+  sourceAmount: string
   recipientAddress: string
   slippage: number
   env: Environments
 }
 
 export type RouteData = {
-  amount: string
-  sendDstAmount: number
-  swapDstAmount: string
+  sourceAmount: string
+  sendDestinationAmount: number
+  swapDestinationAmount: string
 }
 
 export type TransactionRequest = {
   routeType: string
   gasReceiver: boolean
   data: string
-  dstChainGas: number
+  destinationChainGas: number
+}
+
+export type Route = {
+  routeData: RouteData
+  transactionRequest: TransactionRequest
+  params: GetRoute
 }
 
 export type GetRouteResponse = {
-  routeData: RouteData
-  transactionRequest: TransactionRequest
+  route: Route
 }
 
 export type ExecuteRoute = {
   signer: ethers.Wallet
-  transactionRequest: TransactionRequest
-  params: GetRoute
+  route: Route
 }
