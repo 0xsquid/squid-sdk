@@ -2,3 +2,6 @@ node_modules
 .env
 .env.testnet
 .env.localfork
+.env.test
+.env.eth
+.env.etheth

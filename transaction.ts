@@ -22,9 +22,9 @@ const recipientAddress = process.env.recipientAddress!;
 const baseUrl = process.env.baseUrl!;
 
 //route types
-const tradeSendUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=Avalanche&dstTokenOut=axlUSDC&slippage=1`;
+const tradeSendUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=Avalanche&dstTokenOut=aUSDC&slippage=1`;
 const tradeSendTradeUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=WETH&srcInAmount=${sendAmount}&dstChain=Avalanche&dstTokenOut=WAVAX&slippage=1`;
-const sendTradeUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=USDC&srcInAmount=${aUSDC}&dstChain=Avalanche&dstTokenOut=WAVAX&slippage=1`;
+const sendTradeUrl: string = `${baseUrl}/api/transaction?recipientAddress=${recipientAddress}&srcChain=Ethereum&srcTokenIn=aUSDC&srcInAmount=${aUSDC}&dstChain=Avalanche&dstTokenOut=WAVAX&slippage=1`;
 
 async function main(_url: string) {
   console.log("starting script");
@@ -83,6 +83,7 @@ async function main(_url: string) {
 }
 //tradeSendTradeUrl
 //sendTradeUrl
+//tradeSendUrl
 main(sendTradeUrl) // pass in different urls with query strings for route types
   .then(() => process.exit(0))
   .catch((error) => {
