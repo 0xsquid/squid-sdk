@@ -105,8 +105,20 @@ class SquidSdk {
     }
 
     const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc)
+    const srcTokenContract = new ethers.Contract(
+      sourceToken.address,
+      erc20Abi,
+      srcProvider
+    )
 
-    if (this.config.shouldApprove) {
+    const allowance = await srcTokenContract.allowance(
+      params.recipientAddress,
+      sourceChain.contracts.swapExecutor
+    )
+
+    console.log('> Source token allowance: ', allowance.toString())
+
+    if (allowance < params.sourceAmount) {
       const contract = new ethers.Contract(
         sourceToken.address,
         erc20Abi,
@@ -116,27 +128,6 @@ class SquidSdk {
         sourceChain.contracts.swapExecutor,
         params.sourceAmount
       )
-    }
-
-    if (this.config.shouldValidateApproval) {
-      const srcTokenContract = new ethers.Contract(
-        sourceToken.address,
-        erc20Abi,
-        srcProvider
-      )
-
-      const allowance = await srcTokenContract.allowance(
-        params.recipientAddress,
-        sourceChain.contracts.swapExecutor
-      )
-
-      console.log('> Source token allowance: ', allowance.toString())
-
-      if (allowance < params.sourceAmount) {
-        throw new Error(
-          `Error: Approved sourceAmount ${allowance} is less than send sourceAmount ${params.sourceAmount}`
-        )
-      }
     }
 
     const sdk = new AxelarQueryAPI({

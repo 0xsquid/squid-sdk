@@ -3,7 +3,7 @@ import { BigNumber, ethers } from 'ethers'
 import * as dotenv from 'dotenv'
 
 import SquidSdk from './src'
-import { Environments } from './src/types'
+import { Environment } from './src/types'
 
 dotenv.config()
 
@@ -18,15 +18,13 @@ const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint)
 async function main() {
   const signer = new ethers.Wallet(privateKey, provider)
   const squidSdk = new SquidSdk({
-    environment: Environments.LOCAL,
-    shouldValidateApproval: true,
-    shouldApprove: true
+    environment: Environment.LOCAL
   })
 
   await squidSdk.init()
 
-  // console.log('> tokens: ', squidSdk.tokens)
-  // console.log('> chains: ', squidSdk.chains)
+  console.log('> tokens: ', squidSdk.tokens)
+  console.log('> chains: ', squidSdk.chains)
 
   // trade-send
   // const params = {
@@ -37,7 +35,7 @@ async function main() {
   //   destinationChainId: 43114, // ChainName.AVALANCHE,
   //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
   //   slippage: 1,
-  //   env: Environments.LOCAL
+  //   env: Environment.LOCAL
   // }
 
   // trade-send-trade
@@ -51,7 +49,7 @@ async function main() {
     destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WAVAX')
       ?.address as string,
     slippage: 1,
-    env: Environments.LOCAL
+    env: Environment.LOCAL
   }
 
   // send-trade
@@ -63,7 +61,7 @@ async function main() {
   //   destinationChainId: 43114, // ChainName.AVALANCHE,
   //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
   //   slippage: 1,
-  //   env: Environments.LOCAL
+  //   env: Environment.LOCAL
   // }
 
   const { route } = await squidSdk.getRoute(params)

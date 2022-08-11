@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-export enum Environments {
+export enum Environment {
   LOCAL = 'local',
   TESTNET = 'testnet',
   MAINNET = 'mainnet'
@@ -56,7 +56,7 @@ export type TokenData = {
 
 export type Config = {
   apiKey?: string
-  environment: Environments
+  environment: Environment
   shouldApprove?: boolean
   shouldValidateApproval?: boolean
   baseUrl?: string
@@ -70,7 +70,7 @@ export type GetRoute = {
   sourceAmount: string
   recipientAddress: string
   slippage: number
-  env: Environments
+  env: Environment
 }
 
 export type RouteData = {
