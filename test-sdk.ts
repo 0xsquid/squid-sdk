@@ -23,8 +23,8 @@ async function main() {
 
   await squidSdk.init()
 
-  console.log('> tokens: ', squidSdk.tokens)
-  console.log('> chains: ', squidSdk.chains)
+  // console.log('> tokens: ', squidSdk.tokens)
+  // console.log('> chains: ', squidSdk.chains)
 
   // trade-send
   // const params = {
