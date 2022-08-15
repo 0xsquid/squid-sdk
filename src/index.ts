@@ -47,6 +47,7 @@ class SquidSdk {
     const response = await this.axiosInstance.get('/api/sdk-info', {
       params: { env: this.config.environment }
     })
+
     this.tokens = response.data.data.tokens
     this.chains = response.data.data.chains
     this.inited = true
@@ -70,6 +71,7 @@ class SquidSdk {
     }
 
     const response = await this.axiosInstance.get('/api/route', { params })
+
     return {
       route: response.data.route
     }
@@ -95,6 +97,10 @@ class SquidSdk {
       this.tokens as TokenData[],
       params.sourceTokenAddress
     )
+    const destinationChain = getChainData(
+      this.chains as ChainsData,
+      params.destinationChainId
+    )
 
     if (!sourceChain) {
       throw new Error(`sourceChain not found for ${params.sourceChainId}`)
@@ -102,6 +108,12 @@ class SquidSdk {
 
     if (!sourceToken) {
       throw new Error(`sourceToken not found for ${params.sourceTokenAddress}`)
+    }
+
+    if (!destinationChain) {
+      throw new Error(
+        `destinationChain not found for ${params.destinationChainId}`
+      )
     }
 
     const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc)
@@ -115,8 +127,6 @@ class SquidSdk {
       params.recipientAddress,
       sourceChain.contracts.swapExecutor
     )
-
-    console.log('> Source token allowance: ', allowance.toString())
 
     if (allowance < params.sourceAmount) {
       const contract = new ethers.Contract(
@@ -135,8 +145,8 @@ class SquidSdk {
     } as AxelarQueryAPIConfig)
 
     const gasFee = await sdk.estimateGasFee(
-      EvmChain.ETHEREUM,
-      EvmChain.AVALANCHE,
+      sourceChain?.name as EvmChain, // EvmChain.ETHEREUM,
+      destinationChain?.name as EvmChain, // EvmChain.AVALANCHE,
       GasToken.ETH,
       transactionRequest.destinationChainGas
     )
@@ -147,12 +157,10 @@ class SquidSdk {
       value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     }
 
-    const signTxResponse = await signer.signTransaction(tx)
-    console.log('> signTxResponse: ', signTxResponse)
+    await signer.signTransaction(tx)
     const sentTxResponse = await signer.sendTransaction(tx)
-    console.log('> sentTxResponse: ', sentTxResponse.hash)
     const txReceipt = await sentTxResponse.wait(1)
-    console.log('> txReceipt: ', txReceipt.transactionHash)
+
     return txReceipt
   }
 }
