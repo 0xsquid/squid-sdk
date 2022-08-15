@@ -1,7 +1,13 @@
+import axios from 'axios'
+
 import { Environment } from '../types'
 import SquidSdk from '../index'
 
 jest.mock('axios')
+
+// const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
+//   get: jest.fn()
+// })
 
 describe('SquidSdk', () => {
   it('should instance SquidSdk as expected', async () => {
@@ -34,6 +40,22 @@ describe('SquidSdk', () => {
       expect(squidSdk.config).toStrictEqual({
         environment: Environment.TESTNET
       })
+    })
+  })
+
+  describe('axios module', () => {
+    it('get', async () => {
+      const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
+        get: jest.fn().mockResolvedValue({ data: 'some data on test' })
+      })
+
+      const squidSdk = new SquidSdk({
+        environment: Environment.LOCAL
+      })
+
+      await squidSdk.init()
+
+      console.log('> squidsdk: ', squidSdk.chains)
     })
   })
 })
