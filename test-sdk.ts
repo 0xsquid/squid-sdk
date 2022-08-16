@@ -68,12 +68,16 @@ async function main() {
 
   console.log('> route: ', route)
 
-  const executedRoute = await squidSdk.executeRoute({
+  const tx = await squidSdk.executeRoute({
     signer,
     route
   })
 
-  console.log('> executedRoute: ', executedRoute)
+  console.log('> tx: ', tx)
+
+  const txReceipt = await tx.wait(1)
+
+  console.log('> txReceipt: ', txReceipt)
 }
 
 main()

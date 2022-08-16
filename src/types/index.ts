@@ -16,24 +16,42 @@ export type MapChainIdName = {
   [key: number]: ChainName
 }
 
-export type ChainData = {
-  rpc: string
-  networkName: string
+export type squidConfig = {
+  type: string
   chainId: number
-  name: string
-  symbol: string
-  decimals: number
-  icon: string
-  estimatedGas: number
-  contracts: {
-    gateway: string // axelar gateway contract
-    swapExecutor: string // squidswap contracts
-    router: string // swap router address uniswap etc
-    axelarDefaultCrosschain: string // USDC
-    wrappedNativeToken: string // WETH
-    distributionEnsExecutable: string // DistributionENSExecutable.sol
-    multicall: string // batch read transactions,
+  gasUsage: number
+}
+
+export type ChainData = {
+  chainType: string
+  chainId: number
+  networkName: string
+  rpc: string
+  blockExplorerUrls: string[]
+  nativeCurrency: {
+    name: string
+    symbol: string
+    decimals: number
+    icon: string
+  }
+  squidConfig: squidConfig[]
+  chainNativeContracts: {
+    wrappedNativeToken: string
+    distributionEnsExecutable: string
     ensRegistry: string
+    multicall: string
+  }
+  axelarContracts: {
+    gateway: string
+    forecallable: string
+  }
+  squidContracts: {
+    squidMain: string
+    defaultCrosschainToken: string
+  }
+  integrationContracts: {
+    dexUniswapV2: string
+    dexCurve: string
   }
 }
 
