@@ -27,42 +27,46 @@ async function main() {
   // console.log('> chains: ', squidSdk.chains)
 
   // trade-send
-  // const params = {
-  //   recipientAddress,
-  //   sourceChainId: 1, // ChainName.ETHEREUM,
-  //   sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WETH')?.address as string,
-  //   sourceAmount: sendAmount.toString(),
-  //   destinationChainId: 43114, // ChainName.AVALANCHE,
-  //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
-  //   slippage: 1,
-  //   env: Environment.LOCAL
-  // }
-
-  // trade-send-trade
   const params = {
     recipientAddress,
-    sourceChainId: 1, // ChainName.ETHEREUM,
+    sourceChainId: 1,
     sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WETH')
       ?.address as string,
     sourceAmount: sendAmount.toString(),
-    destinationChainId: 43114, // ChainName.AVALANCHE,
-    destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WAVAX')
+    destinationChainId: 1284,
+    destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')
       ?.address as string,
     slippage: 1,
     env: Environment.LOCAL
   }
 
+  // trade-send-trade
+  // const params = {
+  //   recipientAddress,
+  //   sourceChainId: 1,
+  //   sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WETH')
+  //     ?.address as string,
+  //   sourceAmount: sendAmount.toString(),
+  //   destinationChainId: 43114,
+  //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'WAVAX')
+  //     ?.address as string,
+  //   slippage: 1,
+  //   env: Environment.LOCAL
+  // }
+
   // send-trade
   // const params = {
   //   recipientAddress,
-  //   sourceChainId: 1, // ChainName.ETHEREUM,
+  //   sourceChainId: 1,
   //   sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'aUSDC')?.address as string,
   //   sourceAmount: aUSDC,
-  //   destinationChainId: 43114, // ChainName.AVALANCHE,
+  //   destinationChainId: 43114,
   //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
   //   slippage: 1,
   //   env: Environment.LOCAL
   // }
+
+  console.log('> params: ', params)
 
   const { route } = await squidSdk.getRoute(params)
 
