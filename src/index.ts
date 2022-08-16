@@ -80,7 +80,7 @@ class SquidSdk {
   public async executeRoute({
     signer,
     route
-  }: ExecuteRoute): Promise<ethers.providers.TransactionReceipt> {
+  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
     const { transactionRequest, params } = route
 
     if (!this.inited) {
@@ -125,7 +125,7 @@ class SquidSdk {
 
     const allowance = await srcTokenContract.allowance(
       params.recipientAddress,
-      sourceChain.contracts.swapExecutor
+      sourceChain.squidContracts.squidMain
     )
 
     if (allowance < params.sourceAmount) {
@@ -135,7 +135,7 @@ class SquidSdk {
         signer
       )
       await contract.approve(
-        sourceChain.contracts.swapExecutor,
+        sourceChain.squidContracts.squidMain,
         params.sourceAmount
       )
     }
@@ -145,23 +145,20 @@ class SquidSdk {
     } as AxelarQueryAPIConfig)
 
     const gasFee = await sdk.estimateGasFee(
-      sourceChain?.name as EvmChain, // EvmChain.ETHEREUM,
-      destinationChain?.name as EvmChain, // EvmChain.AVALANCHE,
+      sourceChain?.nativeCurrency.name as EvmChain, // EvmChain.ETHEREUM,
+      destinationChain?.nativeCurrency.name as EvmChain, // EvmChain.AVALANCHE,
       GasToken.ETH,
       transactionRequest.destinationChainGas
     )
 
     const tx = {
-      to: sourceChain.contracts.swapExecutor,
+      to: sourceChain.squidContracts.squidMain,
       data: transactionRequest.data,
       value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     }
 
     await signer.signTransaction(tx)
-    const sentTxResponse = await signer.sendTransaction(tx)
-    const txReceipt = await sentTxResponse.wait(1)
-
-    return txReceipt
+    return await signer.sendTransaction(tx)
   }
 }
 
