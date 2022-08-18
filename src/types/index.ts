@@ -75,8 +75,6 @@ export type TokenData = {
 export type Config = {
   apiKey?: string
   environment: Environment
-  shouldApprove?: boolean
-  shouldValidateApproval?: boolean
   baseUrl?: string
 }
 
