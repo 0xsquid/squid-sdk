@@ -45,11 +45,11 @@ describe("SquidSdk", () => {
 
   describe("axios module", () => {
     it("get", async () => {
-      const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
-        get: jest.fn().mockResolvedValue({
-          data: { status: true, data: { chains: [], tokens: [] } }
-        })
-      });
+      // const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
+      //   get: jest.fn().mockResolvedValue({
+      //     data: { status: true, data: { chains: [], tokens: [] } }
+      //   })
+      // });
 
       const squidSdk = new SquidSdk({
         environment: Environment.LOCAL

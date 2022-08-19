@@ -1,4 +1,4 @@
-import { ChainName, MapChainIdName } from '../types'
+import { ChainName, MapChainIdName } from "../types";
 
 export const mapChainIdName: MapChainIdName = {
   1: ChainName.ETHEREUM,
@@ -7,4 +7,4 @@ export const mapChainIdName: MapChainIdName = {
   43114: ChainName.AVALANCHE,
   1287: ChainName.MOONBEAM,
   1284: ChainName.MOONBEAM
-}
+};

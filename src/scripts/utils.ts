@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import SquidSdk from "../index";
-import { Environment, GetRoute, ChainName, ChainData } from "../types";
+import { GetRoute, ChainName } from "../types";
 import * as assert from "assert";
 
 import * as dotenv from "dotenv";
