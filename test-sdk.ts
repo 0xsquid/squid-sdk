@@ -79,7 +79,7 @@ async function main() {
 
   console.log('> tx: ', tx)
 
-  const txReceipt = await tx.wait(1)
+  const txReceipt = await tx.wait()
 
   console.log('> txReceipt: ', txReceipt)
 }

@@ -160,6 +160,52 @@ class SquidSdk {
     await signer.signTransaction(tx)
     return await signer.sendTransaction(tx)
   }
+
+  public async allowance(params: any) {
+    const { owner, spender, tokenAddress } = params
+
+    const token = getTokenData(this.tokens as TokenData[], tokenAddress)
+    if (!token) {
+      throw new Error('Unsupported token')
+    }
+
+    const chain = getChainData(
+      this.chains as ChainsData,
+      token?.chainId as number
+    )
+    if (!chain) {
+      throw new Error('Unsupported chain')
+    }
+
+    const provider = new ethers.providers.JsonRpcProvider(chain.rpc)
+    const contract = new ethers.Contract(token.address, erc20Abi, provider)
+
+    return await contract.allowance(owner, spender)
+  }
+
+  public async approve(params: any) {
+    const { signer, spender, tokenAddress, amount } = params
+
+    const token = getTokenData(this.tokens as TokenData[], tokenAddress)
+    if (!token) {
+      throw new Error('Unsupported token')
+    }
+
+    const chain = getChainData(
+      this.chains as ChainsData,
+      token?.chainId as number
+    )
+    if (!chain) {
+      throw new Error('Unsupported chain')
+    }
+
+    const contract = new ethers.Contract(token.address, erc20Abi, signer)
+    return await contract.approve(
+      spender,
+      amount ||
+        '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+    )
+  }
 }
 
 export default SquidSdk
