@@ -193,7 +193,9 @@ class SquidSdk {
     return await contract.allowance(owner, spender);
   }
 
-  public async approve(params: Approve): Promise<unknown> {
+  public async approve(
+    params: Approve
+  ): Promise<ethers.providers.TransactionResponse> {
     const { signer, spender, tokenAddress, amount } = params;
 
     const token = getTokenData(this.tokens as TokenData[], tokenAddress);
