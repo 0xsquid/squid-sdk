@@ -43,7 +43,7 @@ const getSDK = (env: Environment): SquidSdk => {
     await tradeSendAvalance(squidSdk);
     await tradeSendMoonbeam(squidSdk);
 
-    console.log(`\n> Running TradeSendTrade`);
+    console.log(`\n> Running TradeSendTrade`); // TODO: REVIEW WHY SOMETIMES TRADESENDTRADES FAILS
     await tradeSendTradeEthereum(squidSdk);
     await tradeSendTradeAvalance(squidSdk);
     await tradeSendTradeMoonbeam(squidSdk);
