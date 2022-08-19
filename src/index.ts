@@ -120,33 +120,43 @@ class SquidSdk {
       srcProvider
     );
 
+    const sourceAmount = BigInt(params.sourceAmount);
     const allowance = await srcTokenContract.allowance(
-      params.recipientAddress,
+      signer.address,
       sourceChain.squidContracts.squidMain
     );
 
-    if (allowance < params.sourceAmount) {
-      const contract = new ethers.Contract(
-        sourceToken.address,
-        erc20Abi,
-        signer
+    const balance = await srcTokenContract.balanceOf(signer.address);
+    if (balance < BigInt(params.sourceAmount)) {
+      throw new Error(
+        `Insufficent funds for accout: ${signer.address} on ${params.sourceChainId}`
       );
-      await contract.approve(
-        sourceChain.squidContracts.squidMain,
-        params.sourceAmount
-      );
+    }
+
+    if (allowance < sourceAmount) {
+      const approveTx = await srcTokenContract
+        .connect(signer)
+        .approve(sourceChain.squidContracts.squidMain, sourceAmount);
+      await approveTx.wait();
     }
 
     const sdk = new AxelarQueryAPI({
       environment: this.config.environment as string
     } as AxelarQueryAPIConfig);
 
-    const gasFee = await sdk.estimateGasFee(
-      sourceChain?.nativeCurrency.name as EvmChain, // EvmChain.ETHEREUM,
-      destinationChain?.nativeCurrency.name as EvmChain, // EvmChain.AVALANCHE,
-      GasToken.ETH,
-      transactionRequest.destinationChainGas
-    );
+    let gasFee;
+    try {
+      gasFee = await sdk.estimateGasFee(
+        sourceChain?.nativeCurrency.name as EvmChain, // EvmChain.ETHEREUM,
+        destinationChain?.nativeCurrency.name as EvmChain, // EvmChain.AVALANCHE,
+        GasToken.ETH,
+        transactionRequest.destinationChainGas
+      );
+    } catch (error) {
+      //TODO we need a backup
+      console.warn("error: fetching gasFee:", error);
+      gasFee = 3e7;
+    }
 
     const tx = {
       to: sourceChain.squidContracts.squidMain,
@@ -154,54 +164,53 @@ class SquidSdk {
       value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     };
 
-    await signer.signTransaction(tx);
     return await signer.sendTransaction(tx);
   }
 
   public async allowance(params: any) {
-    const { owner, spender, tokenAddress } = params
+    const { owner, spender, tokenAddress } = params;
 
-    const token = getTokenData(this.tokens as TokenData[], tokenAddress)
+    const token = getTokenData(this.tokens as TokenData[], tokenAddress);
     if (!token) {
-      throw new Error('Unsupported token')
+      throw new Error("Unsupported token");
     }
 
     const chain = getChainData(
       this.chains as ChainsData,
       token?.chainId as number
-    )
+    );
     if (!chain) {
-      throw new Error('Unsupported chain')
+      throw new Error("Unsupported chain");
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpc)
-    const contract = new ethers.Contract(token.address, erc20Abi, provider)
+    const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
+    const contract = new ethers.Contract(token.address, erc20Abi, provider);
 
-    return await contract.allowance(owner, spender)
+    return await contract.allowance(owner, spender);
   }
 
   public async approve(params: any) {
-    const { signer, spender, tokenAddress, amount } = params
+    const { signer, spender, tokenAddress, amount } = params;
 
-    const token = getTokenData(this.tokens as TokenData[], tokenAddress)
+    const token = getTokenData(this.tokens as TokenData[], tokenAddress);
     if (!token) {
-      throw new Error('Unsupported token')
+      throw new Error("Unsupported token");
     }
 
     const chain = getChainData(
       this.chains as ChainsData,
       token?.chainId as number
-    )
+    );
     if (!chain) {
-      throw new Error('Unsupported chain')
+      throw new Error("Unsupported chain");
     }
 
-    const contract = new ethers.Contract(token.address, erc20Abi, signer)
+    const contract = new ethers.Contract(token.address, erc20Abi, signer);
     return await contract.approve(
       spender,
       amount ||
-        '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-    )
+        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    );
   }
 }
 
