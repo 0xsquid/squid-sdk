@@ -13,6 +13,11 @@ import {
   tradeSendEthereum,
   tradeSendMoonbeam
 } from "./tradeSend";
+import {
+  tradeSendTradeAvalance,
+  tradeSendTradeEthereum,
+  tradeSendTradeMoonbeam
+} from "./tradeSendTrade";
 
 dotenv.config();
 
@@ -37,6 +42,11 @@ const getSDK = (env: Environment): SquidSdk => {
     await tradeSendEthereum(squidSdk);
     await tradeSendAvalance(squidSdk);
     await tradeSendMoonbeam(squidSdk);
+
+    console.log(`\n> Running TradeSendTrade`);
+    await tradeSendTradeEthereum(squidSdk);
+    await tradeSendTradeAvalance(squidSdk);
+    await tradeSendTradeMoonbeam(squidSdk);
   } catch (error) {
     console.error(error);
   }

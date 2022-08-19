@@ -1,11 +1,8 @@
 import { ethers } from "ethers";
 import * as assert from "assert";
-import * as dotenv from "dotenv";
 
 import SquidSdk from "../index";
 import { GetRoute, ChainName } from "../types";
-
-dotenv.config();
 
 const buildParam = (
   sourceChainId: number,
@@ -113,9 +110,11 @@ export const getTradeSend = (
   const srcChain = squid.chains[srcChainName];
   const destChain = squid.chains[destChainName];
 
-  // WETH WAVAX WGLMR/axlUSDC address
+  // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
   const srcWrapperNativeToken =
     srcChain.chainNativeContracts.wrappedNativeToken;
+  // DEFAULT CROSS CHAIN TOKEN AS THE DESTINATION (axlUSDC/USDC)
+  const dstCrosschainToken = destChain.squidContracts.defaultCrosschainToken;
 
   const srcSquidExecutable = srcChain.squidContracts.squidMain;
   const destSquidExecutable = destChain.squidContracts.squidMain;
@@ -127,9 +126,8 @@ export const getTradeSend = (
   );
 
   const recipientAddress = getSignerForChain(destChainName)?.address as string;
-  const dstCrosschainToken = destChain.squidContracts.defaultCrosschainToken;
 
-  // 1 WNATIVETOKEN swaps --> USDC/axlUSDC, axlUSDC
+  // WNT swaps --> USDC/axlUSDC => axlUSDC
   const route: GetRoute = buildParam(
     srcChain.chainId,
     destChain.chainId,
@@ -137,6 +135,46 @@ export const getTradeSend = (
     6,
     "1000000000000",
     dstCrosschainToken,
+    recipientAddress
+  );
+
+  return route;
+};
+
+export const getTradeSendTrade = (
+  squid: SquidSdk,
+  srcChainName: ChainName,
+  destChainName: ChainName
+): GetRoute => {
+  const srcChain = squid.chains[srcChainName];
+  const destChain = squid.chains[destChainName];
+
+  // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
+  const srcWrapperNativeToken =
+    srcChain.chainNativeContracts.wrappedNativeToken;
+  // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
+  const destWrapperNativeToken =
+    destChain.chainNativeContracts.wrappedNativeToken;
+
+  const srcSquidExecutable = srcChain.squidContracts.squidMain;
+  const destSquidExecutable = destChain.squidContracts.squidMain;
+
+  assert.equal(
+    srcSquidExecutable,
+    destSquidExecutable,
+    "source and destination squid executable address missmatch"
+  );
+
+  const recipientAddress = getSignerForChain(destChainName)?.address as string;
+
+  // WNT swaps --> USDC/axlUSDC => axlUSDC/USDC --> swap WNT
+  const route: GetRoute = buildParam(
+    srcChain.chainId,
+    destChain.chainId,
+    srcWrapperNativeToken,
+    6,
+    "1000000000000",
+    destWrapperNativeToken,
     recipientAddress
   );
 
