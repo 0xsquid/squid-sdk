@@ -28,16 +28,12 @@ const getSDK = (env: Environment): SquidSdk => {
   const squidSdk = getSDK(Environment.LOCAL);
   await squidSdk.init();
   try {
-    console.log("\n\n");
-    console.log(`> Running SendTrade`);
-    console.log("\n");
+    console.log(`\n> Running SendTrade`);
     await sendTradeEthereum(squidSdk);
     await sendTradeAvalance(squidSdk);
     await sendTradeMoonbeam(squidSdk);
 
-    console.log("\n\n");
-    console.log(`> Running TradeSend`);
-    console.log("\n");
+    console.log(`\n> Running TradeSend`);
     await tradeSendEthereum(squidSdk);
     await tradeSendAvalance(squidSdk);
     await tradeSendMoonbeam(squidSdk);

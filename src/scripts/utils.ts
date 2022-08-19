@@ -8,23 +8,23 @@ import { GetRoute, ChainName } from "../types";
 dotenv.config();
 
 const buildParam = (
-  srcChainId: number,
-  destChainId: number,
-  srcTokenAddress: string,
+  sourceChainId: number,
+  destinationChainId: number,
+  sourceTokenAddress: string,
   sourceTokenDecimals: number,
-  amountIn: string,
-  destTokenAddress: string,
+  sourceAmount: string,
+  destinationTokenAddress: string,
   recipientAddress: string
 ): GetRoute => {
   return {
-    sourceChainId: srcChainId,
-    destinationChainId: destChainId,
-    sourceTokenAddress: srcTokenAddress,
-    destinationTokenAddress: destTokenAddress,
+    sourceChainId,
+    destinationChainId,
+    sourceTokenAddress,
+    destinationTokenAddress,
     sourceAmount: ethers.utils
-      .parseUnits(amountIn, sourceTokenDecimals)
+      .parseUnits(sourceAmount, sourceTokenDecimals)
       .toString(),
-    recipientAddress: recipientAddress,
+    recipientAddress,
     slippage: 1
   } as GetRoute;
 };
