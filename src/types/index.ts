@@ -86,7 +86,6 @@ export type GetRoute = {
   sourceAmount: string
   recipientAddress: string
   slippage: number
-  env: Environment
 }
 
 export type RouteData = {

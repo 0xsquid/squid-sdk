@@ -3,11 +3,11 @@
 exports[`SquidSdk should instance SquidSdk as expected 1`] = `
 SquidSdk {
   "axiosInstance": undefined,
-  "chains": undefined,
+  "chains": Object {},
   "config": Object {
     "environment": "local",
   },
   "inited": false,
-  "tokens": undefined,
+  "tokens": Object {},
 }
 `;
