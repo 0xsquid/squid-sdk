@@ -4,11 +4,13 @@ import {
   EvmChain,
   GasToken
 } from "@axelar-network/axelarjs-sdk";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import * as dotenv from "dotenv";
 
 import {
+  Allowance,
+  Approve,
   ChainsData,
   Config,
   ExecuteRoute,
@@ -44,7 +46,7 @@ class SquidSdk {
   }
 
   public async init() {
-    const response = await this.axiosInstance.get("/api/sdk-info", {});
+    const response = await this.axiosInstance.get("/api/sdk-info");
     this.tokens = response.data.data.tokens;
     this.chains = response.data.data.chains;
     this.inited = true;
@@ -121,17 +123,18 @@ class SquidSdk {
     );
 
     const sourceAmount = BigInt(params.sourceAmount);
+    const balance = await srcTokenContract.balanceOf(signer.address);
+
+    if (balance < BigInt(params.sourceAmount)) {
+      throw new Error(
+        `Insufficent funds for account: ${signer.address} on ${params.sourceChainId}`
+      );
+    }
+
     const allowance = await srcTokenContract.allowance(
       signer.address,
       sourceChain.squidContracts.squidMain
     );
-
-    const balance = await srcTokenContract.balanceOf(signer.address);
-    if (balance < BigInt(params.sourceAmount)) {
-      throw new Error(
-        `Insufficent funds for accout: ${signer.address} on ${params.sourceChainId}`
-      );
-    }
 
     if (allowance < sourceAmount) {
       const approveTx = await srcTokenContract
@@ -147,13 +150,13 @@ class SquidSdk {
     let gasFee;
     try {
       gasFee = await sdk.estimateGasFee(
-        sourceChain?.nativeCurrency.name as EvmChain, // EvmChain.ETHEREUM,
-        destinationChain?.nativeCurrency.name as EvmChain, // EvmChain.AVALANCHE,
+        sourceChain?.nativeCurrency.name as EvmChain,
+        destinationChain?.nativeCurrency.name as EvmChain,
         GasToken.ETH,
         transactionRequest.destinationChainGas
       );
     } catch (error) {
-      //TODO we need a backup
+      // TODO: we need a backup
       console.warn("error: fetching gasFee:", error);
       gasFee = 3e7;
     }
@@ -164,10 +167,11 @@ class SquidSdk {
       value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     };
 
+    await signer.signTransaction(tx);
     return await signer.sendTransaction(tx);
   }
 
-  public async allowance(params: any) {
+  public async allowance(params: Allowance): Promise<BigNumber> {
     const { owner, spender, tokenAddress } = params;
 
     const token = getTokenData(this.tokens as TokenData[], tokenAddress);
@@ -189,7 +193,7 @@ class SquidSdk {
     return await contract.allowance(owner, spender);
   }
 
-  public async approve(params: any) {
+  public async approve(params: Approve): Promise<unknown> {
     const { signer, spender, tokenAddress, amount } = params;
 
     const token = getTokenData(this.tokens as TokenData[], tokenAddress);
