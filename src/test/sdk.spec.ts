@@ -2,6 +2,7 @@ import axios from "axios";
 
 import { Environment } from "../types";
 import SquidSdk from "../index";
+import { assert } from "console";
 
 jest.mock("axios");
 
@@ -45,17 +46,18 @@ describe("SquidSdk", () => {
 
   describe("axios module", () => {
     it("get", async () => {
-      // const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
-      //   get: jest.fn().mockResolvedValue({
-      //     data: { status: true, data: { chains: [], tokens: [] } }
-      //   })
-      // });
+      const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
+        get: jest.fn().mockResolvedValue({
+          data: { status: true, data: { chains: [], tokens: [] } }
+        })
+      });
 
       const squidSdk = new SquidSdk({
         environment: Environment.LOCAL
       });
 
       await squidSdk.init();
+      expect(squidSdk.inited).toEqual(true);
 
       console.log("> squidsdk: ", squidSdk.chains);
     });
