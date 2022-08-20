@@ -46,10 +46,15 @@ class SquidSdk {
   }
 
   public async init() {
-    const response = await this.axiosInstance.get("/api/sdk-info");
-    this.tokens = response.data.data.tokens;
-    this.chains = response.data.data.chains;
-    this.inited = true;
+    let response;
+    try {
+      response = await this.axiosInstance.get("/api/sdk-info");
+      this.tokens = response.data.data.tokens;
+      this.chains = response.data.data.chains;
+      this.inited = true;
+    } catch (error) {
+      new Error(`Squid inititalization failed ${error}`);
+    }
   }
 
   public setConfig(config: Config) {
