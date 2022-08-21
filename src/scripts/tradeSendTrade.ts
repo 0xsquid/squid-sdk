@@ -28,7 +28,7 @@ export const tradeSendTradeEthereum = async (squidSdk: SquidSdk) => {
   );
   console.log("\n");
   console.log(
-    `> tradeSendTrade from ethereum to avalance ${param2.sourceTokenAddress} to ${param2.destinationTokenAddress}`
+    `> tradeSendTrade from ethereum to avalanche ${param2.sourceTokenAddress} to ${param2.destinationTokenAddress}`
   );
   const { route: route2 } = await squidSdk.getRoute(param2);
   const tx2 = await squidSdk.executeRoute({
@@ -39,7 +39,7 @@ export const tradeSendTradeEthereum = async (squidSdk: SquidSdk) => {
   console.log("> txReceipt: ", txReceipt2.transactionHash);
 };
 
-export const tradeSendTradeAvalance = async (squidSdk: SquidSdk) => {
+export const tradeSendTradeAvalanche = async (squidSdk: SquidSdk) => {
   const signer = getSignerForChain(ChainName.AVALANCHE);
   const param = getTradeSendTrade(
     squidSdk,
@@ -65,7 +65,7 @@ export const tradeSendTradeAvalance = async (squidSdk: SquidSdk) => {
   );
   console.log("\n");
   console.log(
-    `> tradeSendTrade from avalance to moonbeam ${param2.sourceTokenAddress} to ${param2.destinationTokenAddress}`
+    `> tradeSendTrade from avalanche to moonbeam ${param2.sourceTokenAddress} to ${param2.destinationTokenAddress}`
   );
   const { route: route2 } = await squidSdk.getRoute(param2);
   const tx2 = await squidSdk.executeRoute({
@@ -95,6 +95,7 @@ export const tradeSendTradeMoonbeam = async (squidSdk: SquidSdk) => {
   const txReceipt = await tx.wait();
   console.log("> txReceipt: ", txReceipt.transactionHash);
 
+  await new Promise(resolve => setTimeout(resolve, 3000));
   const param2 = getTradeSendTrade(
     squidSdk,
     ChainName.MOONBEAM,
