@@ -1,11 +1,11 @@
 {
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
+    "sourceMap": true,
+    "rootDir": "./src",
     "resolveJsonModule": true,
-    "outDir": "dist",
-    "declaration": true
-  }
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }
