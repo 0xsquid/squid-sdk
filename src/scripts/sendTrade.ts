@@ -31,7 +31,7 @@ export const sendTradeEthereum = async (squidSdk: SquidSdk) => {
   console.log("> txReceipt: ", txReceipt2.transactionHash);
 };
 
-export const sendTradeAvalance = async (squidSdk: SquidSdk) => {
+export const sendTradeAvalanche = async (squidSdk: SquidSdk) => {
   const signer = getSignerForChain(ChainName.AVALANCHE);
   const param = getSendTrade(squidSdk, ChainName.AVALANCHE, ChainName.ETHEREUM);
   console.log("\n");

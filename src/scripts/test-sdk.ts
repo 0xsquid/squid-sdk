@@ -4,17 +4,17 @@ import { Environment } from "../types";
 import SquidSdk from "../index";
 
 import {
-  sendTradeAvalance,
+  sendTradeAvalanche,
   sendTradeEthereum,
   sendTradeMoonbeam
 } from "./sendTrade";
 import {
-  tradeSendAvalance,
+  tradeSendAvalanche,
   tradeSendEthereum,
   tradeSendMoonbeam
 } from "./tradeSend";
 import {
-  tradeSendTradeAvalance,
+  tradeSendTradeAvalanche,
   tradeSendTradeEthereum,
   tradeSendTradeMoonbeam
 } from "./tradeSendTrade";
@@ -35,17 +35,17 @@ const getSDK = (env: Environment): SquidSdk => {
   try {
     console.log(`\n> Running SendTrade`);
     await sendTradeEthereum(squidSdk);
-    await sendTradeAvalance(squidSdk);
+    await sendTradeAvalanche(squidSdk);
     await sendTradeMoonbeam(squidSdk);
 
     console.log(`\n> Running TradeSend`);
     await tradeSendEthereum(squidSdk);
-    await tradeSendAvalance(squidSdk);
+    await tradeSendAvalanche(squidSdk);
     await tradeSendMoonbeam(squidSdk);
 
     console.log(`\n> Running TradeSendTrade`); // TODO: REVIEW WHY SOMETIMES TRADESENDTRADES FAILS
     await tradeSendTradeEthereum(squidSdk);
-    await tradeSendTradeAvalance(squidSdk);
+    await tradeSendTradeAvalanche(squidSdk);
     await tradeSendTradeMoonbeam(squidSdk);
   } catch (error) {
     console.error(error);
