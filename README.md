@@ -1,5 +1,23 @@
 # api-sdk
 
+## Integration Tests
+
+1. Run the backend API
+
+2. Run all tests
+
+```bash
+yarn integration
+```
+
+Run only specific tests
+
+```bash
+yarn integration:sendtrade
+yarn integration:tradesend
+yarn integration:tradesendtrade
+```
+
 ## Examples to interact with the Squid API - testnet supported
 
 API endpoint documentation
