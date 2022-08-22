@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import * as assert from "assert";
 
-import SquidSdk from "../index";
+import Squid from "../index";
 import { GetRoute, ChainName } from "../types";
 
 const buildParam = (
@@ -59,7 +59,7 @@ export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
 };
 
 export const getSendTrade = (
-  squid: SquidSdk,
+  squid: Squid,
   srcChainName: ChainName,
   destChainName: ChainName
 ): GetRoute => {
@@ -103,7 +103,7 @@ export const getSendTrade = (
 };
 
 export const getTradeSend = (
-  squid: SquidSdk,
+  squid: Squid,
   srcChainName: ChainName,
   destChainName: ChainName
 ): GetRoute => {
@@ -142,7 +142,7 @@ export const getTradeSend = (
 };
 
 export const getTradeSendTrade = (
-  squid: SquidSdk,
+  squid: Squid,
   srcChainName: ChainName,
   destChainName: ChainName
 ): GetRoute => {

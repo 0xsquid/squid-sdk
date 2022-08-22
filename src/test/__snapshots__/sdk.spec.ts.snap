@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SquidSdk should instance SquidSdk as expected 1`] = `
-SquidSdk {
+exports[`Squid should instance Squid as expected 1`] = `
+Squid {
   "axiosInstance": undefined,
   "chains": Object {},
   "config": Object {
