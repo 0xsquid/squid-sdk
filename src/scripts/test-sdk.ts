@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 
 import { Environment } from "../types";
-import SquidSdk from "../index";
+import Squid from "../index";
 import yargs from "yargs/yargs";
 import {
   sendTradeAvalanche,
@@ -24,8 +24,8 @@ const parser = yargs(process.argv.slice(2)).options({
   s: { type: "string", default: "", alias: "suit" }
 });
 
-const getSDK = (env: Environment): SquidSdk => {
-  const squidSdk = new SquidSdk({
+const getSDK = (env: Environment): Squid => {
+  const squidSdk = new Squid({
     environment: env,
     baseUrl: "http://localhost:3000"
   });

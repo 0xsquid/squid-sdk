@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 
 import * as dotenv from "dotenv";
 
-import SquidSdk from "./src";
+import Squid from "./src";
 import { Environment } from "./src/types";
 
 dotenv.config();
@@ -17,7 +17,7 @@ const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint);
 
 async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
-  const squidSdk = new SquidSdk({
+  const squidSdk = new Squid({
     environment: Environment.LOCAL
   });
 
