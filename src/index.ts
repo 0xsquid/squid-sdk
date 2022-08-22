@@ -22,6 +22,7 @@ import {
 import erc20Abi from "./abi/erc20.json";
 import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
+import { uint256MaxValue } from "./contants/infiniteApprove";
 
 dotenv.config();
 
@@ -83,7 +84,8 @@ class Squid {
 
   public async executeRoute({
     signer,
-    route
+    route,
+    config
   }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
     const { transactionRequest, params } = route;
 
@@ -142,9 +144,15 @@ class Squid {
     );
 
     if (allowance < sourceAmount) {
+      const amountToApprove = config?.infiniteApprove
+        ? uint256MaxValue
+        : this.config.infiniteApprove
+        ? uint256MaxValue
+        : sourceAmount;
+
       const approveTx = await srcTokenContract
         .connect(signer)
-        .approve(sourceChain.squidContracts.squidMain, sourceAmount);
+        .approve(sourceChain.squidContracts.squidMain, amountToApprove);
       await approveTx.wait();
     }
 
@@ -217,11 +225,7 @@ class Squid {
     }
 
     const contract = new ethers.Contract(token.address, erc20Abi, signer);
-    return await contract.approve(
-      spender,
-      amount ||
-        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-    );
+    return await contract.approve(spender, amount || uint256MaxValue);
   }
 }
 
