@@ -22,7 +22,7 @@ import {
 import erc20Abi from "./abi/erc20.json";
 import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
-import { uint256MaxValue } from "./contants/infiniteApprove";
+import { uint256MaxValue } from "./contants/infiniteApproval";
 
 dotenv.config();
 
@@ -85,7 +85,7 @@ class Squid {
   public async executeRoute({
     signer,
     route,
-    config
+    executionSettings
   }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
     const { transactionRequest, params } = route;
 
@@ -144,9 +144,9 @@ class Squid {
     );
 
     if (allowance < sourceAmount) {
-      const amountToApprove = config?.infiniteApprove
+      const amountToApprove = executionSettings?.infiniteApproval
         ? uint256MaxValue
-        : this.config.infiniteApprove
+        : this.config.executionSettings?.infiniteApproval
         ? uint256MaxValue
         : sourceAmount;
 

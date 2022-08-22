@@ -76,7 +76,9 @@ export type Config = {
   apiKey?: string;
   environment: Environment;
   baseUrl?: string;
-  infiniteApproval?: boolean;
+  executionSettings?: {
+    infiniteApproval?: boolean;
+  };
 };
 
 export type GetRoute = {
@@ -115,7 +117,7 @@ export type GetRouteResponse = {
 export type ExecuteRoute = {
   signer: ethers.Wallet;
   route: Route;
-  config?: {
+  executionSettings?: {
     infiniteApproval?: boolean;
   };
 };
