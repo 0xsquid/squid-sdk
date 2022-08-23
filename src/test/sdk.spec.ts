@@ -5,12 +5,11 @@ import Squid from "../index";
 
 jest.mock("axios");
 
-const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
-  get: jest.fn()
-});
-
 describe("Squid", () => {
   it("should instance Squid as expected", async () => {
+    const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
+      get: jest.fn()
+    });
     const squidSdk = new Squid({
       environment: Environment.LOCAL
     });
@@ -20,7 +19,7 @@ describe("Squid", () => {
     expect(squidSdk.config).toStrictEqual({
       environment: Environment.LOCAL
     });
-    expect(squidSdk.tokens).toEqual({});
+    expect(squidSdk.tokens).toEqual([]);
     expect(squidSdk.chains).toEqual({});
   });
 
@@ -31,14 +30,20 @@ describe("Squid", () => {
       });
 
       squidSdk.setConfig({
-        environment: Environment.TESTNET
+        environment: Environment.TESTNET,
+        executionSettings: {
+          infiniteApproval: false
+        }
       });
 
       expect(squidSdk.config).not.toStrictEqual({
         environment: Environment.LOCAL
       });
       expect(squidSdk.config).toStrictEqual({
-        environment: Environment.TESTNET
+        environment: Environment.TESTNET,
+        executionSettings: {
+          infiniteApproval: false
+        }
       });
     });
   });
@@ -47,7 +52,7 @@ describe("Squid", () => {
     it("get", async () => {
       const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
         get: jest.fn().mockResolvedValue({
-          data: { status: true, data: { chains: [], tokens: [] } }
+          data: { status: true, data: { chains: {} }, tokens: [] }
         })
       });
 
