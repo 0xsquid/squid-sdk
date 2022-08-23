@@ -143,11 +143,18 @@ class Squid {
     );
 
     if (allowance < sourceAmount) {
-      const amountToApprove = executionSettings?.infiniteApproval
-        ? uint256MaxValue
-        : this.config.executionSettings?.infiniteApproval
-        ? uint256MaxValue
-        : sourceAmount;
+      let amountToApprove: string | bigint = sourceAmount;
+
+      if (executionSettings?.infiniteApproval) {
+        amountToApprove = uint256MaxValue;
+      }
+
+      if (
+        this.config.executionSettings &&
+        executionSettings?.infiniteApproval
+      ) {
+        amountToApprove = uint256MaxValue;
+      }
 
       const approveTx = await srcTokenContract
         .connect(signer)
