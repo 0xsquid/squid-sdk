@@ -27,7 +27,7 @@ dotenv.config();
 
 const baseUrl = process.env.baseUrl;
 
-class SquidSdk {
+class Squid {
   private axiosInstance: AxiosInstance;
 
   public inited = false;
@@ -70,7 +70,7 @@ class SquidSdk {
   public async getRoute(params: GetRoute): Promise<GetRouteResponse> {
     if (!this.inited) {
       throw new Error(
-        "SquidSdk must be inited! Please call the SquidSdk.init method"
+        "Squid must be inited! Please call the Squid.init method"
       );
     }
 
@@ -89,7 +89,7 @@ class SquidSdk {
 
     if (!this.inited) {
       throw new Error(
-        "SquidSdk must be inited! Please call the SquidSdk.init method"
+        "Squid must be inited! Please call the Squid.init method"
       );
     }
 
@@ -225,4 +225,4 @@ class SquidSdk {
   }
 }
 
-export default SquidSdk;
+export default Squid;

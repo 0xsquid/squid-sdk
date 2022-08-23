@@ -1,8 +1,8 @@
 import { getSignerForChain, getSendTrade } from "./utils";
 import { ChainName } from "../types";
-import SquidSdk from "../index";
+import Squid from "../index";
 
-export const sendTradeEthereum = async (squidSdk: SquidSdk) => {
+export const sendTradeEthereum = async (squidSdk: Squid) => {
   const signer = getSignerForChain(ChainName.ETHEREUM);
   const param = getSendTrade(squidSdk, ChainName.ETHEREUM, ChainName.AVALANCHE);
   console.log("\n");
@@ -31,7 +31,7 @@ export const sendTradeEthereum = async (squidSdk: SquidSdk) => {
   console.log("> txReceipt: ", txReceipt2.transactionHash);
 };
 
-export const sendTradeAvalanche = async (squidSdk: SquidSdk) => {
+export const sendTradeAvalanche = async (squidSdk: Squid) => {
   const signer = getSignerForChain(ChainName.AVALANCHE);
   const param = getSendTrade(squidSdk, ChainName.AVALANCHE, ChainName.ETHEREUM);
   console.log("\n");
@@ -64,7 +64,7 @@ export const sendTradeAvalanche = async (squidSdk: SquidSdk) => {
   console.log("> txReceipt: ", txReceipt2.transactionHash);
 };
 
-export const sendTradeMoonbeam = async (squidSdk: SquidSdk) => {
+export const sendTradeMoonbeam = async (squidSdk: Squid) => {
   const signer = getSignerForChain(ChainName.MOONBEAM);
   const param = getSendTrade(squidSdk, ChainName.MOONBEAM, ChainName.ETHEREUM);
   console.log("\n");

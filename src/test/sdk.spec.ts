@@ -1,18 +1,17 @@
 import axios from "axios";
 
 import { Environment } from "../types";
-import SquidSdk from "../index";
-import { assert } from "console";
+import Squid from "../index";
 
 jest.mock("axios");
 
-// const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
-//   get: jest.fn()
-// })
+const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
+  get: jest.fn()
+});
 
-describe("SquidSdk", () => {
-  it("should instance SquidSdk as expected", async () => {
-    const squidSdk = new SquidSdk({
+describe("Squid", () => {
+  it("should instance Squid as expected", async () => {
+    const squidSdk = new Squid({
       environment: Environment.LOCAL
     });
 
@@ -27,7 +26,7 @@ describe("SquidSdk", () => {
 
   describe("setConfig", () => {
     it("should set config as expected", () => {
-      const squidSdk = new SquidSdk({
+      const squidSdk = new Squid({
         environment: Environment.LOCAL
       });
 
@@ -52,7 +51,7 @@ describe("SquidSdk", () => {
         })
       });
 
-      const squidSdk = new SquidSdk({
+      const squidSdk = new Squid({
         environment: Environment.LOCAL
       });
 
