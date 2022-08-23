@@ -33,7 +33,7 @@ class Squid {
 
   public inited = false;
   public config: Config;
-  public tokens: TokenData[] = {} as TokenData[];
+  public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = {} as ChainsData;
 
   constructor(config: Config) {
@@ -46,15 +46,22 @@ class Squid {
     this.config = config;
   }
 
+  private validateInit() {
+    if (!this.inited) {
+      throw new Error(
+        "SquidSdk must be inited! Please call the SquidSdk.init method"
+      );
+    }
+  }
+
   public async init() {
-    let response;
     try {
-      response = await this.axiosInstance.get("/api/sdk-info");
+      const response = await this.axiosInstance.get("/api/sdk-info");
       this.tokens = response.data.data.tokens;
       this.chains = response.data.data.chains;
       this.inited = true;
     } catch (error) {
-      new Error(`Squid inititalization failed ${error}`);
+      throw new Error(`Squid inititalization failed ${error}`);
     }
   }
 
@@ -69,11 +76,7 @@ class Squid {
   }
 
   public async getRoute(params: GetRoute): Promise<GetRouteResponse> {
-    if (!this.inited) {
-      throw new Error(
-        "Squid must be inited! Please call the Squid.init method"
-      );
-    }
+    this.validateInit();
 
     const response = await this.axiosInstance.get("/api/route", { params });
 
@@ -87,13 +90,9 @@ class Squid {
     route,
     executionSettings
   }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
-    const { transactionRequest, params } = route;
+    this.validateInit();
 
-    if (!this.inited) {
-      throw new Error(
-        "Squid must be inited! Please call the Squid.init method"
-      );
-    }
+    const { transactionRequest, params } = route;
 
     const sourceChain = getChainData(
       this.chains as ChainsData,
@@ -185,6 +184,8 @@ class Squid {
   }
 
   public async allowance(params: Allowance): Promise<BigNumber> {
+    this.validateInit();
+
     const { owner, spender, tokenAddress } = params;
 
     const token = getTokenData(this.tokens as TokenData[], tokenAddress);
@@ -209,6 +210,8 @@ class Squid {
   public async approve(
     params: Approve
   ): Promise<ethers.providers.TransactionResponse> {
+    this.validateInit();
+
     const { signer, spender, tokenAddress, amount } = params;
 
     const token = getTokenData(this.tokens as TokenData[], tokenAddress);
