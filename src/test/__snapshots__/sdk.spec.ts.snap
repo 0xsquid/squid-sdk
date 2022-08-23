@@ -2,7 +2,9 @@
 
 exports[`Squid should instance Squid as expected 1`] = `
 Squid {
-  "axiosInstance": undefined,
+  "axiosInstance": Object {
+    "get": [MockFunction],
+  },
   "chains": Object {},
   "config": Object {
     "environment": "local",
