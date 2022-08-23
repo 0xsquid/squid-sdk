@@ -143,15 +143,15 @@ class Squid {
     );
 
     if (allowance < sourceAmount) {
-      let amountToApprove: string | bigint = sourceAmount;
+      let amountToApprove: string | bigint = uint256MaxValue;
 
-      if (executionSettings?.infiniteApproval) {
-        amountToApprove = uint256MaxValue;
+      if (executionSettings?.infiniteApproval === false) {
+        amountToApprove = sourceAmount;
       }
 
       if (
-        this.config.executionSettings &&
-        executionSettings?.infiniteApproval
+        this.config.executionSettings?.infiniteApproval === false &&
+        !executionSettings?.infiniteApproval
       ) {
         amountToApprove = uint256MaxValue;
       }
