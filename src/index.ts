@@ -178,7 +178,7 @@ export class Squid {
     const tx = {
       to: sourceChain.squidContracts.squidMain,
       data: transactionRequest.data,
-      value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
+      value: BigInt(1e18) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
     };
 
     await signer.signTransaction(tx);
