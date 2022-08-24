@@ -1,11 +1,13 @@
 {
-  "name": "api-sdk",
-  "version": "1.0.0",
+  "name": "@squid/sdk",
+  "version": "1.0.0-beta.0",
   "repository": "https://github.com/0xsquid/api-sdk.git",
-  "author": "koda@0xsquid.com",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "lint": "eslint --ext .js,.ts,.json .",
     "lint:fix": "eslint --ext .js,.ts,.json . --fix",
