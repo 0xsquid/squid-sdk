@@ -9,5 +9,11 @@
     "esModuleInterop": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts", "src/test/*", "src/scripts/*"]
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    "src/test/*",
+    "src/scripts/*",
+    "docs"
+  ]
 }

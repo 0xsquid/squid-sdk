@@ -28,7 +28,7 @@ dotenv.config();
 
 const baseUrl = process.env.baseUrl;
 
-class Squid {
+export class Squid {
   private axiosInstance: AxiosInstance;
 
   public inited = false;
@@ -239,4 +239,4 @@ class Squid {
   }
 }
 
-export default Squid;
+export * from "./types";
