@@ -54,8 +54,8 @@
     "typescript": "^4.7.4"
   },
   "bugs": {
-    "url": "https://github.com/0xsquid/api-sdk/issues"
+    "url": "https://github.com/0xsquid/squid-sdk/issues"
   },
-  "homepage": "https://github.com/0xsquid/api-sdk#readme",
+  "homepage": "https://github.com/0xsquid/squid-sdk#readme",
   "author": ""
 }
