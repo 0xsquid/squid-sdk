@@ -1,4 +1,4 @@
-# 0xSquid SKD
+# 0xSquid SDK
 
 [![Unit Tests](https://github.com/0xsquid/squid-sdk/workflows/Unit%20Tests/badge.svg)](hhttps://github.com/0xsquid/squid-sdk/actions?query=workflow%3A%22Unit+Tests%22)
 [![Lint](https://github.com/0xsquid/squid-sdk//workflows/Lint/badge.svg)](https://github.com/0xsquid/squid-sdk/actions?query=workflow%3ALint)
