@@ -2,7 +2,9 @@ name: squid-sdk CI
 
 on:
   push:
-    branches: [main]
+    branches: 
+      - "main"
+      - "task/CI_CD"
   pull_request:
     branches: [main]
 
