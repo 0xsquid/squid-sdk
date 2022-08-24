@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - "main"
-      - "task/CI_CD"
-  pull_request:
-    branches: [main]
 
 jobs:
   build:
@@ -24,12 +21,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: yarn install, build
         run: |
-          yarn install --network-concurrency 1
+          yarn install --frozen-lockfile
           yarn build
-      - name: sdk tests/linting
-        run: |
-          yarn lint
-          yarn test
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
