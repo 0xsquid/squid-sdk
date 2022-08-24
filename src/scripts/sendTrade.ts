@@ -1,6 +1,6 @@
 import { getSignerForChain, getSendTrade } from "./utils";
 import { ChainName } from "../types";
-import Squid from "../index";
+import { Squid } from "../index";
 
 export const sendTradeEthereum = async (squidSdk: Squid) => {
   const signer = getSignerForChain(ChainName.ETHEREUM);
