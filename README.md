@@ -1,34 +1,9 @@
-# api-sdk
+# 0xSquid SDK
 
-## Integration Tests
+[![Unit Tests](https://github.com/0xsquid/squid-sdk/workflows/Unit%20Tests/badge.svg)](hhttps://github.com/0xsquid/squid-sdk/actions?query=workflow%3A%22Unit+Tests%22)
+[![Lint](https://github.com/0xsquid/squid-sdk//workflows/Lint/badge.svg)](https://github.com/0xsquid/squid-sdk/actions?query=workflow%3ALint)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![npm version](https://img.shields.io/npm/v/@0xsquid/sdk/latest.svg)](https://www.npmjs.com/package/@0xsquid/sdk/v/latest)
+[![npm bundle size (scoped version)](https://img.shields.io/bundlephobia/minzip/@0xsquid/sdk/latest.svg)](https://bundlephobia.com/result?p=@0xsquid/sdk@latest)
 
-1. Run the backend API
-
-2. Run all tests
-
-```bash
-yarn integration
-```
-
-Run only specific tests
-
-```bash
-yarn integration:sendtrade
-yarn integration:tradesend
-yarn integration:tradesendtrade
-```
-
-## Examples to interact with the Squid API - testnet supported
-
-API endpoint documentation
-https://app.gitbook.com/o/bX90yMGYDBu3T1Hqg4EA/s/tXbXyuWIO2PwzNc5Dets/integrate-squid/api
-
-- install package dependancies "yarn install"
-- configuration in .env file (rename example to .env)
-- explore the /api/quotes & api/tokens endpoints for supported chains and tokens
-- run approval.ts to approve tokens before any transactions eg "yarn ts-node approve.ts"
-- run transaction.ts to query /api/transaction endpoint and send tokens cross chain ✨
-
-## Notes
-
-Transactions are not sent via the api, the api is a helper endpoint only, transactions are submitted via the callers rpc endpoint.
+In-depth documentation on this SDK is available at [0xsquid.com](https://app.gitbook.com/o/bX90yMGYDBu3T1Hqg4EA/s/tXbXyuWIO2PwzNc5Dets/integrate-squid/api)
