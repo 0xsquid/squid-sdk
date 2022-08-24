@@ -3,7 +3,7 @@ name: squid-sdk CI
 on:
   push:
     branches:
-      - "main"
+      - "task/CI_CD"
 
 jobs:
   build:
