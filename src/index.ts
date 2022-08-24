@@ -22,7 +22,7 @@ import {
 import erc20Abi from "./abi/erc20.json";
 import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
-import { uint256MaxValue } from "./contants/infiniteApproval";
+import { nativeTokenConstant, uint256MaxValue } from "./contants";
 
 dotenv.config();
 
@@ -98,32 +98,27 @@ export class Squid {
       this.chains as ChainsData,
       params.sourceChainId
     );
-    const sourceToken = getTokenData(
-      this.tokens as TokenData[],
-      params.sourceTokenAddress
-    );
     const destinationChain = getChainData(
       this.chains as ChainsData,
       params.destinationChainId
     );
-
     if (!sourceChain) {
       throw new Error(`sourceChain not found for ${params.sourceChainId}`);
     }
-
-    if (!sourceToken) {
-      throw new Error(`sourceToken not found for ${params.sourceTokenAddress}`);
-    }
-
     if (!destinationChain) {
       throw new Error(
         `destinationChain not found for ${params.destinationChainId}`
       );
     }
 
+    const sourceToken =
+      params.sourceTokenAddress === nativeTokenConstant
+        ? sourceChain.chainNativeContracts.wrappedNativeToken
+        : params.sourceTokenAddress;
+
     const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc);
     const srcTokenContract = new ethers.Contract(
-      sourceToken.address,
+      sourceToken,
       erc20Abi,
       srcProvider
     );
