@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 
 import { Environment } from "../types";
-import Squid from "../index";
+import { Squid } from "../index";
 import yargs from "yargs/yargs";
 import {
   sendTradeAvalanche,

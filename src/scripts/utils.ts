@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import * as assert from "assert";
 
-import Squid from "../index";
+import { Squid } from "../index";
 import { GetRoute, ChainName } from "../types";
 
 const buildParam = (
