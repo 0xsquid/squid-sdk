@@ -2,7 +2,7 @@ name: squid-sdk CI
 
 on:
   push:
-    branches: 
+    branches:
       - "main"
       - "task/CI_CD"
   pull_request:
@@ -23,9 +23,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: yarn install, build
-        run: yarn install --network-concurrency 1
-        run: yarn build
-        run: yarn test
+        run: |
+          yarn install --network-concurrency 1
+          yarn build
+      - name: sdk tests/linting
+        run: |
+          yarn lint
+          yarn test
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
