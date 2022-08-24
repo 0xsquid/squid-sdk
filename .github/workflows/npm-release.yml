@@ -1,9 +1,9 @@
-name: squid-sdk CI
+name: NPM Release
 
 on:
   push:
     branches:
-      - "task/CI_CD"
+      - "main"
 
 jobs:
   build:
