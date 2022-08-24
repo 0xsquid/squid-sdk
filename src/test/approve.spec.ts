@@ -2,7 +2,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 
 import { Environment } from "../types";
-import SquidSdk from "../index";
+import { Squid } from "../index";
 
 import { chainsData } from "./constants/chains";
 import { supportedTokens } from "./constants/tokens";
@@ -31,7 +31,7 @@ describe("SquidSdk approve method", () => {
   ).mockImplementation(mockedContract);
 
   it("should call the approve method with infinite amount", async () => {
-    const squidSdk = new SquidSdk({
+    const squidSdk = new Squid({
       environment: Environment.LOCAL
     });
 
@@ -51,7 +51,7 @@ describe("SquidSdk approve method", () => {
   });
 
   it("should call the approve method with amount", async () => {
-    const squidSdk = new SquidSdk({
+    const squidSdk = new Squid({
       environment: Environment.LOCAL
     });
 

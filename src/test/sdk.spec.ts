@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { Environment } from "../types";
-import Squid from "../index";
+import { Squid } from "../index";
 
 jest.mock("axios");
 
