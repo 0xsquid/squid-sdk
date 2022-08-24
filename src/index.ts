@@ -22,6 +22,7 @@ import {
 import erc20Abi from "./abi/erc20.json";
 import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
+import { uint256MaxValue } from "./contants/infiniteApproval";
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ class Squid {
 
   public inited = false;
   public config: Config;
-  public tokens: TokenData[] = {} as TokenData[];
+  public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = {} as ChainsData;
 
   constructor(config: Config) {
@@ -45,15 +46,22 @@ class Squid {
     this.config = config;
   }
 
+  private validateInit() {
+    if (!this.inited) {
+      throw new Error(
+        "SquidSdk must be inited! Please call the SquidSdk.init method"
+      );
+    }
+  }
+
   public async init() {
-    let response;
     try {
-      response = await this.axiosInstance.get("/api/sdk-info");
+      const response = await this.axiosInstance.get("/api/sdk-info");
       this.tokens = response.data.data.tokens;
       this.chains = response.data.data.chains;
       this.inited = true;
     } catch (error) {
-      new Error(`Squid inititalization failed ${error}`);
+      throw new Error(`Squid inititalization failed ${error}`);
     }
   }
 
@@ -68,11 +76,7 @@ class Squid {
   }
 
   public async getRoute(params: GetRoute): Promise<GetRouteResponse> {
-    if (!this.inited) {
-      throw new Error(
-        "Squid must be inited! Please call the Squid.init method"
-      );
-    }
+    this.validateInit();
 
     const response = await this.axiosInstance.get("/api/route", { params });
 
@@ -83,15 +87,12 @@ class Squid {
 
   public async executeRoute({
     signer,
-    route
+    route,
+    executionSettings
   }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
-    const { transactionRequest, params } = route;
+    this.validateInit();
 
-    if (!this.inited) {
-      throw new Error(
-        "Squid must be inited! Please call the Squid.init method"
-      );
-    }
+    const { transactionRequest, params } = route;
 
     const sourceChain = getChainData(
       this.chains as ChainsData,
@@ -142,9 +143,22 @@ class Squid {
     );
 
     if (allowance < sourceAmount) {
+      let amountToApprove: string | bigint = uint256MaxValue;
+
+      if (executionSettings?.infiniteApproval === false) {
+        amountToApprove = sourceAmount;
+      }
+
+      if (
+        this.config.executionSettings?.infiniteApproval === false &&
+        !executionSettings?.infiniteApproval
+      ) {
+        amountToApprove = uint256MaxValue;
+      }
+
       const approveTx = await srcTokenContract
         .connect(signer)
-        .approve(sourceChain.squidContracts.squidMain, sourceAmount);
+        .approve(sourceChain.squidContracts.squidMain, amountToApprove);
       await approveTx.wait();
     }
 
@@ -177,6 +191,8 @@ class Squid {
   }
 
   public async allowance(params: Allowance): Promise<BigNumber> {
+    this.validateInit();
+
     const { owner, spender, tokenAddress } = params;
 
     const token = getTokenData(this.tokens as TokenData[], tokenAddress);
@@ -201,6 +217,8 @@ class Squid {
   public async approve(
     params: Approve
   ): Promise<ethers.providers.TransactionResponse> {
+    this.validateInit();
+
     const { signer, spender, tokenAddress, amount } = params;
 
     const token = getTokenData(this.tokens as TokenData[], tokenAddress);
@@ -217,11 +235,7 @@ class Squid {
     }
 
     const contract = new ethers.Contract(token.address, erc20Abi, signer);
-    return await contract.approve(
-      spender,
-      amount ||
-        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-    );
+    return await contract.approve(spender, amount || uint256MaxValue);
   }
 }
 
