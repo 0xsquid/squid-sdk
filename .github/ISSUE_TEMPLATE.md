@@ -2,7 +2,7 @@
 
 ## Acceptance Criteria
 
-- [ ] 
+- [ ]
 
 ## Current Behaviour
 
