@@ -24,7 +24,8 @@ const getSDK = (env: Environment): Squid => {
   await squidSdk.init();
 
   try {
-    const params = {
+    // ETH => WAVAX | WORKING
+    /* const params = {
       sourceChainId: 1,
       sourceTokenAddress: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       destinationChainId: 43114,
@@ -32,12 +33,34 @@ const getSDK = (env: Environment): Squid => {
       sourceAmount: ethers.utils.parseEther("1").toString(),
       recipientAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
       slippage: 1
+    }; */
+
+    // ETH => WGLMR | WORKING
+    const params = {
+      sourceChainId: 1,
+      sourceTokenAddress: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      destinationChainId: 1284,
+      destinationTokenAddress: "0xAcc15dC74880C9944775448304B263D191c6077F",
+      sourceAmount: ethers.utils.parseEther("1").toString(),
+      recipientAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
+      slippage: 1
     };
 
+    // AVAX => WETH | REVERTING
+    /* const params = {
+      sourceChainId: 43114,
+      sourceTokenAddress: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      destinationChainId: 1,
+      destinationTokenAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      sourceAmount: ethers.utils.parseEther("1").toString(),
+      recipientAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
+      slippage: 1
+    }; */
+
     const { route } = await squidSdk.getRoute(params);
+    console.log("> route: ", route);
     const tx = await squidSdk.executeRoute({ signer, route });
     const txReceipt = await tx.wait();
-
     console.log("> txReceipt: ", txReceipt.transactionHash);
   } catch (error) {
     console.error(error);
