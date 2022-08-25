@@ -142,13 +142,19 @@ export class Squid {
     } catch (error) {
       // TODO: we need a backup
       console.warn("error: fetching gasFee:", error);
-      gasFee = 3e7;
+      gasFee = "3513000021000000";
     }
+
+    const value = sourceIsNative
+      ? ethers.BigNumber.from(params.sourceAmount).add(
+          ethers.BigNumber.from(gasFee)
+        )
+      : ethers.BigNumber.from(gasFee);
 
     const tx = {
       to: sourceChain.squidContracts.squidMain,
       data: transactionRequest.data,
-      value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
+      value: value
     };
 
     await signer.signTransaction(tx);
