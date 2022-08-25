@@ -58,6 +58,61 @@ export class Squid {
     }
   }
 
+  private async validateBalanceAndApproval({
+    tokenAddress,
+    sourceAmount,
+    signer,
+    sourceChain,
+    infiniteApproval
+  }: {
+    tokenAddress: string;
+    sourceAmount: string;
+    signer: ethers.Wallet;
+    sourceChain: ChainData;
+    infiniteApproval?: boolean;
+  }) {
+    const _sourceAmount = BigInt(sourceAmount);
+    const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc);
+    const srcTokenContract = new ethers.Contract(
+      tokenAddress,
+      erc20Abi,
+      srcProvider
+    );
+
+    const balance = await srcTokenContract.balanceOf(signer.address);
+
+    if (balance < _sourceAmount) {
+      throw new Error(
+        `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
+      );
+    }
+
+    const allowance = await srcTokenContract.allowance(
+      signer.address,
+      sourceChain.squidContracts.squidMain
+    );
+
+    if (allowance < _sourceAmount) {
+      let amountToApprove: string | bigint = uint256MaxValue;
+
+      if (infiniteApproval === false) {
+        amountToApprove = _sourceAmount;
+      }
+
+      if (
+        this.config?.executionSettings?.infiniteApproval === false &&
+        !infiniteApproval
+      ) {
+        amountToApprove = uint256MaxValue;
+      }
+
+      const approveTx = await srcTokenContract
+        .connect(signer)
+        .approve(sourceChain.squidContracts.squidMain, amountToApprove);
+      await approveTx.wait();
+    }
+  }
+
   public async init() {
     try {
       const response = await this.axiosInstance.get("/api/sdk-info");
@@ -159,61 +214,6 @@ export class Squid {
 
     await signer.signTransaction(tx);
     return await signer.sendTransaction(tx);
-  }
-
-  private async validateBalanceAndApproval({
-    tokenAddress,
-    sourceAmount,
-    signer,
-    sourceChain,
-    infiniteApproval
-  }: {
-    tokenAddress: string;
-    sourceAmount: string;
-    signer: ethers.Wallet;
-    sourceChain: ChainData;
-    infiniteApproval?: boolean;
-  }) {
-    const _sourceAmount = BigInt(sourceAmount);
-    const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc);
-    const srcTokenContract = new ethers.Contract(
-      tokenAddress,
-      erc20Abi,
-      srcProvider
-    );
-
-    const balance = await srcTokenContract.balanceOf(signer.address);
-
-    if (balance < _sourceAmount) {
-      throw new Error(
-        `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
-      );
-    }
-
-    const allowance = await srcTokenContract.allowance(
-      signer.address,
-      sourceChain.squidContracts.squidMain
-    );
-
-    if (allowance < _sourceAmount) {
-      let amountToApprove: string | bigint = uint256MaxValue;
-
-      if (infiniteApproval === false) {
-        amountToApprove = _sourceAmount;
-      }
-
-      if (
-        this.config?.executionSettings?.infiniteApproval === false &&
-        !infiniteApproval
-      ) {
-        amountToApprove = uint256MaxValue;
-      }
-
-      const approveTx = await srcTokenContract
-        .connect(signer)
-        .approve(sourceChain.squidContracts.squidMain, amountToApprove);
-      await approveTx.wait();
-    }
   }
 
   public async allowance(params: Allowance): Promise<BigNumber> {
