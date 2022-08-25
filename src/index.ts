@@ -189,9 +189,9 @@ export class Squid {
     let gasFee;
     try {
       gasFee = await sdk.estimateGasFee(
-        sourceChain?.nativeCurrency.name as EvmChain,
-        destinationChain?.nativeCurrency.name as EvmChain,
-        GasToken.ETH,
+        sourceChain.nativeCurrency.name as EvmChain,
+        destinationChain.nativeCurrency.name as EvmChain,
+        destinationChain.nativeCurrency.symbol as GasToken,
         transactionRequest.destinationChainGas
       );
     } catch (error) {
