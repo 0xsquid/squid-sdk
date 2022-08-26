@@ -1,102 +1,52 @@
 import { getSignerForChain, getTradeSend } from "./utils";
 import { ChainName } from "../types";
 import { Squid } from "../index";
+import { ethers } from "ethers";
 
-export const tradeSendEthereum = async (squidSdk: Squid) => {
-  const signer = getSignerForChain(ChainName.ETHEREUM);
-  const param = getTradeSend(squidSdk, ChainName.ETHEREUM, ChainName.MOONBEAM);
+const executeTradeSend = async (
+  squid: Squid,
+  signer: ethers.Wallet,
+  fromNetwork: ChainName,
+  toNetwork: ChainName,
+  amount: string,
+  isSrcNative = false
+) => {
+  const param = getTradeSend(
+    squid,
+    fromNetwork,
+    toNetwork,
+    amount,
+    isSrcNative
+  );
   console.log("\n");
   console.log(
-    `> tradeSend from ethereum to moonbeam ${param.sourceTokenAddress} to ${param.destinationTokenAddress}`
+    `> tradeSend: ${fromNetwork}=>${toNetwork} from ${
+      isSrcNative ? "Native" : "Token"
+    } ${param.sourceTokenAddress} to Token ${param.destinationTokenAddress}`
   );
-  const { route } = await squidSdk.getRoute(param);
-  const tx = await squidSdk.executeRoute({
+
+  const { route } = await squid.getRoute(param);
+  const tx = await squid.executeRoute({
     signer,
     route
   });
   const txReceipt = await tx.wait();
-  console.log("> txReceipt: ", txReceipt.transactionHash);
-
-  const param2 = getTradeSend(
-    squidSdk,
-    ChainName.ETHEREUM,
-    ChainName.AVALANCHE
-  );
-  console.log("\n");
   console.log(
-    `> tradeSend from ethereum to avalanche ${param2.sourceTokenAddress} to ${param2.destinationTokenAddress}`
+    `> txReceipt: , ${
+      txReceipt.transactionHash
+    }, gasUsed: ${txReceipt.gasUsed.toNumber()} `
   );
-  const { route: route2 } = await squidSdk.getRoute(param2);
-  const tx2 = await squidSdk.executeRoute({
-    signer,
-    route: route2
-  });
-  const txReceipt2 = await tx2.wait();
-  console.log("> txReceipt: ", txReceipt2.transactionHash);
 };
 
-export const tradeSendAvalanche = async (squidSdk: Squid) => {
-  const signer = getSignerForChain(ChainName.AVALANCHE);
-  const param = getTradeSend(squidSdk, ChainName.AVALANCHE, ChainName.ETHEREUM);
-  console.log("\n");
-  console.log(
-    `> tradeSend from avalanche to ethereum ${param.sourceTokenAddress} to ${param.destinationTokenAddress}`
-  );
-  const { route } = await squidSdk.getRoute(param);
-  const tx = await squidSdk.executeRoute({
-    signer,
-    route
-  });
-  const txReceipt = await tx.wait();
-  console.log("> txReceipt: ", txReceipt.transactionHash);
-
-  const param2 = getTradeSend(
-    squidSdk,
-    ChainName.AVALANCHE,
-    ChainName.MOONBEAM
-  );
-  console.log("\n");
-  console.log(
-    `> tradeSend from avalanche to moonbeam ${param2.sourceTokenAddress} to ${param2.destinationTokenAddress}`
-  );
-  const { route: route2 } = await squidSdk.getRoute(param2);
-  const tx2 = await squidSdk.executeRoute({
-    signer,
-    route: route2
-  });
-  const txReceipt2 = await tx2.wait();
-  console.log("> txReceipt: ", txReceipt2.transactionHash);
-};
-
-export const tradeSendMoonbeam = async (squidSdk: Squid) => {
-  const signer = getSignerForChain(ChainName.MOONBEAM);
-  const param = getTradeSend(squidSdk, ChainName.MOONBEAM, ChainName.ETHEREUM);
-  console.log("\n");
-  console.log(
-    `> tradeSend from moonbeam to ethereum ${param.sourceTokenAddress} to ${param.destinationTokenAddress}`
-  );
-  const { route } = await squidSdk.getRoute(param);
-  const tx = await squidSdk.executeRoute({
-    signer,
-    route
-  });
-  const txReceipt = await tx.wait();
-  console.log("> txReceipt: ", txReceipt.transactionHash);
-
-  const param2 = getTradeSend(
-    squidSdk,
-    ChainName.MOONBEAM,
-    ChainName.AVALANCHE
-  );
-  console.log("\n");
-  console.log(
-    `> tradeSend from moonbeam to avalanche ${param2.sourceTokenAddress} to ${param2.destinationTokenAddress}`
-  );
-  const { route: route2 } = await squidSdk.getRoute(param2);
-  const tx2 = await squidSdk.executeRoute({
-    signer,
-    route: route2
-  });
-  const txReceipt2 = await tx2.wait();
-  console.log("> txReceipt: ", txReceipt2.transactionHash);
+export const tradeSend = async (
+  squid: Squid,
+  src: ChainName,
+  dests: ChainName[],
+  amount: string
+) => {
+  const signer = getSignerForChain(src);
+  for (const dest of dests) {
+    await executeTradeSend(squid, signer, src, dest, amount);
+    await executeTradeSend(squid, signer, src, dest, amount, true);
+  }
 };

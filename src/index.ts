@@ -7,7 +7,7 @@ import {
 import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import * as dotenv from "dotenv";
-
+import { TransactionRequest } from "@ethersproject/abstract-provider";
 import {
   Allowance,
   Approve,
@@ -186,7 +186,7 @@ export class Squid {
       environment: this.config?.environment as string
     } as AxelarQueryAPIConfig);
 
-    let gasFee;
+    let gasFee: string;
     try {
       gasFee = await sdk.estimateGasFee(
         sourceChain.nativeCurrency.name as EvmChain,
@@ -209,10 +209,10 @@ export class Squid {
     const tx = {
       to: sourceChain.squidContracts.squidMain,
       data: transactionRequest.data,
-      value: value
-    };
+      value: value,
+      gasLimit: 60e4 // 600000 gasLimit
+    } as TransactionRequest;
 
-    await signer.signTransaction(tx);
     return await signer.sendTransaction(tx);
   }
 
@@ -236,7 +236,6 @@ export class Squid {
 
     const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
     const contract = new ethers.Contract(token.address, erc20Abi, provider);
-
     return await contract.allowance(owner, spender);
   }
 
