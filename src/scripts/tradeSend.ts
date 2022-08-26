@@ -2,6 +2,8 @@ import { getSignerForChain, getTradeSend } from "./utils";
 import { ChainName } from "../types";
 import { Squid } from "../index";
 import { ethers } from "ethers";
+import { nativeTokenConstant } from "../constants";
+import chalk from "chalk";
 
 const executeTradeSend = async (
   squid: Squid,
@@ -21,8 +23,10 @@ const executeTradeSend = async (
   console.log("\n");
   console.log(
     `> tradeSend: ${fromNetwork}=>${toNetwork} from ${
-      isSrcNative ? "Native" : "Token"
-    } ${param.sourceTokenAddress} to Token ${param.destinationTokenAddress}`
+      isSrcNative ? chalk.red("Native") : chalk.green("Token")
+    } ${
+      isSrcNative ? nativeTokenConstant : param.sourceTokenAddress
+    } to ${chalk.green("Token")} ${param.destinationTokenAddress}`
   );
 
   const { route } = await squid.getRoute(param);
