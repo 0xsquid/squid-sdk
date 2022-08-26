@@ -2,10 +2,14 @@
   "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
   "editor.formatOnSave": true,
   "eslint.alwaysShowStatus": true,
+  "files.insertFinalNewline": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
   "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
