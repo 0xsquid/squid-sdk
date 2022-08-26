@@ -7,7 +7,6 @@ import {
 import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import * as dotenv from "dotenv";
-import { TransactionRequest } from "@ethersproject/abstract-provider";
 import {
   Allowance,
   Approve,
@@ -211,7 +210,7 @@ export class Squid {
       data: transactionRequest.data,
       value: value,
       gasLimit: 60e4 // 600000 gasLimit
-    } as TransactionRequest;
+    };
 
     return await signer.sendTransaction(tx);
   }
