@@ -3,6 +3,7 @@ import * as assert from "assert";
 
 import { Squid } from "../index";
 import { GetRoute, ChainName } from "../types";
+import { nativeTokenConstant } from "../constants/index";
 
 const buildParam = (
   sourceChainId: number,
@@ -61,7 +62,9 @@ export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
 export const getSendTrade = (
   squid: Squid,
   srcChainName: ChainName,
-  destChainName: ChainName
+  destChainName: ChainName,
+  amount: string,
+  isDestNative = false
 ): GetRoute => {
   const srcChain = squid.chains[srcChainName];
   const destChain = squid.chains[destChainName];
@@ -86,33 +89,39 @@ export const getSendTrade = (
   );
 
   const recipientAddress = getSignerForChain(destChainName)?.address as string;
-  const destWrappedNative = destChain.chainNativeContracts.wrappedNativeToken;
+  // select ether native constant for destination chain or wrapped native
+  const destWrappedNative = isDestNative
+    ? nativeTokenConstant
+    : destChain.chainNativeContracts.wrappedNativeToken;
 
-  //$100 axlUSDC ,swaps --> USDC/Wrapped
+  //$1 axlUSDC ,swaps --> USDC/Wrapped
   const route: GetRoute = buildParam(
     srcChain.chainId,
     destChain.chainId,
     srcGatewayToken,
     6,
-    "100",
+    amount,
     destWrappedNative,
     recipientAddress
   );
-
   return route;
 };
 
 export const getTradeSend = (
   squid: Squid,
   srcChainName: ChainName,
-  destChainName: ChainName
+  destChainName: ChainName,
+  amount: string,
+  isSrcNative = false
 ): GetRoute => {
   const srcChain = squid.chains[srcChainName];
   const destChain = squid.chains[destChainName];
 
   // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
-  const srcWrapperNativeToken =
-    srcChain.chainNativeContracts.wrappedNativeToken;
+  const srcWrapperNativeToken = isSrcNative
+    ? nativeTokenConstant
+    : srcChain.chainNativeContracts.wrappedNativeToken;
+
   // DEFAULT CROSS CHAIN TOKEN AS THE DESTINATION (axlUSDC/USDC)
   const dstCrosschainToken = destChain.squidContracts.defaultCrosschainToken;
 
@@ -132,8 +141,8 @@ export const getTradeSend = (
     srcChain.chainId,
     destChain.chainId,
     srcWrapperNativeToken,
-    6,
-    "1000000000000",
+    18,
+    amount, // Wrapped native
     dstCrosschainToken,
     recipientAddress
   );
@@ -144,17 +153,22 @@ export const getTradeSend = (
 export const getTradeSendTrade = (
   squid: Squid,
   srcChainName: ChainName,
-  destChainName: ChainName
+  destChainName: ChainName,
+  amount: string,
+  isSrcNative = false,
+  isDestNative = false
 ): GetRoute => {
   const srcChain = squid.chains[srcChainName];
   const destChain = squid.chains[destChainName];
 
   // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
-  const srcWrapperNativeToken =
-    srcChain.chainNativeContracts.wrappedNativeToken;
+  const srcWrapperNativeToken = isSrcNative
+    ? nativeTokenConstant
+    : srcChain.chainNativeContracts.wrappedNativeToken;
   // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
-  const destWrapperNativeToken =
-    destChain.chainNativeContracts.wrappedNativeToken;
+  const destWrapperNativeToken = isDestNative
+    ? nativeTokenConstant
+    : destChain.chainNativeContracts.wrappedNativeToken;
 
   const srcSquidExecutable = srcChain.squidContracts.squidMain;
   const destSquidExecutable = destChain.squidContracts.squidMain;
@@ -172,8 +186,8 @@ export const getTradeSendTrade = (
     srcChain.chainId,
     destChain.chainId,
     srcWrapperNativeToken,
-    6,
-    "1000000000000",
+    18,
+    amount,
     destWrapperNativeToken,
     recipientAddress
   );

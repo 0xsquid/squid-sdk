@@ -1,4 +1,4 @@
-import { mapChainIdName } from "../contants/chains";
+import { mapChainIdName } from "../constants/chains";
 import { ChainData, ChainsData } from "../types";
 
 export const getChainData = (
