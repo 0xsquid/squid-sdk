@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from "ethers";
 import * as dotenv from "dotenv";
-import { Squid } from "./src";
+import { Squid } from "./../index";
 
 dotenv.config();
 
