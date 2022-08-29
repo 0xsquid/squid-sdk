@@ -6,7 +6,7 @@ import { Squid } from "../index";
 
 import { chainsData } from "./constants/chains";
 import { supportedTokens } from "./constants/tokens";
-import { uint256MaxValue } from "../contants/infiniteApproval";
+import { uint256MaxValue } from "../constants";
 
 jest.mock("axios");
 jest.mock("ethers");

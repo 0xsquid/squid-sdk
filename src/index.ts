@@ -7,10 +7,10 @@ import {
 import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import * as dotenv from "dotenv";
-
 import {
   Allowance,
   Approve,
+  ChainData,
   ChainsData,
   Config,
   ExecuteRoute,
@@ -22,7 +22,7 @@ import {
 import erc20Abi from "./abi/erc20.json";
 import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
-import { uint256MaxValue } from "./contants/infiniteApproval";
+import { nativeTokenConstant, uint256MaxValue } from "./constants";
 
 dotenv.config();
 
@@ -32,18 +32,21 @@ export class Squid {
   private axiosInstance: AxiosInstance;
 
   public inited = false;
-  public config: Config;
+  public config: Config | undefined;
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = {} as ChainsData;
 
-  constructor(config: Config) {
+  constructor(config?: Config) {
     this.axiosInstance = axios.create({
-      baseURL: config.baseUrl || baseUrl,
+      baseURL: config?.baseUrl || baseUrl,
       headers: {
         // 'api-key': config.apiKey
       }
     });
-    this.config = config;
+
+    if (config) {
+      this.config = config;
+    }
   }
 
   private validateInit() {
@@ -51,6 +54,61 @@ export class Squid {
       throw new Error(
         "SquidSdk must be inited! Please call the SquidSdk.init method"
       );
+    }
+  }
+
+  private async validateBalanceAndApproval({
+    tokenAddress,
+    sourceAmount,
+    signer,
+    sourceChain,
+    infiniteApproval
+  }: {
+    tokenAddress: string;
+    sourceAmount: string;
+    signer: ethers.Wallet;
+    sourceChain: ChainData;
+    infiniteApproval?: boolean;
+  }) {
+    const _sourceAmount = BigInt(sourceAmount);
+    const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc);
+    const srcTokenContract = new ethers.Contract(
+      tokenAddress,
+      erc20Abi,
+      srcProvider
+    );
+
+    const balance = await srcTokenContract.balanceOf(signer.address);
+
+    if (balance < _sourceAmount) {
+      throw new Error(
+        `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
+      );
+    }
+
+    const allowance = await srcTokenContract.allowance(
+      signer.address,
+      sourceChain.squidContracts.squidMain
+    );
+
+    if (allowance < _sourceAmount) {
+      let amountToApprove: string | bigint = uint256MaxValue;
+
+      if (infiniteApproval === false) {
+        amountToApprove = _sourceAmount;
+      }
+
+      if (
+        this.config?.executionSettings?.infiniteApproval === false &&
+        !infiniteApproval
+      ) {
+        amountToApprove = uint256MaxValue;
+      }
+
+      const approveTx = await srcTokenContract
+        .connect(signer)
+        .approve(sourceChain.squidContracts.squidMain, amountToApprove);
+      await approveTx.wait();
     }
   }
 
@@ -98,95 +156,62 @@ export class Squid {
       this.chains as ChainsData,
       params.sourceChainId
     );
-    const sourceToken = getTokenData(
-      this.tokens as TokenData[],
-      params.sourceTokenAddress
-    );
     const destinationChain = getChainData(
       this.chains as ChainsData,
       params.destinationChainId
     );
-
     if (!sourceChain) {
       throw new Error(`sourceChain not found for ${params.sourceChainId}`);
     }
-
-    if (!sourceToken) {
-      throw new Error(`sourceToken not found for ${params.sourceTokenAddress}`);
-    }
-
     if (!destinationChain) {
       throw new Error(
         `destinationChain not found for ${params.destinationChainId}`
       );
     }
 
-    const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc);
-    const srcTokenContract = new ethers.Contract(
-      sourceToken.address,
-      erc20Abi,
-      srcProvider
-    );
+    const sourceIsNative = params.sourceTokenAddress === nativeTokenConstant;
 
-    const sourceAmount = BigInt(params.sourceAmount);
-    const balance = await srcTokenContract.balanceOf(signer.address);
-
-    if (balance < BigInt(params.sourceAmount)) {
-      throw new Error(
-        `Insufficent funds for account: ${signer.address} on ${params.sourceChainId}`
-      );
-    }
-
-    const allowance = await srcTokenContract.allowance(
-      signer.address,
-      sourceChain.squidContracts.squidMain
-    );
-
-    if (allowance < sourceAmount) {
-      let amountToApprove: string | bigint = uint256MaxValue;
-
-      if (executionSettings?.infiniteApproval === false) {
-        amountToApprove = sourceAmount;
-      }
-
-      if (
-        this.config.executionSettings?.infiniteApproval === false &&
-        !executionSettings?.infiniteApproval
-      ) {
-        amountToApprove = uint256MaxValue;
-      }
-
-      const approveTx = await srcTokenContract
-        .connect(signer)
-        .approve(sourceChain.squidContracts.squidMain, amountToApprove);
-      await approveTx.wait();
+    if (!sourceIsNative) {
+      await this.validateBalanceAndApproval({
+        tokenAddress: params.sourceTokenAddress,
+        sourceAmount: params.sourceAmount,
+        sourceChain,
+        infiniteApproval: executionSettings?.infiniteApproval,
+        signer
+      });
     }
 
     const sdk = new AxelarQueryAPI({
-      environment: this.config.environment as string
+      environment: this.config?.environment as string
     } as AxelarQueryAPIConfig);
 
-    let gasFee;
+    let gasFee: string;
     try {
       gasFee = await sdk.estimateGasFee(
-        sourceChain?.nativeCurrency.name as EvmChain,
-        destinationChain?.nativeCurrency.name as EvmChain,
-        GasToken.ETH,
+        sourceChain.nativeCurrency.name as EvmChain,
+        destinationChain.nativeCurrency.name as EvmChain,
+        destinationChain.nativeCurrency.symbol as GasToken,
         transactionRequest.destinationChainGas
       );
     } catch (error) {
       // TODO: we need a backup
       console.warn("error: fetching gasFee:", error);
-      gasFee = 3e7;
+      gasFee = "3513000021000000";
     }
+
+    const value = sourceIsNative
+      ? ethers.BigNumber.from(params.sourceAmount).add(
+          ethers.BigNumber.from(gasFee)
+        )
+      : ethers.BigNumber.from(gasFee);
 
     const tx = {
       to: sourceChain.squidContracts.squidMain,
       data: transactionRequest.data,
-      value: BigInt(gasFee) // this will need to be calculated, maybe by the api, also standarice usage of this kind of values
+      value: value,
+      gasLimit: 60e4 // 600000 gasLimit
     };
 
-    await signer.signTransaction(tx);
     return await signer.sendTransaction(tx);
   }
 
@@ -210,7 +235,6 @@ export class Squid {
 
     const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
     const contract = new ethers.Contract(token.address, erc20Abi, provider);
-
     return await contract.allowance(owner, spender);
   }
 

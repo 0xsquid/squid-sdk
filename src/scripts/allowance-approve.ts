@@ -13,13 +13,13 @@ const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint);
 
 async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
-  const squidSdk = new Squid({
+  const squid = new Squid({
     environment: Environment.LOCAL
   });
 
-  await squidSdk.init();
+  await squid.init();
 
-  const allowance = await squidSdk.allowance({
+  const allowance = await squid.allowance({
     owner: signer.address,
     spender: "0x6972A415e0572bd2E5E3c7DF307d0AFe32D30955",
     tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -27,7 +27,7 @@ async function main() {
 
   console.log("> allowance: ", allowance.toString());
 
-  const approve = await squidSdk.approve({
+  const approve = await squid.approve({
     signer,
     spender: "0x6972A415e0572bd2E5E3c7DF307d0AFe32D30955",
     tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -36,7 +36,7 @@ async function main() {
 
   console.log("> approve: ", approve);
 
-  const allowance2 = await squidSdk.allowance({
+  const allowance2 = await squid.allowance({
     owner: signer.address,
     spender: "0x6972A415e0572bd2E5E3c7DF307d0AFe32D30955",
     tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
