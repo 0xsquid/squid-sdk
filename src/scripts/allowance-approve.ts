@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import * as dotenv from "dotenv";
 
 import { Squid } from "..";
-import { Environment } from "../types";
 
 dotenv.config();
 
@@ -13,9 +12,7 @@ const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint);
 
 async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
-  const squid = new Squid({
-    environment: Environment.LOCAL
-  });
+  const squid = new Squid();
 
   await squid.init();
 

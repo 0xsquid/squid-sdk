@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 
-import { ChainName, Environment } from "../types";
+import { ChainName } from "../types";
 import { Squid } from "../index";
 import yargs from "yargs/yargs";
 import { sendTrade } from "./sendTrade";
@@ -12,16 +12,15 @@ const parser = yargs(process.argv.slice(2)).options({
   s: { type: "string", default: "", alias: "suite" }
 });
 
-const getSDK = (env: Environment): Squid => {
+const getSDK = (): Squid => {
   const squid = new Squid({
-    environment: env,
     baseUrl: "http://localhost:3000"
   });
   return squid;
 };
 
 (async () => {
-  const squid = getSDK(Environment.LOCAL);
+  const squid = getSDK();
   await squid.init();
   const argv = await parser.argv;
   const all = argv.s === "";

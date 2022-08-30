@@ -182,7 +182,7 @@ export class Squid {
     }
 
     const sdk = new AxelarQueryAPI({
-      environment: this.config?.environment as string
+      environment: "testnet" // TODO: MAP WITH BASEURL
     } as AxelarQueryAPIConfig);
 
     let gasFee: string;
