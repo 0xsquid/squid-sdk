@@ -6,9 +6,6 @@ Squid {
     "get": [MockFunction],
   },
   "chains": Object {},
-  "config": Object {
-    "environment": "local",
-  },
   "inited": false,
   "tokens": Array [],
 }
