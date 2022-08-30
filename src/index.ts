@@ -26,7 +26,7 @@ import { nativeTokenConstant, uint256MaxValue } from "./constants";
 
 dotenv.config();
 
-const baseUrl = process.env.baseUrl;
+const baseUrl = "https://testnet.api.0xsquid.com/";
 
 export class Squid {
   private axiosInstance: AxiosInstance;
@@ -36,7 +36,7 @@ export class Squid {
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = {} as ChainsData;
 
-  constructor(config?: Config) {
+  constructor(config = {} as Config) {
     this.axiosInstance = axios.create({
       baseURL: config?.baseUrl || baseUrl,
       headers: {
@@ -44,9 +44,10 @@ export class Squid {
       }
     });
 
-    if (config) {
-      this.config = config;
-    }
+    this.config = {
+      baseUrl: config?.baseUrl || baseUrl,
+      ...config
+    };
   }
 
   private validateInit() {
@@ -182,7 +183,10 @@ export class Squid {
     }
 
     const sdk = new AxelarQueryAPI({
-      environment: "testnet" // TODO: MAP WITH BASEURL
+      environment:
+        this.config?.baseUrl && !this.config.baseUrl.includes("testnet")
+          ? "mainnet"
+          : "testnet"
     } as AxelarQueryAPIConfig);
 
     let gasFee: string;
