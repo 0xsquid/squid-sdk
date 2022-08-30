@@ -1,11 +1,5 @@
 import { ethers } from "ethers";
 
-export enum Environment {
-  LOCAL = "local",
-  TESTNET = "testnet",
-  MAINNET = "mainnet"
-}
-
 export enum ChainName {
   ETHEREUM = "Ethereum",
   AVALANCHE = "Avalanche",
@@ -74,7 +68,6 @@ export type TokenData = {
 
 export type Config = {
   apiKey?: string;
-  environment: Environment;
   baseUrl?: string;
   executionSettings?: {
     infiniteApproval?: boolean;
