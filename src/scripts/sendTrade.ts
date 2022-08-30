@@ -13,16 +13,16 @@ const excecuteSendTrade = async (
   amount: string,
   isDestNative = false
 ) => {
-  const param = getSendTrade(squid, fromNetwork, toNetwork, amount);
+  const params = getSendTrade(squid, fromNetwork, toNetwork, amount);
   console.log("\n");
   console.log(
     `> sendTrade: from ${fromNetwork}=>${toNetwork} from ${chalk.green(
       "Token"
-    )} ${param.sourceTokenAddress} to ${
+    )} ${params.sourceTokenAddress} to ${
       isDestNative ? chalk.red("Native") : chalk.green("Token")
-    } ${isDestNative ? nativeTokenConstant : param.destinationTokenAddress}`
+    } ${isDestNative ? nativeTokenConstant : params.destinationTokenAddress}`
   );
-  const { route } = await squid.getRoute(param);
+  const { route } = await squid.getRoute(params);
   const tx = await squid.executeRoute({
     signer,
     route
@@ -44,6 +44,6 @@ export const sendTrade = async (
   const signer = getSignerForChain(src);
   for (const dest of dests) {
     await excecuteSendTrade(squid, signer, src, dest, amount);
-    await excecuteSendTrade(squid, signer, src, dest, amount, true);
+    //await excecuteSendTrade(squid, signer, src, dest, amount, true);
   }
 };
