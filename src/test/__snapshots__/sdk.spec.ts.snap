@@ -6,6 +6,9 @@ Squid {
     "get": [MockFunction],
   },
   "chains": Object {},
+  "config": Object {
+    "baseUrl": "https://testnet.api.0xsquid.com/",
+  },
   "inited": false,
   "tokens": Array [],
 }
