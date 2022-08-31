@@ -7,16 +7,22 @@ import {
 import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import * as dotenv from "dotenv";
+
 import {
   Allowance,
   Approve,
-  ChainData,
+  ApproveRoute,
   ChainsData,
   Config,
   ExecuteRoute,
   GetRoute,
   GetRouteResponse,
-  TokenData
+  IsRouteApproved,
+  Route,
+  RoutePopulatedData,
+  RouteType,
+  TokenData,
+  ValidateBalanceAndApproval
 } from "./types";
 
 import erc20Abi from "./abi/erc20.json";
@@ -59,58 +65,122 @@ export class Squid {
   }
 
   private async validateBalanceAndApproval({
-    tokenAddress,
+    srcTokenContract,
     sourceAmount,
-    signer,
+    sourceIsNative,
+    spenderContractAddress,
+    srcProvider,
     sourceChain,
+    signer,
     infiniteApproval
-  }: {
-    tokenAddress: string;
-    sourceAmount: string;
-    signer: ethers.Wallet;
-    sourceChain: ChainData;
-    infiniteApproval?: boolean;
-  }) {
-    const _sourceAmount = BigInt(sourceAmount);
+  }: ValidateBalanceAndApproval) {
+    const _sourceAmount = ethers.BigNumber.from(sourceAmount);
+
+    if (!sourceIsNative) {
+      const balance = await srcTokenContract.balanceOf(signer.address);
+
+      if (_sourceAmount.gt(balance)) {
+        throw new Error(
+          `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
+        );
+      }
+
+      const allowance = await srcTokenContract.allowance(
+        signer.address,
+        spenderContractAddress
+      );
+
+      if (_sourceAmount.gt(allowance)) {
+        let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
+
+        if (infiniteApproval === false) {
+          amountToApprove = _sourceAmount;
+        }
+
+        if (
+          this.config?.executionSettings?.infiniteApproval === false &&
+          !infiniteApproval
+        ) {
+          amountToApprove = ethers.BigNumber.from(uint256MaxValue);
+        }
+
+        const approveTx = await srcTokenContract
+          .connect(signer)
+          .approve(spenderContractAddress, amountToApprove);
+        await approveTx.wait();
+      }
+    } else {
+      const balance = await srcProvider.getBalance(signer.address);
+
+      if (_sourceAmount.gt(balance)) {
+        throw new Error(
+          `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
+        );
+      }
+    }
+  }
+
+  private validateRouteData(route: Route): RoutePopulatedData {
+    const {
+      params: {
+        sourceChainId,
+        destinationChainId,
+        sourceTokenAddress,
+        destinationTokenAddress
+      },
+      transactionRequest: { routeType }
+    } = route;
+
+    const sourceChain = getChainData(this.chains as ChainsData, sourceChainId);
+    const destinationChain = getChainData(
+      this.chains as ChainsData,
+      destinationChainId
+    );
+    if (!sourceChain) {
+      throw new Error(`sourceChain not found for ${sourceChainId}`);
+    }
+    if (!destinationChain) {
+      throw new Error(`destinationChain not found for ${destinationChainId}`);
+    }
+
     const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc);
-    const srcTokenContract = new ethers.Contract(
-      tokenAddress,
-      erc20Abi,
-      srcProvider
+    const sourceToken = getTokenData(
+      this.tokens,
+      sourceTokenAddress,
+      sourceChainId
+    );
+    const destinationToken = getTokenData(
+      this.tokens,
+      destinationTokenAddress,
+      destinationChainId
     );
 
-    const balance = await srcTokenContract.balanceOf(signer.address);
+    const spenderContractAddress =
+      routeType === RouteType.SEND
+        ? sourceChain.axelarContracts.gateway
+        : sourceChain.squidContracts.squidMain;
 
-    if (balance < _sourceAmount) {
-      throw new Error(
-        `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
+    const sourceIsNative = sourceTokenAddress === nativeTokenConstant;
+    let srcTokenContract;
+
+    if (!sourceIsNative) {
+      srcTokenContract = new ethers.Contract(
+        sourceTokenAddress,
+        erc20Abi,
+        srcProvider
       );
     }
 
-    const allowance = await srcTokenContract.allowance(
-      signer.address,
-      sourceChain.squidContracts.squidMain
-    );
-
-    if (allowance < _sourceAmount) {
-      let amountToApprove: string | bigint = uint256MaxValue;
-
-      if (infiniteApproval === false) {
-        amountToApprove = _sourceAmount;
-      }
-
-      if (
-        this.config?.executionSettings?.infiniteApproval === false &&
-        !infiniteApproval
-      ) {
-        amountToApprove = uint256MaxValue;
-      }
-
-      const approveTx = await srcTokenContract
-        .connect(signer)
-        .approve(sourceChain.squidContracts.squidMain, amountToApprove);
-      await approveTx.wait();
-    }
+    return {
+      sourceChain,
+      destinationChain,
+      sourceToken,
+      destinationToken,
+      srcTokenContract,
+      srcProvider,
+      sourceIsNative,
+      spenderContractAddress
+    };
   }
 
   public async init() {
@@ -153,28 +223,21 @@ export class Squid {
 
     const { transactionRequest, params } = route;
 
-    const sourceChain = getChainData(
-      this.chains as ChainsData,
-      params.sourceChainId
-    );
-    const destinationChain = getChainData(
-      this.chains as ChainsData,
-      params.destinationChainId
-    );
-    if (!sourceChain) {
-      throw new Error(`sourceChain not found for ${params.sourceChainId}`);
-    }
-    if (!destinationChain) {
-      throw new Error(
-        `destinationChain not found for ${params.destinationChainId}`
-      );
-    }
-
-    const sourceIsNative = params.sourceTokenAddress === nativeTokenConstant;
+    const {
+      sourceIsNative,
+      sourceChain,
+      destinationChain,
+      srcTokenContract,
+      srcProvider,
+      spenderContractAddress
+    } = this.validateRouteData(route);
 
     if (!sourceIsNative) {
       await this.validateBalanceAndApproval({
-        tokenAddress: params.sourceTokenAddress,
+        srcTokenContract: srcTokenContract as ethers.Contract,
+        spenderContractAddress,
+        srcProvider,
+        sourceIsNative,
         sourceAmount: params.sourceAmount,
         sourceChain,
         infiniteApproval: executionSettings?.infiniteApproval,
@@ -219,12 +282,111 @@ export class Squid {
     return await signer.sendTransaction(tx);
   }
 
-  public async allowance(params: Allowance): Promise<BigNumber> {
+  public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
+    isApproved: boolean;
+    message: string;
+  }> {
     this.validateInit();
 
-    const { owner, spender, tokenAddress } = params;
+    const {
+      sourceIsNative,
+      sourceChain,
+      srcProvider,
+      srcTokenContract,
+      spenderContractAddress
+    } = this.validateRouteData(route);
 
-    const token = getTokenData(this.tokens as TokenData[], tokenAddress);
+    const {
+      params: { sourceAmount }
+    } = route;
+
+    const amount = ethers.BigNumber.from(sourceAmount);
+
+    if (!sourceIsNative) {
+      const balance = await (srcTokenContract as ethers.Contract).balanceOf(
+        sender
+      );
+
+      if (amount.gt(balance)) {
+        throw new Error(
+          `Insufficent funds for account: ${sender} on chain ${sourceChain.chainId}`
+        );
+      }
+
+      const allowance = await (srcTokenContract as ethers.Contract).allowance(
+        sender,
+        spenderContractAddress
+      );
+
+      if (amount.gt(allowance)) {
+        throw new Error(
+          `Insufficent allowance for contract: ${spenderContractAddress} on chain ${sourceChain.chainId}`
+        );
+      }
+
+      return {
+        isApproved: true,
+        message: `User has approved Squid to use ${sourceAmount} of ${await (
+          srcTokenContract as ethers.Contract
+        ).symbol()}`
+      };
+    } else {
+      const balance = await srcProvider.getBalance(sender);
+
+      if (amount.gt(balance)) {
+        throw new Error(
+          `Insufficent funds for account: ${sender} on chain ${sourceChain.chainId}`
+        );
+      }
+
+      return {
+        isApproved: true,
+        message: `User has the expected balance ${sourceAmount} of ${sourceChain.nativeCurrency.symbol}`
+      };
+    }
+  }
+
+  public async approveRoute({ route, signer }: ApproveRoute): Promise<boolean> {
+    this.validateInit();
+
+    const { sourceIsNative, srcTokenContract, spenderContractAddress } =
+      this.validateRouteData(route);
+
+    const {
+      params: { sourceAmount }
+    } = route as Route;
+
+    if (sourceIsNative) {
+      return true;
+    }
+
+    let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
+
+    if (this.config?.executionSettings?.infiniteApproval === false) {
+      amountToApprove = ethers.BigNumber.from(sourceAmount);
+    }
+
+    const approveTx = await (srcTokenContract as ethers.Contract)
+      .connect(signer)
+      .approve(spenderContractAddress, amountToApprove);
+    await approveTx.wait();
+
+    return true;
+  }
+
+  public async allowance({
+    owner,
+    spender,
+    tokenAddress,
+    chainId
+  }: Allowance): Promise<BigNumber> {
+    this.validateInit();
+
+    const token = getTokenData(
+      this.tokens as TokenData[],
+      tokenAddress,
+      chainId
+    );
     if (!token) {
       throw new Error("Unsupported token");
     }
@@ -242,14 +404,20 @@ export class Squid {
     return await contract.allowance(owner, spender);
   }
 
-  public async approve(
-    params: Approve
-  ): Promise<ethers.providers.TransactionResponse> {
+  public async approve({
+    signer,
+    spender,
+    tokenAddress,
+    amount,
+    chainId
+  }: Approve): Promise<ethers.providers.TransactionResponse> {
     this.validateInit();
 
-    const { signer, spender, tokenAddress, amount } = params;
-
-    const token = getTokenData(this.tokens as TokenData[], tokenAddress);
+    const token = getTokenData(
+      this.tokens as TokenData[],
+      tokenAddress,
+      chainId
+    );
     if (!token) {
       throw new Error("Unsupported token");
     }

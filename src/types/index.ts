@@ -119,6 +119,7 @@ export type Allowance = {
   owner: string;
   spender: string;
   tokenAddress: string;
+  chainId: number;
 };
 
 export type Approve = {
@@ -126,4 +127,44 @@ export type Approve = {
   spender: string;
   tokenAddress: string;
   amount?: string;
+  chainId: number;
+};
+
+export enum RouteType {
+  TRADE_SEND_TRADE = "TRADE_SEND_TRADE",
+  TRADE_SEND = "TRADE_SEND",
+  SEND_TRADE = "SEND_TRADE",
+  SEND = "SEND"
+}
+
+export type IsRouteApproved = {
+  route: Route;
+  sender: string;
+};
+
+export type ApproveRoute = {
+  route: Route;
+  signer: ethers.Wallet;
+};
+
+export type RoutePopulatedData = {
+  sourceChain: ChainData;
+  destinationChain: ChainData;
+  sourceToken: TokenData | undefined;
+  destinationToken: TokenData | undefined;
+  srcTokenContract: ethers.Contract | undefined;
+  srcProvider: ethers.providers.JsonRpcProvider;
+  sourceIsNative: boolean;
+  spenderContractAddress: string;
+};
+
+export type ValidateBalanceAndApproval = {
+  srcTokenContract: ethers.Contract;
+  srcProvider: ethers.providers.JsonRpcProvider;
+  sourceIsNative: boolean;
+  sourceAmount: string;
+  spenderContractAddress: string;
+  signer: ethers.Wallet;
+  sourceChain: ChainData;
+  infiniteApproval?: boolean;
 };
