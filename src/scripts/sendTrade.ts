@@ -44,6 +44,6 @@ export const sendTrade = async (
   const signer = getSignerForChain(src);
   for (const dest of dests) {
     await excecuteSendTrade(squid, signer, src, dest, amount);
-    //await excecuteSendTrade(squid, signer, src, dest, amount, true);
+    await excecuteSendTrade(squid, signer, src, dest, amount, true);
   }
 };

@@ -12,7 +12,6 @@ const sendAmount: BigNumber = ethers.utils.parseEther("1"); // 0.1 WETH
 
 const privateKey = process.env.privateKey as string;
 const ethRpcEndPoint = process.env.ethereumRpcEndPoint as string; // be sure that rpc corresponds to env
-const recipientAddress = process.env.recipientAddress as string;
 const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint);
 
 async function main() {
