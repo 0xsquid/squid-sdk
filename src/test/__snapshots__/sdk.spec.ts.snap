@@ -7,7 +7,7 @@ Squid {
   },
   "chains": Object {},
   "config": Object {
-    "environment": "local",
+    "baseUrl": "https://testnet.api.0xsquid.com/",
   },
   "inited": false,
   "tokens": Array [],
