@@ -1,6 +1,5 @@
 import axios from "axios";
 
-import { Environment } from "../types";
 import { Squid } from "../index";
 
 jest.mock("axios");
@@ -10,37 +9,25 @@ describe("Squid", () => {
     const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
       get: jest.fn()
     });
-    const squidSdk = new Squid({
-      environment: Environment.LOCAL
-    });
+    const squidSdk = new Squid();
 
     expect(squidSdk).toMatchSnapshot();
     expect(squidSdk.inited).toBe(false);
-    expect(squidSdk.config).toStrictEqual({
-      environment: Environment.LOCAL
-    });
     expect(squidSdk.tokens).toEqual([]);
     expect(squidSdk.chains).toEqual({});
   });
 
   describe("setConfig", () => {
     it("should set config as expected", () => {
-      const squidSdk = new Squid({
-        environment: Environment.LOCAL
-      });
+      const squidSdk = new Squid();
 
       squidSdk.setConfig({
-        environment: Environment.TESTNET,
         executionSettings: {
           infiniteApproval: false
         }
       });
 
-      expect(squidSdk.config).not.toStrictEqual({
-        environment: Environment.LOCAL
-      });
       expect(squidSdk.config).toStrictEqual({
-        environment: Environment.TESTNET,
         executionSettings: {
           infiniteApproval: false
         }
@@ -56,9 +43,7 @@ describe("Squid", () => {
         })
       });
 
-      const squidSdk = new Squid({
-        environment: Environment.LOCAL
-      });
+      const squidSdk = new Squid();
 
       await squidSdk.init();
       expect(squidSdk.inited).toEqual(true);
