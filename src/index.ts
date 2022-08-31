@@ -273,7 +273,7 @@ export class Squid {
       : ethers.BigNumber.from(gasFee);
 
     const tx = {
-      to: sourceChain.squidContracts.squidMain,
+      to: spenderContractAddress,
       data: transactionRequest.data,
       value: value,
       gasLimit: 60e4 // 600000 gasLimit
