@@ -32,9 +32,9 @@ const getSDK = (env: Environment): Squid => {
   try {
     if (all || argv.s === "sendtrade") {
       console.log(`\n> Running SendTrade`);
-      await sendTrade(squid, ChainName.ETHEREUM, ethereumDests, "0.001");
-      await sendTrade(squid, ChainName.AVALANCHE, avalancheDests, "0.1");
-      await sendTrade(squid, ChainName.MOONBEAM, moonbeamDests, "0.1");
+      await sendTrade(squid, ChainName.ETHEREUM, ethereumDests, "1"); // USDC value
+      await sendTrade(squid, ChainName.AVALANCHE, avalancheDests, "1"); // USDC value
+      await sendTrade(squid, ChainName.MOONBEAM, moonbeamDests, "1"); // USDC value
     }
 
     if (all || argv.s === "tradesend") {
