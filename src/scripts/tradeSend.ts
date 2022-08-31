@@ -13,7 +13,7 @@ const executeTradeSend = async (
   amount: string,
   isSrcNative = false
 ) => {
-  const param = getTradeSend(
+  const params = getTradeSend(
     squid,
     fromNetwork,
     toNetwork,
@@ -25,11 +25,11 @@ const executeTradeSend = async (
     `> tradeSend: ${fromNetwork}=>${toNetwork} from ${
       isSrcNative ? chalk.red("Native") : chalk.green("Token")
     } ${
-      isSrcNative ? nativeTokenConstant : param.sourceTokenAddress
-    } to ${chalk.green("Token")} ${param.destinationTokenAddress}`
+      isSrcNative ? nativeTokenConstant : params.sourceTokenAddress
+    } to ${chalk.green("Token")} ${params.destinationTokenAddress}`
   );
 
-  const { route } = await squid.getRoute(param);
+  const { route } = await squid.getRoute(params);
   const tx = await squid.executeRoute({
     signer,
     route

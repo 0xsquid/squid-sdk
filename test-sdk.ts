@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 
 import * as dotenv from "dotenv";
 
-import Squid from "./src";
+import { Squid } from "./src";
 import { Environment } from "./src/types";
 
 dotenv.config();
@@ -11,14 +11,14 @@ const sendAmount: BigNumber = ethers.utils.parseEther("1"); // 0.1 WETH
 // const aUSDC: BigNumber = ethers.utils.parseUnits('1', 6) // 1 aUSDC
 
 const privateKey = process.env.privateKey as string;
-const ethRpcEndPoint = process.env.ethRpcEndPoint as string; // be sure that rpc corresponds to env
-const recipientAddress = process.env.recipientAddress as string;
+const ethRpcEndPoint = process.env.ethereumRpcEndPoint as string; // be sure that rpc corresponds to env
 const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint);
 
 async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
   const squidSdk = new Squid({
-    environment: Environment.LOCAL
+    environment: Environment.LOCAL,
+    baseUrl: "http://localhost:3000"
   });
 
   await squidSdk.init();
@@ -28,7 +28,7 @@ async function main() {
 
   // trade-send
   const params = {
-    recipientAddress,
+    recipientAddress: signer.address,
     sourceChainId: 1,
     sourceTokenAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     sourceAmount: sendAmount.toString(),
