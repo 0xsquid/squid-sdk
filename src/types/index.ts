@@ -92,6 +92,7 @@ export type RouteData = {
 
 export type TransactionRequest = {
   routeType: string;
+  targetAddress: string;
   gasReceiver: boolean;
   data: string;
   destinationChainGas: number;
@@ -130,13 +131,6 @@ export type Approve = {
   chainId: number;
 };
 
-export enum RouteType {
-  TRADE_SEND_TRADE = "TRADE_SEND_TRADE",
-  TRADE_SEND = "TRADE_SEND",
-  SEND_TRADE = "SEND_TRADE",
-  SEND = "SEND"
-}
-
 export type IsRouteApproved = {
   route: Route;
   sender: string;
@@ -155,7 +149,7 @@ export type RoutePopulatedData = {
   srcTokenContract: ethers.Contract | undefined;
   srcProvider: ethers.providers.JsonRpcProvider;
   sourceIsNative: boolean;
-  spenderContractAddress: string;
+  targetAddress: string;
 };
 
 export type ValidateBalanceAndApproval = {
@@ -163,7 +157,7 @@ export type ValidateBalanceAndApproval = {
   srcProvider: ethers.providers.JsonRpcProvider;
   sourceIsNative: boolean;
   sourceAmount: string;
-  spenderContractAddress: string;
+  targetAddress: string;
   signer: ethers.Wallet;
   sourceChain: ChainData;
   infiniteApproval?: boolean;

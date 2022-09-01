@@ -20,7 +20,6 @@ import {
   IsRouteApproved,
   Route,
   RoutePopulatedData,
-  RouteType,
   TokenData,
   ValidateBalanceAndApproval
 } from "./types";
@@ -68,7 +67,7 @@ export class Squid {
     srcTokenContract,
     sourceAmount,
     sourceIsNative,
-    spenderContractAddress,
+    targetAddress,
     srcProvider,
     sourceChain,
     signer,
@@ -87,7 +86,7 @@ export class Squid {
 
       const allowance = await srcTokenContract.allowance(
         signer.address,
-        spenderContractAddress
+        targetAddress
       );
 
       if (_sourceAmount.gt(allowance)) {
@@ -106,7 +105,7 @@ export class Squid {
 
         const approveTx = await srcTokenContract
           .connect(signer)
-          .approve(spenderContractAddress, amountToApprove);
+          .approve(targetAddress, amountToApprove);
         await approveTx.wait();
       }
     } else {
@@ -128,7 +127,7 @@ export class Squid {
         sourceTokenAddress,
         destinationTokenAddress
       },
-      transactionRequest: { routeType }
+      transactionRequest: { targetAddress }
     } = route;
 
     const sourceChain = getChainData(this.chains as ChainsData, sourceChainId);
@@ -155,11 +154,6 @@ export class Squid {
       destinationChainId
     );
 
-    const spenderContractAddress =
-      routeType === RouteType.SEND
-        ? sourceChain.axelarContracts.gateway
-        : sourceChain.squidContracts.squidMain;
-
     const sourceIsNative = sourceTokenAddress === nativeTokenConstant;
     let srcTokenContract;
 
@@ -179,7 +173,7 @@ export class Squid {
       srcTokenContract,
       srcProvider,
       sourceIsNative,
-      spenderContractAddress
+      targetAddress
     };
   }
 
@@ -229,13 +223,13 @@ export class Squid {
       destinationChain,
       srcTokenContract,
       srcProvider,
-      spenderContractAddress
+      targetAddress
     } = this.validateRouteData(route);
 
     if (!sourceIsNative) {
       await this.validateBalanceAndApproval({
         srcTokenContract: srcTokenContract as ethers.Contract,
-        spenderContractAddress,
+        targetAddress,
         srcProvider,
         sourceIsNative,
         sourceAmount: params.sourceAmount,
@@ -273,7 +267,7 @@ export class Squid {
       : ethers.BigNumber.from(gasFee);
 
     const tx = {
-      to: spenderContractAddress,
+      to: targetAddress,
       data: transactionRequest.data,
       value: value,
       gasLimit: 60e4 // 600000 gasLimit
@@ -293,7 +287,7 @@ export class Squid {
       sourceChain,
       srcProvider,
       srcTokenContract,
-      spenderContractAddress
+      targetAddress
     } = this.validateRouteData(route);
 
     const {
@@ -315,12 +309,12 @@ export class Squid {
 
       const allowance = await (srcTokenContract as ethers.Contract).allowance(
         sender,
-        spenderContractAddress
+        targetAddress
       );
 
       if (amount.gt(allowance)) {
         throw new Error(
-          `Insufficent allowance for contract: ${spenderContractAddress} on chain ${sourceChain.chainId}`
+          `Insufficent allowance for contract: ${targetAddress} on chain ${sourceChain.chainId}`
         );
       }
 
@@ -349,7 +343,7 @@ export class Squid {
   public async approveRoute({ route, signer }: ApproveRoute): Promise<boolean> {
     this.validateInit();
 
-    const { sourceIsNative, srcTokenContract, spenderContractAddress } =
+    const { sourceIsNative, srcTokenContract, targetAddress } =
       this.validateRouteData(route);
 
     const {
@@ -368,7 +362,7 @@ export class Squid {
 
     const approveTx = await (srcTokenContract as ethers.Contract)
       .connect(signer)
-      .approve(spenderContractAddress, amountToApprove);
+      .approve(targetAddress, amountToApprove);
     await approveTx.wait();
 
     return true;
