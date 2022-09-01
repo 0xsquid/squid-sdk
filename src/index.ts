@@ -255,8 +255,6 @@ export class Squid {
         transactionRequest.destinationChainGas
       );
     } catch (error) {
-      // TODO: we need a backup
-      console.warn("error: fetching gasFee:", error);
       gasFee = "3513000021000000";
     }
 
@@ -266,12 +264,18 @@ export class Squid {
         )
       : ethers.BigNumber.from(gasFee);
 
-    const tx = {
+    let tx = {
       to: targetAddress,
       data: transactionRequest.data,
-      value: value,
       gasLimit: 60e4 // 600000 gasLimit
-    };
+    } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
+
+    if (transactionRequest.routeType !== "SEND") {
+      tx = {
+        ...tx,
+        value
+      };
+    }
 
     return await signer.sendTransaction(tx);
   }
