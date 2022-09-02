@@ -162,3 +162,20 @@ export type ValidateBalanceAndApproval = {
   sourceChain: ChainData;
   infiniteApproval?: boolean;
 };
+
+export type GetStatus = {
+  transactionId: string;
+  routeType: string;
+  destinationAddress?: string;
+  destinationChainId?: number;
+  fromBlock?: number;
+  toBlock?: number;
+};
+
+export type GetStatusResponse = {
+  id: string;
+  status: string;
+  gasStatus: string;
+  destinationTransactionId: string;
+  blockNumber: number;
+};
