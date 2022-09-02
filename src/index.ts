@@ -16,6 +16,8 @@ import {
   ExecuteRoute,
   GetRoute,
   GetRouteResponse,
+  GetStatus,
+  GetStatusResponse,
   TokenData
 } from "./types";
 
@@ -264,6 +266,12 @@ export class Squid {
 
     const contract = new ethers.Contract(token.address, erc20Abi, signer);
     return await contract.approve(spender, amount || uint256MaxValue);
+  }
+
+  public async getStatus(params: GetStatus): Promise<GetStatusResponse> {
+    const response = await this.axiosInstance.get("/api/status", { params });
+
+    return response.data.data;
   }
 }
 
