@@ -86,8 +86,11 @@ export type GetRoute = {
 
 export type RouteData = {
   sourceAmount: string;
-  sendDestinationAmount: number;
-  swapDestinationAmount: string;
+  destinationAmount: number;
+  destinationAmountOutMin: string;
+  exchangeRate: string;
+  sourceTokenUsdPrice: number;
+  destinationTokenUsdPrice: number;
 };
 
 export type TransactionRequest = {
