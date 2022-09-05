@@ -6,15 +6,20 @@ import { Squid } from "./src";
 
 dotenv.config();
 
-// const sendAmount: BigNumber = ethers.utils.parseEther("1"); // 0.1 WETH
-const USDC: BigNumber = ethers.utils.parseUnits("102", 6); // 1 USDC
+const sendAmount: BigNumber = ethers.utils.parseEther("1"); // 0.1 WETH
+const aUSDC: BigNumber = ethers.utils.parseUnits("100", 6); // 1 aUSDC
 
 const privateKey = process.env.privateKey as string;
 const ethereumRpcEndPoint = process.env.ethereumRpcEndPoint as string;
-const provider = new ethers.providers.JsonRpcProvider(ethereumRpcEndPoint);
+const provider = new ethers.providers.JsonRpcProvider(
+  "https://ropsten.infura.io/v3/510b6d5b3c56497b8070626a54f565a9"
+);
 
 async function main() {
-  const signer = new ethers.Wallet(privateKey, provider);
+  const signer = new ethers.Wallet(
+    "05628be03b65c6766668898da5b419a4669aa67891bbea16718a455874bce422",
+    provider
+  );
   const squidSdk = new Squid({ baseUrl: "http://localhost:3000" });
 
   await squidSdk.init();
@@ -25,11 +30,11 @@ async function main() {
   // trade-send
   const params = {
     recipientAddress: signer.address,
-    sourceChainId: 1,
-    sourceTokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    sourceAmount: "102300000", // USDC.toString(),
-    destinationChainId: 1284,
-    destinationTokenAddress: "0xAcc15dC74880C9944775448304B263D191c6077F",
+    sourceChainId: 3,
+    sourceTokenAddress: "0x526f0a95edc3df4cbdb7bb37d4f7ed451db8e369",
+    sourceAmount: aUSDC.toString(),
+    destinationChainId: 43113,
+    destinationTokenAddress: "0x57f1c63497aee0be305b8852b354cec793da43bb",
     slippage: 1
   };
 
@@ -50,8 +55,8 @@ async function main() {
   // const params = {
   //   recipientAddress,
   //   sourceChainId: 1,
-  //   sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'USDC')?.address as string,
-  //   sourceAmount: USDC,
+  //   sourceTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'aUSDC')?.address as string,
+  //   sourceAmount: aUSDC,
   //   destinationChainId: 43114,
   //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
   //   slippage: 1
@@ -61,7 +66,6 @@ async function main() {
 
   const { route } = await squidSdk.getRoute(params);
 
-  console.log("> rotue: ", route);
   const tx = await squidSdk.executeRoute({
     signer,
     route
