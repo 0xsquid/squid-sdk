@@ -92,6 +92,7 @@ export type RouteData = {
 
 export type TransactionRequest = {
   routeType: string;
+  targetAddress: string;
   gasReceiver: boolean;
   data: string;
   destinationChainGas: number;
@@ -119,6 +120,7 @@ export type Allowance = {
   owner: string;
   spender: string;
   tokenAddress: string;
+  chainId: number;
 };
 
 export type Approve = {
@@ -126,4 +128,37 @@ export type Approve = {
   spender: string;
   tokenAddress: string;
   amount?: string;
+  chainId: number;
+};
+
+export type IsRouteApproved = {
+  route: Route;
+  sender: string;
+};
+
+export type ApproveRoute = {
+  route: Route;
+  signer: ethers.Wallet;
+};
+
+export type RoutePopulatedData = {
+  sourceChain: ChainData;
+  destinationChain: ChainData;
+  sourceToken: TokenData | undefined;
+  destinationToken: TokenData | undefined;
+  srcTokenContract: ethers.Contract | undefined;
+  srcProvider: ethers.providers.JsonRpcProvider;
+  sourceIsNative: boolean;
+  targetAddress: string;
+};
+
+export type ValidateBalanceAndApproval = {
+  srcTokenContract: ethers.Contract;
+  srcProvider: ethers.providers.JsonRpcProvider;
+  sourceIsNative: boolean;
+  sourceAmount: string;
+  targetAddress: string;
+  signer: ethers.Wallet;
+  sourceChain: ChainData;
+  infiniteApproval?: boolean;
 };
