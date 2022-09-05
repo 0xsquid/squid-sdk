@@ -17,8 +17,8 @@ import {
   ExecuteRoute,
   GetRoute,
   GetStatus,
-  GetStatusResponse,
-  GetRouteResponse,
+  StatusResponse,
+  RouteResponse,
   TokenData,
   IsRouteApproved,
   Route,
@@ -200,7 +200,7 @@ export class Squid {
     this.config = config;
   }
 
-  public async getRoute(params: GetRoute): Promise<GetRouteResponse> {
+  public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
 
     const response = await this.axiosInstance.get("/api/route", { params });
@@ -434,7 +434,7 @@ export class Squid {
     return await contract.approve(spender, amount || uint256MaxValue);
   }
 
-  public async getStatus(params: GetStatus): Promise<GetStatusResponse> {
+  public async getStatus(params: GetStatus): Promise<StatusResponse> {
     const response = await this.axiosInstance.get("/api/status", { params });
 
     return response.data.data;

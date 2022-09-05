@@ -104,7 +104,7 @@ export type Route = {
   params: GetRoute;
 };
 
-export type GetRouteResponse = {
+export type RouteResponse = {
   route: Route;
 };
 
@@ -172,24 +172,7 @@ export type GetStatus = {
   toBlock?: number;
 };
 
-export type GetStatusResponse = {
-  id: string;
-  status: string;
-  gasStatus: string;
-  destinationTransactionId: string;
-  blockNumber: number;
-};
-
-export type GetStatus = {
-  transactionId: string;
-  routeType: string;
-  destinationAddress?: string;
-  destinationChainId?: number;
-  fromBlock?: number;
-  toBlock?: number;
-};
-
-export type GetStatusResponse = {
+export type StatusResponse = {
   id: string;
   status: string;
   gasStatus: string;
