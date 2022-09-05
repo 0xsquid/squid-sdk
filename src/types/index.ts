@@ -104,7 +104,7 @@ export type Route = {
   params: GetRoute;
 };
 
-export type GetRouteResponse = {
+export type RouteResponse = {
   route: Route;
 };
 
@@ -161,4 +161,21 @@ export type ValidateBalanceAndApproval = {
   signer: ethers.Wallet;
   sourceChain: ChainData;
   infiniteApproval?: boolean;
+};
+
+export type GetStatus = {
+  transactionId: string;
+  routeType: string;
+  destinationAddress?: string;
+  destinationChainId?: number;
+  fromBlock?: number;
+  toBlock?: number;
+};
+
+export type StatusResponse = {
+  id: string;
+  status: string;
+  gasStatus: string;
+  destinationTransactionId: string;
+  blockNumber: number;
 };

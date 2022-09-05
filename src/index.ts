@@ -16,11 +16,13 @@ import {
   Config,
   ExecuteRoute,
   GetRoute,
-  GetRouteResponse,
+  GetStatus,
+  StatusResponse,
+  RouteResponse,
+  TokenData,
   IsRouteApproved,
   Route,
   RoutePopulatedData,
-  TokenData,
   ValidateBalanceAndApproval
 } from "./types";
 
@@ -198,7 +200,7 @@ export class Squid {
     this.config = config;
   }
 
-  public async getRoute(params: GetRoute): Promise<GetRouteResponse> {
+  public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
 
     const response = await this.axiosInstance.get("/api/route", { params });
@@ -430,6 +432,12 @@ export class Squid {
 
     const contract = new ethers.Contract(token.address, erc20Abi, signer);
     return await contract.approve(spender, amount || uint256MaxValue);
+  }
+
+  public async getStatus(params: GetStatus): Promise<StatusResponse> {
+    const response = await this.axiosInstance.get("/api/status", { params });
+
+    return response.data.data;
   }
 }
 
