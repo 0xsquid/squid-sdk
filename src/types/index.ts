@@ -112,7 +112,7 @@ export type RouteResponse = {
 };
 
 export type ExecuteRoute = {
-  signer: ethers.Wallet;
+  signer: ethers.Wallet | ethers.Signer;
   route: Route;
   executionSettings?: {
     infiniteApproval?: boolean;
@@ -127,7 +127,7 @@ export type Allowance = {
 };
 
 export type Approve = {
-  signer: ethers.Wallet;
+  signer: ethers.Wallet | ethers.Signer;
   spender: string;
   tokenAddress: string;
   amount?: string;
@@ -141,7 +141,7 @@ export type IsRouteApproved = {
 
 export type ApproveRoute = {
   route: Route;
-  signer: ethers.Wallet;
+  signer: ethers.Wallet | ethers.Signer;
 };
 
 export type RoutePopulatedData = {
@@ -161,7 +161,7 @@ export type ValidateBalanceAndApproval = {
   sourceIsNative: boolean;
   sourceAmount: string;
   targetAddress: string;
-  signer: ethers.Wallet;
+  signer: ethers.Wallet | ethers.Signer;
   sourceChain: ChainData;
   infiniteApproval?: boolean;
 };
