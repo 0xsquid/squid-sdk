@@ -4,7 +4,7 @@ import {
   EvmChain,
   GasToken
 } from "@axelar-network/axelarjs-sdk";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, FixedNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import * as dotenv from "dotenv";
 
@@ -211,8 +211,44 @@ export class Squid {
 
     const response = await this.axiosInstance.get("/api/route", { params });
 
+    const {
+      sourceTokenAddress,
+      sourceChainId,
+      destinationTokenAddress,
+      destinationChainId
+    } = params;
+    const { routeData, transactionRequest } = response.data.route as Route;
+
+    const sourceToken = getTokenData(
+      this.tokens,
+      sourceTokenAddress,
+      sourceChainId
+    ) as TokenData;
+    const destinationToken = getTokenData(
+      this.tokens,
+      destinationTokenAddress,
+      destinationChainId
+    ) as TokenData;
+
+    const sourceTokenBN = FixedNumber.from(
+      ethers.utils.formatUnits(routeData.sourceAmount, sourceToken.decimals)
+    );
+    const destinationTokenBN = FixedNumber.from(
+      ethers.utils.formatUnits(
+        routeData.destinationAmount,
+        destinationToken.decimals
+      )
+    );
+
     return {
-      route: response.data.route
+      route: {
+        routeData: {
+          ...routeData,
+          exchangeRate: destinationTokenBN.divUnsafe(sourceTokenBN).toString()
+        },
+        transactionRequest,
+        params
+      }
     };
   }
 

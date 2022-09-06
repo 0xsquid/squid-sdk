@@ -1,13 +1,11 @@
 import { BigNumber, ethers } from "ethers";
-
 import * as dotenv from "dotenv";
-
 import { Squid } from "./src";
 
 dotenv.config();
 
 // const sendAmount: BigNumber = ethers.utils.parseEther("1"); // 0.1 WETH
-const USDC: BigNumber = ethers.utils.parseUnits("100", 6); // 1 USDC
+const USDC: BigNumber = ethers.utils.parseUnits("102", 6); // 1 USDC
 
 const privateKey = process.env.privateKey as string;
 const ethereumRpcEndPoint = process.env.ethereumRpcEndPoint as string;
@@ -18,18 +16,16 @@ async function main() {
   const squidSdk = new Squid({ baseUrl: "http://localhost:3000" });
 
   await squidSdk.init();
-
   // console.log('> tokens: ', squidSdk.tokens)
   // console.log('> chains: ', squidSdk.chains)
-
   // trade-send
   const params = {
     recipientAddress: signer.address,
     sourceChainId: 1,
     sourceTokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    sourceAmount: USDC.toString(),
+    sourceAmount: "102300000", // USDC.toString(),
     destinationChainId: 1284,
-    destinationTokenAddress: "0xCa01a1D0993565291051daFF390892518ACfAD3A",
+    destinationTokenAddress: "0xAcc15dC74880C9944775448304B263D191c6077F",
     slippage: 1
   };
 
@@ -45,7 +41,6 @@ async function main() {
   //     ?.address as string,
   //   slippage: 1
   // }
-
   // send-trade
   // const params = {
   //   recipientAddress,
@@ -56,18 +51,16 @@ async function main() {
   //   destinationTokenAddress: squidSdk.tokens?.find(t => t.symbol === 'axlUSDC')?.address as string,
   //   slippage: 1
   // }
-
   console.log("> params: ", params);
 
   const { route } = await squidSdk.getRoute(params);
 
+  console.log("> rotue: ", route);
   const tx = await squidSdk.executeRoute({
     signer,
     route
   });
-
   const txReceipt = await tx.wait();
-
   console.log("> txReceipt: ", txReceipt.transactionHash);
 }
 
