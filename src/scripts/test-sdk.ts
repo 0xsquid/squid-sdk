@@ -6,6 +6,7 @@ import yargs from "yargs/yargs";
 import { sendTrade } from "./sendTrade";
 import { tradeSend } from "./tradeSend";
 import { tradeSendTrade } from "./tradeSendTrade";
+import { sendOnly } from "./sendOnly";
 
 dotenv.config();
 const parser = yargs(process.argv.slice(2)).options({
@@ -44,10 +45,17 @@ const getSDK = (): Squid => {
     }
 
     if (all || argv.s === "tradesendtrade") {
-      console.log(`\n> Running TradeSendTrade`); // TODO: REVIEW WHY SOMETIMES TRADESENDTRADES FAILS
+      console.log(`\n> Running TradeSendTrade`);
       await tradeSendTrade(squid, ChainName.ETHEREUM, ethereumDests, "0.001");
       await tradeSendTrade(squid, ChainName.AVALANCHE, avalancheDests, "0.1");
       await tradeSendTrade(squid, ChainName.MOONBEAM, moonbeamDests, "0.1");
+    }
+
+    if (all || argv.s === "sendOnly") {
+      console.log(`\n> Running SendOnly`);
+      await sendOnly(squid, ChainName.ETHEREUM, ethereumDests, "20");
+      await sendOnly(squid, ChainName.AVALANCHE, avalancheDests, "20");
+      await sendOnly(squid, ChainName.MOONBEAM, moonbeamDests, "20");
     }
   } catch (error) {
     console.error(error);

@@ -194,3 +194,46 @@ export const getTradeSendTrade = (
 
   return route;
 };
+
+export const getSendOnly = (
+  squid: Squid,
+  srcChainName: ChainName,
+  destChainName: ChainName,
+  amount: string
+): GetRoute => {
+  const srcChain = squid.chains[srcChainName];
+  const destChain = squid.chains[destChainName];
+
+  // USDC/axlUSDC address
+  const srcGatewayToken = srcChain.squidContracts.defaultCrosschainToken;
+  const destGatewayToken = destChain.squidContracts.defaultCrosschainToken;
+
+  assert.notEqual(
+    srcGatewayToken,
+    destGatewayToken,
+    "source and destination default cross-chain token should not be equal"
+  );
+
+  const srcSquidExecutable = srcChain.squidContracts.squidMain;
+  const destSquidExecutable = destChain.squidContracts.squidMain;
+
+  assert.equal(
+    srcSquidExecutable,
+    destSquidExecutable,
+    "source and destination squid executable address missmatch"
+  );
+
+  const recipientAddress = getSignerForChain(destChainName)?.address as string;
+
+  // axlUSDC/USDC -> axlUSDC/USDC
+  const route: GetRoute = buildParam(
+    srcChain.chainId,
+    destChain.chainId,
+    srcGatewayToken,
+    6,
+    amount,
+    destGatewayToken,
+    recipientAddress
+  );
+  return route;
+};
