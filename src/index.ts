@@ -76,18 +76,24 @@ export class Squid {
     infiniteApproval
   }: ValidateBalanceAndApproval) {
     const _sourceAmount = ethers.BigNumber.from(sourceAmount);
+    let address;
+    if (signer && !ethers.Signer.isSigner(signer)) {
+      address = await (signer as ethers.Signer).getAddress();
+    } else {
+      address = (signer as ethers.Wallet).address;
+    }
 
     if (!sourceIsNative) {
-      const balance = await srcTokenContract.balanceOf(signer.address);
+      const balance = await srcTokenContract.balanceOf(address);
 
       if (_sourceAmount.gt(balance)) {
         throw new Error(
-          `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
+          `Insufficent funds for account: ${address} on chain ${sourceChain.chainId}`
         );
       }
 
       const allowance = await srcTokenContract.allowance(
-        signer.address,
+        address,
         targetAddress
       );
 
@@ -111,11 +117,11 @@ export class Squid {
         await approveTx.wait();
       }
     } else {
-      const balance = await srcProvider.getBalance(signer.address);
+      const balance = await srcProvider.getBalance(address);
 
       if (_sourceAmount.gt(balance)) {
         throw new Error(
-          `Insufficent funds for account: ${signer.address} on chain ${sourceChain.chainId}`
+          `Insufficent funds for account: ${address} on chain ${sourceChain.chainId}`
         );
       }
     }
