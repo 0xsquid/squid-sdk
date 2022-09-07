@@ -77,7 +77,7 @@ export class Squid {
   }: ValidateBalanceAndApproval) {
     const _sourceAmount = ethers.BigNumber.from(sourceAmount);
     let address;
-    if (signer && !ethers.Signer.isSigner(signer)) {
+    if (signer && ethers.Signer.isSigner(signer)) {
       address = await (signer as ethers.Signer).getAddress();
     } else {
       address = (signer as ethers.Wallet).address;
