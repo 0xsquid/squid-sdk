@@ -64,6 +64,7 @@ export type TokenData = {
   crosschain: boolean;
   commonKey: string;
   logoURI: string;
+  coingeckoId: string;
 };
 
 export type Config = {
@@ -86,7 +87,7 @@ export type GetRoute = {
 
 export type RouteData = {
   sourceAmount: string;
-  destinationAmount: number;
+  destinationAmount: string;
   destinationAmountOutMin: string;
   exchangeRate: string;
   sourceTokenUsdPrice: number;
