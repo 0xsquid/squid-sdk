@@ -23,7 +23,8 @@
     "integration": "npx ts-node src/scripts/test-sdk.ts",
     "integration:sendtrade": "npx ts-node src/scripts/test-sdk.ts -s sendtrade",
     "integration:tradesend": "npx ts-node src/scripts/test-sdk.ts -s tradesend",
-    "integration:tradesendtrade": "npx ts-node src/scripts/test-sdk.ts -s tradesendtrade"
+    "integration:tradesendtrade": "npx ts-node src/scripts/test-sdk.ts -s tradesendtrade",
+    "integration:sendOnly": "npx ts-node src/scripts/test-sdk.ts -s sendOnly"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.6.18",

@@ -5,4 +5,5 @@ node_modules
 .env.test
 .env.eth
 .env.etheth
+.env.*
 dist
