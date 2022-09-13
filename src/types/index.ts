@@ -29,8 +29,8 @@ export type MapChainIdName = {
 };
 
 export type squidConfig = {
-  type: string;
-  chainId: number;
+  type: ChainType;
+  chainId: number | string;
   gasUsage: number;
 };
 
@@ -105,8 +105,6 @@ export type RouteData = {
   destinationAmount: string;
   destinationAmountOutMin: string;
   exchangeRate: string;
-  sourceTokenUsdPrice: number;
-  destinationTokenUsdPrice: number;
 };
 
 export type TransactionRequest = {
@@ -186,7 +184,7 @@ export type GetStatus = {
   transactionId: string;
   routeType: string;
   destinationAddress?: string;
-  destinationChainId?: number;
+  destinationChainId?: number | string;
   fromBlock?: number;
   toBlock?: number;
 };
