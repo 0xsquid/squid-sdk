@@ -23,7 +23,8 @@ import {
   IsRouteApproved,
   Route,
   RoutePopulatedData,
-  ValidateBalanceAndApproval
+  ValidateBalanceAndApproval,
+  ChainData
 } from "./types";
 
 import erc20Abi from "./abi/erc20.json";
@@ -41,7 +42,7 @@ export class Squid {
   public inited = false;
   public config: Config | undefined;
   public tokens: TokenData[] = [] as TokenData[];
-  public chains: ChainsData = {} as ChainsData;
+  public chains: ChainsData = [] as ChainData[];
 
   constructor(config = {} as Config) {
     this.axiosInstance = axios.create({
@@ -458,7 +459,7 @@ export class Squid {
     const token = getTokenData(
       this.tokens as TokenData[],
       tokenAddress,
-      chainId
+      chainId as number | string
     );
     if (!token) {
       throw new Error("Unsupported token");
@@ -466,7 +467,7 @@ export class Squid {
 
     const chain = getChainData(
       this.chains as ChainsData,
-      token?.chainId as number
+      token?.chainId as number | string
     );
     if (!chain) {
       throw new Error("Unsupported chain");
