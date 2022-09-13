@@ -5,7 +5,7 @@ Squid {
   "axiosInstance": Object {
     "get": [MockFunction],
   },
-  "chains": Object {},
+  "chains": Array [],
   "config": Object {
     "baseUrl": "https://testnet.api.0xsquid.com/",
   },
