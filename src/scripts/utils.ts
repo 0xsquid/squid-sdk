@@ -2,12 +2,18 @@ import { ethers } from "ethers";
 import * as assert from "assert";
 
 import { Squid } from "../index";
-import { GetRoute, ChainName } from "../types";
+import {
+  GetRoute,
+  ChainName,
+  ChainData,
+  ChainsData,
+  ChainType
+} from "../types";
 import { nativeTokenConstant } from "../constants/index";
 
 const buildParam = (
-  sourceChainId: number,
-  destinationChainId: number,
+  sourceChainId: number | string,
+  destinationChainId: number | string,
   sourceTokenAddress: string,
   sourceTokenDecimals: number,
   sourceAmount: string,
@@ -56,7 +62,7 @@ export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
       break;
   }
 
-  return signer;
+  return signer as ethers.Wallet;
 };
 
 export const getSendTrade = (
@@ -66,8 +72,8 @@ export const getSendTrade = (
   amount: string,
   isDestNative = false
 ): GetRoute => {
-  const srcChain = squid.chains[srcChainName];
-  const destChain = squid.chains[destChainName];
+  const srcChain = getChainDataByChainName(squid.chains, srcChainName);
+  const destChain = getChainDataByChainName(squid.chains, destChainName);
 
   // USDC/axlUSDC address
   const srcGatewayToken = srcChain.squidContracts.defaultCrosschainToken;
@@ -112,10 +118,11 @@ export const getTradeSend = (
   srcChainName: ChainName,
   destChainName: ChainName,
   amount: string,
-  isSrcNative = false
+  isSrcNative = false,
+  recipientAdd?: string
 ): GetRoute => {
-  const srcChain = squid.chains[srcChainName];
-  const destChain = squid.chains[destChainName];
+  const srcChain = getChainDataByChainName(squid.chains, srcChainName);
+  const destChain = getChainDataByChainName(squid.chains, destChainName);
 
   // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
   const srcWrapperNativeToken = isSrcNative
@@ -128,13 +135,16 @@ export const getTradeSend = (
   const srcSquidExecutable = srcChain.squidContracts.squidMain;
   const destSquidExecutable = destChain.squidContracts.squidMain;
 
-  assert.equal(
-    srcSquidExecutable,
-    destSquidExecutable,
-    "source and destination squid executable address missmatch"
-  );
-
-  const recipientAddress = getSignerForChain(destChainName)?.address as string;
+  if (destChain.chainType != ChainType.Cosmos) {
+    assert.equal(
+      srcSquidExecutable,
+      destSquidExecutable,
+      "source and destination squid executable address missmatch"
+    );
+  }
+  const recipientAddress = recipientAdd
+    ? recipientAdd
+    : (getSignerForChain(destChainName)?.address as string);
 
   // WNT swaps --> USDC/axlUSDC => axlUSDC
   const route: GetRoute = buildParam(
@@ -158,8 +168,8 @@ export const getTradeSendTrade = (
   isSrcNative = false,
   isDestNative = false
 ): GetRoute => {
-  const srcChain = squid.chains[srcChainName];
-  const destChain = squid.chains[destChainName];
+  const srcChain = getChainDataByChainName(squid.chains, srcChainName);
+  const destChain = getChainDataByChainName(squid.chains, destChainName);
 
   // WRAPPED NATIVE TOKEN AS THE SOURCE (WETH/WAVAX/WGLMR)
   const srcWrapperNativeToken = isSrcNative
@@ -199,31 +209,36 @@ export const getSendOnly = (
   squid: Squid,
   srcChainName: ChainName,
   destChainName: ChainName,
-  amount: string
+  amount: string,
+  recipientAdd?: string
 ): GetRoute => {
-  const srcChain = squid.chains[srcChainName];
-  const destChain = squid.chains[destChainName];
+  const srcChain = getChainDataByChainName(squid.chains, srcChainName);
+  const destChain = getChainDataByChainName(squid.chains, destChainName);
 
   // USDC/axlUSDC address
   const srcGatewayToken = srcChain.squidContracts.defaultCrosschainToken;
   const destGatewayToken = destChain.squidContracts.defaultCrosschainToken;
 
-  assert.notEqual(
-    srcGatewayToken,
-    destGatewayToken,
-    "source and destination default cross-chain token should not be equal"
-  );
+  if (destChain.chainType != ChainType.Cosmos) {
+    assert.notEqual(
+      srcGatewayToken,
+      destGatewayToken,
+      "source and destination default cross-chain token should not be equal"
+    );
 
-  const srcSquidExecutable = srcChain.squidContracts.squidMain;
-  const destSquidExecutable = destChain.squidContracts.squidMain;
+    const srcSquidExecutable = srcChain.squidContracts.squidMain;
+    const destSquidExecutable = destChain.squidContracts.squidMain;
 
-  assert.equal(
-    srcSquidExecutable,
-    destSquidExecutable,
-    "source and destination squid executable address missmatch"
-  );
+    assert.equal(
+      srcSquidExecutable,
+      destSquidExecutable,
+      "source and destination squid executable address missmatch"
+    );
+  }
 
-  const recipientAddress = getSignerForChain(destChainName)?.address as string;
+  const recipientAddress = recipientAdd
+    ? recipientAdd
+    : (getSignerForChain(destChainName)?.address as string);
 
   // axlUSDC/USDC -> axlUSDC/USDC
   const route: GetRoute = buildParam(
@@ -236,4 +251,12 @@ export const getSendOnly = (
     recipientAddress
   );
   return route;
+};
+
+export const getChainDataByChainName = (
+  chains: ChainsData,
+  chainName: ChainName
+): ChainData => {
+  const chain = chains.find(chain => chain.chainName === chainName);
+  return chain as ChainData;
 };

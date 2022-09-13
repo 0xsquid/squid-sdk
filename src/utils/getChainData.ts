@@ -3,7 +3,7 @@ import { ChainData, ChainsData } from "../types";
 
 export const getChainData = (
   chains: ChainsData,
-  chainId: number
+  chainId: number | string
 ): ChainData | undefined => {
-  return chains[mapChainIdName[chainId as number]];
+  return chains.find(chain => chain.chainId == chainId);
 };

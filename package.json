@@ -24,7 +24,9 @@
     "integration:sendtrade": "npx ts-node src/scripts/test-sdk.ts -s sendtrade",
     "integration:tradesend": "npx ts-node src/scripts/test-sdk.ts -s tradesend",
     "integration:tradesendtrade": "npx ts-node src/scripts/test-sdk.ts -s tradesendtrade",
-    "integration:sendOnly": "npx ts-node src/scripts/test-sdk.ts -s sendOnly"
+    "integration:sendOnly": "npx ts-node src/scripts/test-sdk.ts -s sendOnly",
+    "integration:sendOnlyCosmos": "npx ts-node src/scripts/test-sdk.ts -s sendOnlyCosmos",
+    "integration:tradeSendCosmos": "npx ts-node src/scripts/test-sdk.ts -s tradeSendCosmos"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.6.18",
