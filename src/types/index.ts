@@ -36,7 +36,7 @@ export type squidConfig = {
 
 export type ChainData = {
   chainName: ChainName;
-  chainType: string;
+  chainType: ChainType;
   chainId: number | string;
   networkName: string;
   rpc: string;
