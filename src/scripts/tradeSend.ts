@@ -11,14 +11,16 @@ const executeTradeSend = async (
   fromNetwork: ChainName,
   toNetwork: ChainName,
   amount: string,
-  isSrcNative = false
+  isSrcNative = false,
+  recipientAdd?: string
 ) => {
   const params = getTradeSend(
     squid,
     fromNetwork,
     toNetwork,
     amount,
-    isSrcNative
+    isSrcNative,
+    recipientAdd
   );
   console.log("\n");
   console.log(
@@ -52,5 +54,35 @@ export const tradeSend = async (
   for (const dest of dests) {
     await executeTradeSend(squid, signer, src, dest, amount);
     await executeTradeSend(squid, signer, src, dest, amount, true);
+  }
+};
+
+export const tradeSendCosmos = async (
+  squid: Squid,
+  src: ChainName,
+  dests: ChainName[],
+  amount: string,
+  recipientAdd?: string
+) => {
+  const signer = getSignerForChain(src);
+  for (const dest of dests) {
+    await executeTradeSend(
+      squid,
+      signer,
+      src,
+      dest,
+      amount,
+      false,
+      recipientAdd
+    );
+    await executeTradeSend(
+      squid,
+      signer,
+      src,
+      dest,
+      amount,
+      true,
+      recipientAdd
+    );
   }
 };

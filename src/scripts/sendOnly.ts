@@ -1,5 +1,5 @@
 import { getSignerForChain, getSendOnly } from "./utils";
-import { ChainName } from "../types";
+import { ChainName, GetRoute } from "../types";
 import { Squid } from "../index";
 import { ethers } from "ethers";
 import chalk from "chalk";
@@ -9,9 +9,16 @@ const executeSendOnly = async (
   signer: ethers.Wallet,
   fromNetwork: ChainName,
   toNetwork: ChainName,
-  amount: string
+  amount: string,
+  recipientAdd?: string
 ) => {
-  const params = getSendOnly(squid, fromNetwork, toNetwork, amount);
+  const params = getSendOnly(
+    squid,
+    fromNetwork,
+    toNetwork,
+    amount,
+    recipientAdd
+  );
   console.log("\n");
   console.log(
     `> sendOnly: from ${fromNetwork}=>${toNetwork} from ${chalk.green(
@@ -44,5 +51,19 @@ export const sendOnly = async (
   for (const dest of dests) {
     await executeSendOnly(squid, signer, src, dest, amount);
     await executeSendOnly(squid, signer, src, dest, amount);
+  }
+};
+
+export const sendOnlyCosmos = async (
+  squid: Squid,
+  src: ChainName,
+  dests: ChainName[],
+  amount: string,
+  recipientAddress: string
+) => {
+  console.log(src);
+  const signer = getSignerForChain(src);
+  for (const dest of dests) {
+    await executeSendOnly(squid, signer, src, dest, amount, recipientAddress);
   }
 };

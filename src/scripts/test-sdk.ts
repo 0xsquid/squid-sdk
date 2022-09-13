@@ -4,9 +4,9 @@ import { ChainName } from "../types";
 import { Squid } from "../index";
 import yargs from "yargs/yargs";
 import { sendTrade } from "./sendTrade";
-import { tradeSend } from "./tradeSend";
+import { tradeSend, tradeSendCosmos } from "./tradeSend";
 import { tradeSendTrade } from "./tradeSendTrade";
-import { sendOnly } from "./sendOnly";
+import { sendOnly, sendOnlyCosmos } from "./sendOnly";
 
 dotenv.config();
 const parser = yargs(process.argv.slice(2)).options({
@@ -28,7 +28,8 @@ const getSDK = (): Squid => {
   const ethereumDests = [ChainName.AVALANCHE, ChainName.MOONBEAM];
   const avalancheDests = [ChainName.ETHEREUM, ChainName.MOONBEAM];
   const moonbeamDests = [ChainName.ETHEREUM, ChainName.AVALANCHE];
-
+  const cosmosDests = [ChainName.KUJIRA];
+  const kujiraDestAddress = "kujira1xmp9qkcnfz7zcxu3xd6ywcf4zge73uny8g3jhu";
   try {
     if (all || argv.s === "sendtrade") {
       console.log(`\n> Running SendTrade`);
@@ -56,6 +57,32 @@ const getSDK = (): Squid => {
       await sendOnly(squid, ChainName.ETHEREUM, ethereumDests, "20");
       await sendOnly(squid, ChainName.AVALANCHE, avalancheDests, "20");
       await sendOnly(squid, ChainName.MOONBEAM, moonbeamDests, "20");
+    }
+
+    if (argv.s === "cosmosOnly" || argv.s === "sendOnlyCosmos") {
+      console.log(`\n> Running SendOnlyCosmos`);
+      await sendOnlyCosmos(
+        squid,
+        ChainName.ETHEREUM,
+        cosmosDests,
+        "1",
+        kujiraDestAddress
+      );
+      // await sendOnly(squid, ChainName.AVALANCHE, avalancheDests, "20");
+      // await sendOnly(squid, ChainName.MOONBEAM, moonbeamDests, "20");
+    }
+
+    if (argv.s === "cosmosOnly" || argv.s === "tradeSendCosmos") {
+      console.log(`\n> Running tradeSendCosmos`);
+      await tradeSendCosmos(
+        squid,
+        ChainName.ETHEREUM,
+        cosmosDests,
+        "0.001",
+        kujiraDestAddress
+      );
+      // await tradeSend(squid, ChainName.AVALANCHE, avalancheDests, "0.1");
+      // await tradeSend(squid, ChainName.MOONBEAM, moonbeamDests, "0.1");
     }
   } catch (error) {
     console.error(error);
