@@ -218,7 +218,7 @@ export class Squid {
       destinationTokenAddress,
       destinationChainId
     } = params;
-    const { routeData, transactionRequest } = response.data.route as Route;
+    const { estimate, transactionRequest } = response.data.route as Route;
 
     const sourceToken = getTokenData(
       this.tokens,
@@ -232,19 +232,16 @@ export class Squid {
     ) as TokenData;
 
     const sourceTokenBN = FixedNumber.from(
-      ethers.utils.formatUnits(routeData.sourceAmount, sourceToken.decimals)
+      ethers.utils.formatUnits(estimate.fromAmount, sourceToken.decimals)
     );
     const destinationTokenBN = FixedNumber.from(
-      ethers.utils.formatUnits(
-        routeData.destinationAmount,
-        destinationToken.decimals
-      )
+      ethers.utils.formatUnits(estimate.toAmount, destinationToken.decimals)
     );
 
     return {
       route: {
-        routeData: {
-          ...routeData,
+        estimate: {
+          ...estimate,
           exchangeRate: destinationTokenBN.divUnsafe(sourceTokenBN).toString()
         },
         transactionRequest,
@@ -464,7 +461,7 @@ export class Squid {
     if (!token) {
       throw new Error("Unsupported token");
     }
-    console.log(this.chains);
+
     const chain = getChainData(
       this.chains as ChainsData,
       token?.chainId as number | string
