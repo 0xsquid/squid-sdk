@@ -2,12 +2,30 @@ import { ethers } from "ethers";
 
 export enum ChainName {
   ETHEREUM = "Ethereum",
+  OSMOSIS = "osmosis",
+  OSMOSIS4 = "osmosis-4",
+  MOONBEAM = "Moonbeam",
   AVALANCHE = "Avalanche",
-  MOONBEAM = "Moonbeam"
+  COSMOS = "cosmoshub",
+  AXELARNET = "Axelarnet",
+  KUJIRA = "kujira",
+  SEI = "sei",
+  FETCH = "fetch",
+  CRESCENT = "crescent",
+  EMONEY = "e-money",
+  INJECTIVE = "injective",
+  JUNO = "juno",
+  SECRET = "secret",
+  TERRA2 = "terra-2"
+}
+
+export enum ChainType {
+  EVM = "evm",
+  Cosmos = "cosmos"
 }
 
 export type MapChainIdName = {
-  [key: number]: ChainName;
+  [key: string | number]: ChainName;
 };
 
 export type squidConfig = {
@@ -17,8 +35,9 @@ export type squidConfig = {
 };
 
 export type ChainData = {
+  chainName: ChainName;
   chainType: string;
-  chainId: number;
+  chainId: number | string;
   networkName: string;
   rpc: string;
   blockExplorerUrls: string[];
@@ -49,14 +68,10 @@ export type ChainData = {
   };
 };
 
-export type ChainsData = {
-  [ChainName.ETHEREUM]: ChainData;
-  [ChainName.AVALANCHE]: ChainData;
-  [ChainName.MOONBEAM]: ChainData;
-};
+export type ChainsData = ChainData[];
 
 export type TokenData = {
-  chainId: number;
+  chainId: number | string;
   address: string;
   name: string;
   symbol: string;
@@ -76,8 +91,8 @@ export type Config = {
 };
 
 export type GetRoute = {
-  sourceChainId: number;
-  destinationChainId: number;
+  sourceChainId: number | string;
+  destinationChainId: number | string;
   sourceTokenAddress: string;
   destinationTokenAddress: string;
   sourceAmount: string;
@@ -124,7 +139,7 @@ export type Allowance = {
   owner: string;
   spender: string;
   tokenAddress: string;
-  chainId: number;
+  chainId: number | string;
 };
 
 export type Approve = {
@@ -132,7 +147,7 @@ export type Approve = {
   spender: string;
   tokenAddress: string;
   amount?: string;
-  chainId: number;
+  chainId: number | string;
 };
 
 export type IsRouteApproved = {
