@@ -22,8 +22,8 @@ const moonbeamBase = {
   estimatedGas: 300000
 };
 
-export const chainsData = {
-  Ethereum: {
+export const chainsData = [
+  {
     chainType: "evm",
     rpc: "http://localhost:8500/0",
     networkName: "Ethereum Local",
@@ -61,7 +61,7 @@ export const chainsData = {
       dexCurve: ""
     }
   },
-  Avalanche: {
+  {
     chainType: "evm",
     rpc: "http://localhost:8500/1",
     networkName: "Avalanche Local",
@@ -99,7 +99,7 @@ export const chainsData = {
       dexCurve: ""
     }
   },
-  Moonbeam: {
+  {
     chainType: "evm",
     rpc: "http://localhost:8500/2",
     networkName: "Moonbeam Local",
@@ -137,4 +137,4 @@ export const chainsData = {
       dexCurve: ""
     }
   }
-};
+];

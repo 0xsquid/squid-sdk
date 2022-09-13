@@ -464,7 +464,7 @@ export class Squid {
     if (!token) {
       throw new Error("Unsupported token");
     }
-
+    console.log(this.chains);
     const chain = getChainData(
       this.chains as ChainsData,
       token?.chainId as number | string
