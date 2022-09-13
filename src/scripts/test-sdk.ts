@@ -68,8 +68,6 @@ const getSDK = (): Squid => {
         "1",
         kujiraDestAddress
       );
-      // await sendOnly(squid, ChainName.AVALANCHE, avalancheDests, "20");
-      // await sendOnly(squid, ChainName.MOONBEAM, moonbeamDests, "20");
     }
 
     if (argv.s === "cosmosOnly" || argv.s === "tradeSendCosmos") {
@@ -81,8 +79,6 @@ const getSDK = (): Squid => {
         "0.001",
         kujiraDestAddress
       );
-      // await tradeSend(squid, ChainName.AVALANCHE, avalancheDests, "0.1");
-      // await tradeSend(squid, ChainName.MOONBEAM, moonbeamDests, "0.1");
     }
   } catch (error) {
     console.error(error);
