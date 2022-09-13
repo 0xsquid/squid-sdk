@@ -14,7 +14,7 @@ describe("Squid", () => {
     expect(squidSdk).toMatchSnapshot();
     expect(squidSdk.inited).toBe(false);
     expect(squidSdk.tokens).toEqual([]);
-    expect(squidSdk.chains).toEqual({});
+    expect(squidSdk.chains).toEqual([]);
   });
 
   describe("setConfig", () => {
@@ -39,7 +39,7 @@ describe("Squid", () => {
     it("get", async () => {
       const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
         get: jest.fn().mockResolvedValue({
-          data: { status: true, data: { chains: {} }, tokens: [] }
+          data: { status: true, data: { chains: [] }, tokens: [] }
         })
       });
 

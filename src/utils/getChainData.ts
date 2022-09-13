@@ -5,5 +5,7 @@ export const getChainData = (
   chains: ChainsData,
   chainId: number | string
 ): ChainData | undefined => {
-  return chains.find(chain => chain.chainId == chainId);
+  return Array.isArray(chains)
+    ? chains.find(chain => chain.chainId == chainId)
+    : ({} as ChainData);
 };
