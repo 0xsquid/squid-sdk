@@ -100,13 +100,6 @@ export type GetRoute = {
   slippage: number;
 };
 
-export type RouteData = {
-  sourceAmount: string;
-  destinationAmount: string;
-  destinationAmountOutMin: string;
-  exchangeRate: string;
-};
-
 export type TransactionRequest = {
   routeType: string;
   targetAddress: string;
@@ -115,8 +108,33 @@ export type TransactionRequest = {
   destinationChainGas: number;
 };
 
+export type RouteData = SwapData[];
+
+export type SwapData = {
+  dex: {
+    chainName: string;
+    dexName: string;
+    swapRouter: string;
+  };
+  path: string[];
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromAmount: string;
+  toAmount: string;
+  toAmountMin: string;
+};
+
+export type Estimate = {
+  fromAmount: string;
+  sendAmount: string;
+  toAmount: string;
+  toAmountMin: string;
+  route: RouteData[];
+  exchangeRate?: string;
+};
+
 export type Route = {
-  routeData: RouteData;
+  estimate: Estimate;
   transactionRequest: TransactionRequest;
   params: GetRoute;
 };
