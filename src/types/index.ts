@@ -108,7 +108,9 @@ export type TransactionRequest = {
   destinationChainGas: number;
 };
 
-export type RouteData = {
+export type RouteData = SwapData[];
+
+export type SwapData = {
   dex: {
     chainName: string;
     dexName: string;
@@ -127,7 +129,7 @@ export type Estimate = {
   sendAmount: string;
   toAmount: string;
   toAmountMin: string;
-  route: RouteData[][];
+  route: RouteData[];
   exchangeRate?: string;
 };
 
