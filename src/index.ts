@@ -209,45 +209,8 @@ export class Squid {
 
   public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
-
     const response = await this.axiosInstance.get("/api/route", { params });
-
-    const {
-      sourceTokenAddress,
-      sourceChainId,
-      destinationTokenAddress,
-      destinationChainId
-    } = params;
-    const { estimate, transactionRequest } = response.data.route as Route;
-
-    const sourceToken = getTokenData(
-      this.tokens,
-      sourceTokenAddress,
-      sourceChainId
-    ) as TokenData;
-    const destinationToken = getTokenData(
-      this.tokens,
-      destinationTokenAddress,
-      destinationChainId
-    ) as TokenData;
-
-    const sourceTokenBN = FixedNumber.from(
-      ethers.utils.formatUnits(estimate.fromAmount, sourceToken.decimals)
-    );
-    const destinationTokenBN = FixedNumber.from(
-      ethers.utils.formatUnits(estimate.toAmount, destinationToken.decimals)
-    );
-
-    return {
-      route: {
-        estimate: {
-          ...estimate,
-          exchangeRate: destinationTokenBN.divUnsafe(sourceTokenBN).toString()
-        },
-        transactionRequest,
-        params
-      }
-    };
+    return { route: response.data.route };
   }
 
   public async executeRoute({
