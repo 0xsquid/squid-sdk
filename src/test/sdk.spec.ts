@@ -47,8 +47,6 @@ describe("Squid", () => {
 
       await squidSdk.init();
       expect(squidSdk.inited).toEqual(true);
-
-      console.log("> squidsdk: ", squidSdk.chains);
     });
   });
 });
