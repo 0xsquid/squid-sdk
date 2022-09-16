@@ -9,7 +9,7 @@ Squid {
   "config": Object {
     "baseUrl": "https://testnet.api.0xsquid.com/",
   },
-  "inited": false,
+  "initialized": false,
   "tokens": Array [],
 }
 `;

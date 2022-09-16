@@ -39,7 +39,7 @@ const baseUrl = "https://testnet.api.0xsquid.com/";
 export class Squid {
   private axiosInstance: AxiosInstance;
 
-  public inited = false;
+  public initialized = false;
   public config: Config | undefined;
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = [] as ChainData[];
@@ -59,9 +59,9 @@ export class Squid {
   }
 
   private validateInit() {
-    if (!this.inited) {
+    if (!this.initialized) {
       throw new Error(
-        "SquidSdk must be inited! Please call the SquidSdk.init method"
+        "SquidSdk must be initialized! Please call the SquidSdk.init method"
       );
     }
   }
@@ -191,7 +191,7 @@ export class Squid {
       const response = await this.axiosInstance.get("/api/sdk-info");
       this.tokens = response.data.data.tokens;
       this.chains = response.data.data.chains;
-      this.inited = true;
+      this.initialized = true;
     } catch (error) {
       throw new Error(`Squid inititalization failed ${error}`);
     }
