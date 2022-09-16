@@ -12,7 +12,7 @@ describe("Squid", () => {
     const squidSdk = new Squid();
 
     expect(squidSdk).toMatchSnapshot();
-    expect(squidSdk.inited).toBe(false);
+    expect(squidSdk.initialized).toBe(false);
     expect(squidSdk.tokens).toEqual([]);
     expect(squidSdk.chains).toEqual([]);
   });
@@ -46,7 +46,7 @@ describe("Squid", () => {
       const squidSdk = new Squid();
 
       await squidSdk.init();
-      expect(squidSdk.inited).toEqual(true);
+      expect(squidSdk.initialized).toEqual(true);
     });
   });
 });
