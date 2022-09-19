@@ -7,6 +7,8 @@ export const mapChainIdName: MapChainIdName = {
   43114: ChainName.AVALANCHE,
   1287: ChainName.MOONBEAM,
   1284: ChainName.MOONBEAM,
+  137: ChainName.POLYGON,
+  80001: ChainName.POLYGON,
   cosmoshub: ChainName.COSMOS,
   "osmo-test-4": ChainName.OSMOSIS4,
   "osmosis-4": ChainName.OSMOSIS,
