@@ -38,10 +38,12 @@ export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
   const ethereumRpc = process.env.ethereumRpcEndPoint as string;
   const avalanceRpc = process.env.avalanceRpcEndPoint as string;
   const moonbeamRpc = process.env.moonbeamRpcEndPoint as string;
+  const polygonRpc = process.env.polygonRpcEndPoint as string;
 
   assert.notEqual(ethereumRpc, undefined, ".env: ethereumRpcEndPoint missing");
   assert.notEqual(avalanceRpc, undefined, ".env: avalanceRpcEndPoint missing");
   assert.notEqual(moonbeamRpc, undefined, ".env: moonbeamRpcEndPoint missing");
+  assert.notEqual(polygonRpc, undefined, ".env: polygonRpcEndPoint missing");
   assert.notEqual(privateKey, undefined, ".env: privateKey missing");
 
   let provider;
@@ -58,6 +60,10 @@ export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
       break;
     case ChainName.MOONBEAM:
       provider = new ethers.providers.JsonRpcProvider(moonbeamRpc);
+      signer = new ethers.Wallet(privateKey, provider);
+      break;
+    case ChainName.POLYGON:
+      provider = new ethers.providers.JsonRpcProvider(polygonRpc);
       signer = new ethers.Wallet(privateKey, provider);
       break;
   }
