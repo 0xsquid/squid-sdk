@@ -28,7 +28,7 @@ const executeSendOnly = async (
     }`
   );
   const { route } = await squid.getRoute(params);
-  console.log("> route: ", route);
+  // console.log("> route: ", route);
   const tx = await squid.executeRoute({
     signer,
     route

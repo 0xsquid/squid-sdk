@@ -4,9 +4,8 @@ import {
   EvmChain,
   GasToken
 } from "@axelar-network/axelarjs-sdk";
-import { BigNumber, FixedNumber, ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
-import * as dotenv from "dotenv";
 
 import {
   Allowance,
@@ -31,8 +30,6 @@ import erc20Abi from "./abi/erc20.json";
 import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
-
-dotenv.config();
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 

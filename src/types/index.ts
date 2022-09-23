@@ -16,7 +16,8 @@ export enum ChainName {
   INJECTIVE = "injective",
   JUNO = "juno",
   SECRET = "secret",
-  TERRA2 = "terra-2"
+  TERRA2 = "terra-2",
+  POLYGON = "Polygon"
 }
 
 export enum ChainType {
