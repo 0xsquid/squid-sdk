@@ -439,6 +439,20 @@ export class Squid {
 
     return response.data.data;
   }
+
+  public async getTokenPrice({
+    tokenAddress,
+    chainId
+  }: {
+    tokenAddress: string;
+    chainId: string | number;
+  }) {
+    const response = await this.axiosInstance.get("/api/token-price", {
+      params: { tokenAddress, chainId }
+    });
+
+    return response.data.price;
+  }
 }
 
 export * from "./types";
