@@ -269,7 +269,7 @@ export class Squid {
     let tx = {
       to: targetAddress,
       data: transactionRequest.data,
-      gasLimit: 60e4 // 600000 gasLimit
+      gasLimit: 70e4 // 700000 gasLimit
     } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
 
     if (transactionRequest.routeType !== "SEND") {
@@ -438,6 +438,20 @@ export class Squid {
     const response = await this.axiosInstance.get("/api/status", { params });
 
     return response.data.data;
+  }
+
+  public async getTokenPrice({
+    tokenAddress,
+    chainId
+  }: {
+    tokenAddress: string;
+    chainId: string | number;
+  }) {
+    const response = await this.axiosInstance.get("/api/token-price", {
+      params: { tokenAddress, chainId }
+    });
+
+    return response.data.price;
   }
 }
 
