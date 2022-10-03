@@ -1,5 +1,5 @@
 import { getSignerForChain, getSendOnly } from "./utils";
-import { ChainName, GetRoute } from "../types";
+import { ChainName } from "../types";
 import { Squid } from "../index";
 import { ethers } from "ethers";
 import chalk from "chalk";
@@ -23,9 +23,7 @@ const executeSendOnly = async (
   console.log(
     `> sendOnly: from ${fromNetwork}=>${toNetwork} from ${chalk.green(
       "Token"
-    )} ${params.sourceTokenAddress} to ${chalk.green("Token")} ${
-      params.destinationTokenAddress
-    }`
+    )} ${params.fromToken} to ${chalk.green("Token")} ${params.toToken}`
   );
   const { route } = await squid.getRoute(params);
   // console.log("> route: ", route);

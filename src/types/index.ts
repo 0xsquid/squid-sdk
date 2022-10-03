@@ -58,6 +58,11 @@ export type ChainData = {
     gateway: string;
     forecallable: string;
   };
+  squidContracts: {
+    squidMain: string;
+    defaultCrosschainToken: string;
+    multicall: string;
+  };
 };
 
 export type ChainsData = ChainData[];
