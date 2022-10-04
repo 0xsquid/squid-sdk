@@ -48,7 +48,6 @@ export type ChainData = {
     decimals: number;
     icon: string;
   };
-  squidConfig: squidConfig[];
   chainNativeContracts: {
     wrappedNativeToken: string;
     distributionEnsExecutable: string;
@@ -62,10 +61,7 @@ export type ChainData = {
   squidContracts: {
     squidMain: string;
     defaultCrosschainToken: string;
-  };
-  integrationContracts: {
-    dexUniswapV2: string;
-    dexCurve: string;
+    multicall: string;
   };
 };
 
@@ -92,12 +88,12 @@ export type Config = {
 };
 
 export type GetRoute = {
-  sourceChainId: number | string;
-  destinationChainId: number | string;
-  sourceTokenAddress: string;
-  destinationTokenAddress: string;
-  sourceAmount: string;
-  recipientAddress: string;
+  fromChain: number | string;
+  toChain: number | string;
+  fromToken: string;
+  toToken: string;
+  fromAmount: string;
+  toAddress: string;
   slippage: number;
 };
 
@@ -178,24 +174,24 @@ export type ApproveRoute = {
 };
 
 export type RoutePopulatedData = {
-  sourceChain: ChainData;
-  destinationChain: ChainData;
-  sourceToken: TokenData | undefined;
-  destinationToken: TokenData | undefined;
-  srcTokenContract: ethers.Contract | undefined;
-  srcProvider: ethers.providers.JsonRpcProvider;
-  sourceIsNative: boolean;
+  fromChain: ChainData;
+  toChain: ChainData;
+  fromToken: TokenData | undefined;
+  toToken: TokenData | undefined;
+  fromTokenContract: ethers.Contract | undefined;
+  fromProvider: ethers.providers.JsonRpcProvider;
+  fromIsNative: boolean;
   targetAddress: string;
 };
 
 export type ValidateBalanceAndApproval = {
-  srcTokenContract: ethers.Contract;
-  srcProvider: ethers.providers.JsonRpcProvider;
-  sourceIsNative: boolean;
-  sourceAmount: string;
+  fromTokenContract: ethers.Contract;
+  fromProvider: ethers.providers.JsonRpcProvider;
+  fromIsNative: boolean;
+  fromAmount: string;
   targetAddress: string;
   signer: ethers.Wallet | ethers.Signer;
-  sourceChain: ChainData;
+  fromChain: ChainData;
   infiniteApproval?: boolean;
 };
 
@@ -203,7 +199,7 @@ export type GetStatus = {
   transactionId: string;
   routeType: string;
   destinationAddress?: string;
-  destinationChainId?: number | string;
+  toChain?: number | string;
   fromBlock?: number;
   toBlock?: number;
 };
