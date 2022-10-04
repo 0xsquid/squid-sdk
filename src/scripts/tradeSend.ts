@@ -26,9 +26,9 @@ const executeTradeSend = async (
   console.log(
     `> tradeSend: ${fromNetwork}=>${toNetwork} from ${
       isSrcNative ? chalk.red("Native") : chalk.green("Token")
-    } ${
-      isSrcNative ? nativeTokenConstant : params.sourceTokenAddress
-    } to ${chalk.green("Token")} ${params.destinationTokenAddress}`
+    } ${isSrcNative ? nativeTokenConstant : params.fromToken} to ${chalk.green(
+      "Token"
+    )} ${params.toToken}`
   );
 
   const { route } = await squid.getRoute(params);

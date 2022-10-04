@@ -64,16 +64,16 @@ export class Squid {
   }
 
   private async validateBalanceAndApproval({
-    srcTokenContract,
-    sourceAmount,
-    sourceIsNative,
+    fromTokenContract,
+    fromAmount,
+    fromIsNative,
     targetAddress,
-    srcProvider,
-    sourceChain,
+    fromProvider,
+    fromChain,
     signer,
     infiniteApproval
   }: ValidateBalanceAndApproval) {
-    const _sourceAmount = ethers.BigNumber.from(sourceAmount);
+    const _sourceAmount = ethers.BigNumber.from(fromAmount);
     let address;
     if (signer && ethers.Signer.isSigner(signer)) {
       address = await (signer as ethers.Signer).getAddress();
@@ -81,16 +81,16 @@ export class Squid {
       address = (signer as ethers.Wallet).address;
     }
 
-    if (!sourceIsNative) {
-      const balance = await srcTokenContract.balanceOf(address);
+    if (!fromIsNative) {
+      const balance = await fromTokenContract.balanceOf(address);
 
       if (_sourceAmount.gt(balance)) {
         throw new Error(
-          `Insufficent funds for account: ${address} on chain ${sourceChain.chainId}`
+          `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`
         );
       }
 
-      const allowance = await srcTokenContract.allowance(
+      const allowance = await fromTokenContract.allowance(
         address,
         targetAddress
       );
@@ -109,17 +109,17 @@ export class Squid {
           amountToApprove = ethers.BigNumber.from(uint256MaxValue);
         }
 
-        const approveTx = await srcTokenContract
+        const approveTx = await fromTokenContract
           .connect(signer)
           .approve(targetAddress, amountToApprove);
         await approveTx.wait();
       }
     } else {
-      const balance = await srcProvider.getBalance(address);
+      const balance = await fromProvider.getBalance(address);
 
       if (_sourceAmount.gt(balance)) {
         throw new Error(
-          `Insufficent funds for account: ${address} on chain ${sourceChain.chainId}`
+          `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`
         );
       }
     }
@@ -127,58 +127,45 @@ export class Squid {
 
   private validateRouteData(route: Route): RoutePopulatedData {
     const {
-      params: {
-        sourceChainId,
-        destinationChainId,
-        sourceTokenAddress,
-        destinationTokenAddress
-      },
+      params: { fromChain, toChain, fromToken, toToken },
       transactionRequest: { targetAddress }
     } = route;
 
-    const sourceChain = getChainData(this.chains as ChainsData, sourceChainId);
-    const destinationChain = getChainData(
+    const _fromChain = getChainData(
       this.chains as ChainsData,
-      destinationChainId
+      route.params.fromChain
     );
-    if (!sourceChain) {
-      throw new Error(`sourceChain not found for ${sourceChainId}`);
+    const _toChain = getChainData(this.chains as ChainsData, toChain);
+    if (!_fromChain) {
+      throw new Error(`fromChain not found for ${fromChain}`);
     }
-    if (!destinationChain) {
-      throw new Error(`destinationChain not found for ${destinationChainId}`);
+    if (!_toChain) {
+      throw new Error(`toChain not found for ${toChain}`);
     }
 
-    const srcProvider = new ethers.providers.JsonRpcProvider(sourceChain.rpc);
-    const sourceToken = getTokenData(
-      this.tokens,
-      sourceTokenAddress,
-      sourceChainId
-    );
-    const destinationToken = getTokenData(
-      this.tokens,
-      destinationTokenAddress,
-      destinationChainId
-    );
+    const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
+    const _fromToken = getTokenData(this.tokens, fromToken, fromChain);
+    const _toToken = getTokenData(this.tokens, toToken, toChain);
 
-    const sourceIsNative = sourceTokenAddress === nativeTokenConstant;
-    let srcTokenContract;
+    const fromIsNative = fromToken === nativeTokenConstant;
+    let fromTokenContract;
 
-    if (!sourceIsNative) {
-      srcTokenContract = new ethers.Contract(
-        sourceTokenAddress,
+    if (!fromIsNative) {
+      fromTokenContract = new ethers.Contract(
+        fromToken,
         erc20Abi,
-        srcProvider
+        fromProvider
       );
     }
 
     return {
-      sourceChain,
-      destinationChain,
-      sourceToken,
-      destinationToken,
-      srcTokenContract,
-      srcProvider,
-      sourceIsNative,
+      fromChain: _fromChain,
+      toChain: _toChain,
+      fromToken: _fromToken,
+      toToken: _toToken,
+      fromTokenContract,
+      fromProvider,
+      fromIsNative,
       targetAddress
     };
   }
@@ -220,22 +207,22 @@ export class Squid {
     const { transactionRequest, params } = route;
 
     const {
-      sourceIsNative,
-      sourceChain,
-      destinationChain,
-      srcTokenContract,
-      srcProvider,
+      fromIsNative,
+      fromChain,
+      toChain,
+      fromTokenContract,
+      fromProvider,
       targetAddress
     } = this.validateRouteData(route);
 
-    if (!sourceIsNative) {
+    if (!fromIsNative) {
       await this.validateBalanceAndApproval({
-        srcTokenContract: srcTokenContract as ethers.Contract,
+        fromTokenContract: fromTokenContract as ethers.Contract,
         targetAddress,
-        srcProvider,
-        sourceIsNative,
-        sourceAmount: params.sourceAmount,
-        sourceChain,
+        fromProvider,
+        fromIsNative,
+        fromAmount: params.fromAmount,
+        fromChain,
         infiniteApproval: executionSettings?.infiniteApproval,
         signer
       });
@@ -251,17 +238,17 @@ export class Squid {
     let gasFee: string;
     try {
       gasFee = await sdk.estimateGasFee(
-        sourceChain.nativeCurrency.name as EvmChain,
-        destinationChain.nativeCurrency.name as EvmChain,
-        destinationChain.nativeCurrency.symbol as GasToken,
+        fromChain.nativeCurrency.name as EvmChain,
+        toChain.nativeCurrency.name as EvmChain,
+        toChain.nativeCurrency.symbol as GasToken,
         transactionRequest.destinationChainGas
       );
     } catch (error) {
       gasFee = "3513000021000000";
     }
 
-    const value = sourceIsNative
-      ? ethers.BigNumber.from(params.sourceAmount).add(
+    const value = fromIsNative
+      ? ethers.BigNumber.from(params.fromAmount).add(
           ethers.BigNumber.from(gasFee)
         )
       : ethers.BigNumber.from(gasFee);
@@ -289,59 +276,59 @@ export class Squid {
     this.validateInit();
 
     const {
-      sourceIsNative,
-      sourceChain,
-      srcProvider,
-      srcTokenContract,
+      fromIsNative,
+      fromChain,
+      fromProvider,
+      fromTokenContract,
       targetAddress
     } = this.validateRouteData(route);
 
     const {
-      params: { sourceAmount }
+      params: { fromAmount }
     } = route;
 
-    const amount = ethers.BigNumber.from(sourceAmount);
+    const amount = ethers.BigNumber.from(fromAmount);
 
-    if (!sourceIsNative) {
-      const balance = await (srcTokenContract as ethers.Contract).balanceOf(
+    if (!fromIsNative) {
+      const balance = await (fromTokenContract as ethers.Contract).balanceOf(
         sender
       );
 
       if (amount.gt(balance)) {
         throw new Error(
-          `Insufficent funds for account: ${sender} on chain ${sourceChain.chainId}`
+          `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`
         );
       }
 
-      const allowance = await (srcTokenContract as ethers.Contract).allowance(
+      const allowance = await (fromTokenContract as ethers.Contract).allowance(
         sender,
         targetAddress
       );
 
       if (amount.gt(allowance)) {
         throw new Error(
-          `Insufficent allowance for contract: ${targetAddress} on chain ${sourceChain.chainId}`
+          `Insufficent allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`
         );
       }
 
       return {
         isApproved: true,
-        message: `User has approved Squid to use ${sourceAmount} of ${await (
-          srcTokenContract as ethers.Contract
+        message: `User has approved Squid to use ${fromAmount} of ${await (
+          fromTokenContract as ethers.Contract
         ).symbol()}`
       };
     } else {
-      const balance = await srcProvider.getBalance(sender);
+      const balance = await fromProvider.getBalance(sender);
 
       if (amount.gt(balance)) {
         throw new Error(
-          `Insufficent funds for account: ${sender} on chain ${sourceChain.chainId}`
+          `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`
         );
       }
 
       return {
         isApproved: true,
-        message: `User has the expected balance ${sourceAmount} of ${sourceChain.nativeCurrency.symbol}`
+        message: `User has the expected balance ${fromAmount} of ${fromChain.nativeCurrency.symbol}`
       };
     }
   }
@@ -349,24 +336,24 @@ export class Squid {
   public async approveRoute({ route, signer }: ApproveRoute): Promise<boolean> {
     this.validateInit();
 
-    const { sourceIsNative, srcTokenContract, targetAddress } =
+    const { fromIsNative, fromTokenContract, targetAddress } =
       this.validateRouteData(route);
 
     const {
-      params: { sourceAmount }
+      params: { fromAmount }
     } = route as Route;
 
-    if (sourceIsNative) {
+    if (fromIsNative) {
       return true;
     }
 
     let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
 
     if (this.config?.executionSettings?.infiniteApproval === false) {
-      amountToApprove = ethers.BigNumber.from(sourceAmount);
+      amountToApprove = ethers.BigNumber.from(fromAmount);
     }
 
-    const approveTx = await (srcTokenContract as ethers.Contract)
+    const approveTx = await (fromTokenContract as ethers.Contract)
       .connect(signer)
       .approve(targetAddress, amountToApprove);
     await approveTx.wait();
