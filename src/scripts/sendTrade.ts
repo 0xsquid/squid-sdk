@@ -13,7 +13,13 @@ const excecuteSendTrade = async (
   amount: string,
   isDestNative = false
 ) => {
-  const params = getSendTrade(squid, fromNetwork, toNetwork, amount);
+  const params = getSendTrade(
+    squid,
+    fromNetwork,
+    toNetwork,
+    amount,
+    isDestNative
+  );
   console.log("\n");
   console.log(
     `> sendTrade: from ${fromNetwork}=>${toNetwork} from ${chalk.green(
