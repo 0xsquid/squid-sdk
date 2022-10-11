@@ -133,7 +133,7 @@ export type Estimate = {
 export type Route = {
   estimate: Estimate;
   transactionRequest: TransactionRequest;
-  params: GetRoute;
+  params: GetRoute & { fromToken: TokenData; toToken: TokenData };
 };
 
 export type RouteResponse = {
