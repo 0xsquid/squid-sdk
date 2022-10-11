@@ -63,6 +63,7 @@ export type ChainData = {
     defaultCrosschainToken: string;
     multicall: string;
   };
+  estimatedRouteDuration: number;
 };
 
 export type ChainsData = ChainData[];
@@ -128,6 +129,7 @@ export type Estimate = {
   toAmountMin: string;
   route: RouteData[];
   exchangeRate?: string;
+  estimatedRouteDuration: number;
 };
 
 export type Route = {
