@@ -96,6 +96,7 @@ export type GetRoute = {
   fromAmount: string;
   toAddress: string;
   slippage: number;
+  quoteOnly?: boolean;
 };
 
 export type TransactionRequest = {
