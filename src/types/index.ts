@@ -131,6 +131,7 @@ export type Estimate = {
   route: RouteData[];
   exchangeRate?: string;
   estimatedRouteDuration: number;
+  aggregatePriceImpact: string;
 };
 
 export type Route = {
