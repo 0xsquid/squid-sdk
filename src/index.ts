@@ -144,15 +144,13 @@ export class Squid {
     }
 
     const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
-    const _fromToken = getTokenData(this.tokens, fromToken, fromChain);
-    const _toToken = getTokenData(this.tokens, toToken, toChain);
 
-    const fromIsNative = fromToken === nativeTokenConstant;
+    const fromIsNative = fromToken.address === nativeTokenConstant;
     let fromTokenContract;
 
     if (!fromIsNative) {
       fromTokenContract = new ethers.Contract(
-        fromToken,
+        fromToken.address,
         erc20Abi,
         fromProvider
       );
@@ -161,8 +159,8 @@ export class Squid {
     return {
       fromChain: _fromChain,
       toChain: _toChain,
-      fromToken: _fromToken,
-      toToken: _toToken,
+      fromToken,
+      toToken,
       fromTokenContract,
       fromProvider,
       fromIsNative,
