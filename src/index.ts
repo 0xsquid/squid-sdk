@@ -226,30 +226,11 @@ export class Squid {
       });
     }
 
-    const sdk = new AxelarQueryAPI({
-      environment:
-        this.config?.baseUrl && !this.config.baseUrl.includes("testnet")
-          ? "mainnet"
-          : "testnet"
-    } as AxelarQueryAPIConfig);
-
-    let gasFee: string;
-    try {
-      gasFee = await sdk.estimateGasFee(
-        fromChain.nativeCurrency.name as EvmChain,
-        toChain.nativeCurrency.name as EvmChain,
-        toChain.nativeCurrency.symbol as GasToken,
-        transactionRequest.destinationChainGas
-      );
-    } catch (error) {
-      gasFee = "3513000021000000";
-    }
-
     const value = fromIsNative
       ? ethers.BigNumber.from(params.fromAmount).add(
-          ethers.BigNumber.from(gasFee)
+          ethers.BigNumber.from(route.transactionRequest.value)
         )
-      : ethers.BigNumber.from(gasFee);
+      : ethers.BigNumber.from(route.transactionRequest.value);
 
     let tx = {
       to: targetAddress,

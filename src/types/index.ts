@@ -103,9 +103,8 @@ export type GetRoute = {
 export type TransactionRequest = {
   routeType: string;
   targetAddress: string;
-  gasReceiver: boolean;
   data: string;
-  destinationChainGas: number;
+  value: number;
 };
 
 export type RouteData = SwapData[];
