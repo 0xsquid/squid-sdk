@@ -11,7 +11,7 @@ const provider = new ethers.providers.JsonRpcProvider(rpcEndPoint);
 async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
   const squidSdk = new Squid({
-    baseUrl: "update this" // "http://localhost:3000" | "http://testnet.api.0xsquid.com"
+    baseUrl: "http://localhost:3000" // "http://localhost:3000" | "http://testnet.api.0xsquid.com"
   });
 
   await squidSdk.init();
