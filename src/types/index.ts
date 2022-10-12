@@ -63,6 +63,7 @@ export type ChainData = {
     defaultCrosschainToken: string;
     multicall: string;
   };
+  estimatedRouteDuration: number;
 };
 
 export type ChainsData = ChainData[];
@@ -95,6 +96,7 @@ export type GetRoute = {
   fromAmount: string;
   toAddress: string;
   slippage: number;
+  quoteOnly?: boolean;
 };
 
 export type TransactionRequest = {
@@ -128,12 +130,14 @@ export type Estimate = {
   toAmountMin: string;
   route: RouteData[];
   exchangeRate?: string;
+  estimatedRouteDuration: number;
+  aggregatePriceImpact: string;
 };
 
 export type Route = {
   estimate: Estimate;
   transactionRequest: TransactionRequest;
-  params: GetRoute;
+  params: GetRoute & { fromToken: TokenData; toToken: TokenData };
 };
 
 export type RouteResponse = {
