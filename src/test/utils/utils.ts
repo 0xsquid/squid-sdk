@@ -1,5 +1,5 @@
 import { ethers, Contract, BigNumber } from "ethers";
-import abi from "./erc20.json";
+import erc20Abi from "../abi/erc20.json";
 
 export async function getTokenBalance(
   tokenAddress: string,
@@ -8,7 +8,7 @@ export async function getTokenBalance(
 ) {
   let balance: BigNumber;
   //const erc20Abi = require("./../abi/erc20.json");
-  const tokenContract = new ethers.Contract(tokenAddress, abi, provider);
+  const tokenContract = new ethers.Contract(tokenAddress, erc20Abi, provider);
   if (tokenAddress === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
     balance = await provider.getBalance(address);
   } else {

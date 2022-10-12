@@ -1,7 +1,7 @@
 import { describe, jest } from "@jest/globals";
 import { ethers } from "ethers";
 import { ChainName, Squid } from "../index";
-import { getTokenBalance, waiting } from "./utils";
+import { getTokenBalance, waiting } from "./utils/utils";
 
 //base config
 jest.setTimeout(10000000);
