@@ -15,7 +15,7 @@ const squidSdk = new Squid({
 });
 const axlUsdcSymbol = "axlUSDC";
 const usdcSymbol = "USDC";
-const timeToWait = 1000; //time taken between trades before querying the destination chain
+const timeToWait = 10000; //time taken between trades before querying the destination chain
 const slippage = 99;
 
 let ETHEREUM;

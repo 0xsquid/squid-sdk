@@ -51,12 +51,12 @@ const getSDK = (): Squid => {
     if (all || argv.s === "sendtrade") {
       console.log(`\n> Running SendTrade`);
       await sendTrade(squid, ChainName.ETHEREUM, ethereumDests, "1"); // USDC value
-      await sendTrade(squid, ChainName.AVALANCHE, avalancheDests, "1"); // USDC value
-      await sendTrade(squid, ChainName.MOONBEAM, moonbeamDests, "1"); // USDC value
-      await sendTrade(squid, ChainName.POLYGON, polygonDests, "1"); // USDC value
+      //await sendTrade(squid, ChainName.AVALANCHE, avalancheDests, "1"); // USDC value
+      //await sendTrade(squid, ChainName.MOONBEAM, moonbeamDests, "1"); // USDC value
+      //await sendTrade(squid, ChainName.POLYGON, polygonDests, "1"); // USDC value
     }
 
-    if (all || argv.s === "tradesend") {
+    /*  if (all || argv.s === "tradesend") {
       console.log(`\n> Running TradeSend`);
       await tradeSend(squid, ChainName.ETHEREUM, ethereumDests, "0.001");
       await tradeSend(squid, ChainName.AVALANCHE, avalancheDests, "0.1");
@@ -100,7 +100,7 @@ const getSDK = (): Squid => {
         "0.001",
         kujiraDestAddress
       );
-    }
+    } */
   } catch (error) {
     console.error(error);
   }
