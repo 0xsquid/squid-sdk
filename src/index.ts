@@ -1,9 +1,3 @@
-import {
-  AxelarQueryAPI,
-  AxelarQueryAPIConfig,
-  EvmChain,
-  GasToken
-} from "@axelar-network/axelarjs-sdk";
 import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
 
@@ -207,7 +201,6 @@ export class Squid {
     const {
       fromIsNative,
       fromChain,
-      toChain,
       fromTokenContract,
       fromProvider,
       targetAddress
