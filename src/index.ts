@@ -226,11 +226,7 @@ export class Squid {
       });
     }
 
-    const value = fromIsNative
-      ? ethers.BigNumber.from(params.fromAmount).add(
-          ethers.BigNumber.from(route.transactionRequest.value)
-        )
-      : ethers.BigNumber.from(route.transactionRequest.value);
+    const value = ethers.BigNumber.from(route.transactionRequest.value);
 
     let tx = {
       to: targetAddress,
