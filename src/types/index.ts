@@ -97,7 +97,7 @@ export type GetRoute = {
   toAddress: string;
   slippage: number;
   quoteOnly?: boolean;
-  forecallable?: boolean;
+  enableForecall?: boolean;
 };
 
 export type TransactionRequest = {
