@@ -103,7 +103,7 @@ describe("Testing trades from Ethereum to avalanche", () => {
     expect(srcTokenBalancePre).toBeGreaterThan(srcTokenBalancePost);
     expect(dstTokenBalancePre).toBeLessThan(dstTokenBalancePost);
   });
-  /* 
+
   test(" test callBridge: WETH on ethereum to USDC on avalanche", async () => {
     ////////////////////
     /// configure this part
@@ -420,9 +420,9 @@ describe("Testing trades from Ethereum to avalanche", () => {
     // verify balance changes
     expect(srcTokenBalancePre).toBeGreaterThan(srcTokenBalancePost);
     expect(dstTokenBalancePre).toBeLessThan(dstTokenBalancePost);
-  }); */
+  });
 });
-/* 
+
 describe("Testing trades from Ethereum to Moonbeam", () => {
   ETHEREUM = squidSdk.chains.find(
     chain => chain.chainName == ChainName.ETHEREUM
@@ -2060,4 +2060,3 @@ describe("Testing trades from Moonbeam to Ethereum", () => {
     expect(dstTokenBalancePre).toBeLessThan(dstTokenBalancePost);
   });
 });
- */
