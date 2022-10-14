@@ -164,7 +164,7 @@ export class Squid {
 
   public async init() {
     try {
-      const response = await this.axiosInstance.get("/api/sdk-info");
+      const response = await this.axiosInstance.get("/v1/sdk-info");
       this.tokens = response.data.data.tokens;
       this.chains = response.data.data.chains;
       this.initialized = true;
@@ -185,7 +185,7 @@ export class Squid {
 
   public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
-    const response = await this.axiosInstance.get("/api/route", { params });
+    const response = await this.axiosInstance.get("/v1/route", { params });
     return { route: response.data.route };
   }
 
@@ -390,7 +390,7 @@ export class Squid {
   }
 
   public async getStatus(params: GetStatus): Promise<StatusResponse> {
-    const response = await this.axiosInstance.get("/api/status", { params });
+    const response = await this.axiosInstance.get("/v1/status", { params });
 
     return response.data.data;
   }
@@ -402,7 +402,7 @@ export class Squid {
     tokenAddress: string;
     chainId: string | number;
   }) {
-    const response = await this.axiosInstance.get("/api/token-price", {
+    const response = await this.axiosInstance.get("/v1/token-price", {
       params: { tokenAddress, chainId }
     });
 
