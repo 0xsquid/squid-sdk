@@ -165,8 +165,8 @@ export class Squid {
   public async init() {
     try {
       const response = await this.axiosInstance.get("/v1/sdk-info");
-      this.tokens = response.data.data.tokens;
-      this.chains = response.data.data.chains;
+      this.tokens = response.data.tokens;
+      this.chains = response.data.chains;
       this.initialized = true;
     } catch (error) {
       throw new Error(`Squid inititalization failed ${error}`);
@@ -392,7 +392,7 @@ export class Squid {
   public async getStatus(params: GetStatus): Promise<StatusResponse> {
     const response = await this.axiosInstance.get("/v1/status", { params });
 
-    return response.data.data;
+    return response.data;
   }
 
   public async getTokenPrice({
