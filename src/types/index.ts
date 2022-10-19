@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 
 export enum ChainName {
   ETHEREUM = "Ethereum",
+  ETHEREUM2 = "Ethereum-2",
   OSMOSIS = "osmosis",
   OSMOSIS4 = "osmosis-4",
   MOONBEAM = "Moonbeam",
