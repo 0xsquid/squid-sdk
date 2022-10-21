@@ -224,7 +224,7 @@ export class Squid {
     let tx = {
       to: targetAddress,
       data: transactionRequest.data,
-      gasLimit: 70e4 // 700000 gasLimit
+      gasLimit: transactionRequest.gasLimit
     } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
 
     if (transactionRequest.routeType !== "SEND") {
