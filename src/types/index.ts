@@ -106,6 +106,10 @@ export type TransactionRequest = {
   targetAddress: string;
   data: string;
   value: number;
+  gasLimit: string;
+  gasPrice: string;
+  maxFeePerGas: string;
+  maxPriorityFeePerGas: string;
 };
 
 export type RouteData = SwapData[];
@@ -133,6 +137,8 @@ export type Estimate = {
   exchangeRate?: string;
   estimatedRouteDuration: number;
   aggregatePriceImpact: string;
+  feeCosts: FeeCost[];
+  gasCosts: GasCost[];
 };
 
 export type Route = {
@@ -215,4 +221,25 @@ export type StatusResponse = {
   gasStatus: string;
   destinationTransactionId: string;
   blockNumber: number;
+};
+
+export type GasCost = {
+  type: string;
+  token: TokenData;
+  amount: string;
+  amountUSD: string;
+  gasPrice: string;
+  maxFeePerGas: string;
+  maxPriorityFeePerGas: string;
+  estimate: string;
+  limit: string;
+};
+
+export type FeeCost = {
+  name: string;
+  description: string;
+  percentage: string;
+  token: TokenData;
+  amount: string;
+  amountUSD: string;
 };
