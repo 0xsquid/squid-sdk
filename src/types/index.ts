@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 
 export enum ChainName {
   ETHEREUM = "Ethereum",
+  ETHEREUM2 = "Ethereum-2",
   OSMOSIS = "osmosis",
   OSMOSIS4 = "osmosis-4",
   MOONBEAM = "Moonbeam",
@@ -48,7 +49,6 @@ export type ChainData = {
     decimals: number;
     icon: string;
   };
-  squidConfig: squidConfig[];
   chainNativeContracts: {
     wrappedNativeToken: string;
     distributionEnsExecutable: string;
@@ -62,11 +62,9 @@ export type ChainData = {
   squidContracts: {
     squidMain: string;
     defaultCrosschainToken: string;
+    multicall: string;
   };
-  integrationContracts: {
-    dexUniswapV2: string;
-    dexCurve: string;
-  };
+  estimatedRouteDuration: number;
 };
 
 export type ChainsData = ChainData[];
@@ -92,21 +90,26 @@ export type Config = {
 };
 
 export type GetRoute = {
-  sourceChainId: number | string;
-  destinationChainId: number | string;
-  sourceTokenAddress: string;
-  destinationTokenAddress: string;
-  sourceAmount: string;
-  recipientAddress: string;
+  fromChain: number | string;
+  toChain: number | string;
+  fromToken: string;
+  toToken: string;
+  fromAmount: string;
+  toAddress: string;
   slippage: number;
+  quoteOnly?: boolean;
+  enableForecall?: boolean;
 };
 
 export type TransactionRequest = {
   routeType: string;
   targetAddress: string;
-  gasReceiver: boolean;
   data: string;
-  destinationChainGas: number;
+  value: number;
+  gasLimit: string;
+  gasPrice: string;
+  maxFeePerGas: string;
+  maxPriorityFeePerGas: string;
 };
 
 export type RouteData = SwapData[];
@@ -132,12 +135,16 @@ export type Estimate = {
   toAmountMin: string;
   route: RouteData[];
   exchangeRate?: string;
+  estimatedRouteDuration: number;
+  aggregatePriceImpact: string;
+  feeCosts: FeeCost[];
+  gasCosts: GasCost[];
 };
 
 export type Route = {
   estimate: Estimate;
   transactionRequest: TransactionRequest;
-  params: GetRoute;
+  params: GetRoute & { fromToken: TokenData; toToken: TokenData };
 };
 
 export type RouteResponse = {
@@ -178,24 +185,24 @@ export type ApproveRoute = {
 };
 
 export type RoutePopulatedData = {
-  sourceChain: ChainData;
-  destinationChain: ChainData;
-  sourceToken: TokenData | undefined;
-  destinationToken: TokenData | undefined;
-  srcTokenContract: ethers.Contract | undefined;
-  srcProvider: ethers.providers.JsonRpcProvider;
-  sourceIsNative: boolean;
+  fromChain: ChainData;
+  toChain: ChainData;
+  fromToken: TokenData | undefined;
+  toToken: TokenData | undefined;
+  fromTokenContract: ethers.Contract | undefined;
+  fromProvider: ethers.providers.JsonRpcProvider;
+  fromIsNative: boolean;
   targetAddress: string;
 };
 
 export type ValidateBalanceAndApproval = {
-  srcTokenContract: ethers.Contract;
-  srcProvider: ethers.providers.JsonRpcProvider;
-  sourceIsNative: boolean;
-  sourceAmount: string;
+  fromTokenContract: ethers.Contract;
+  fromProvider: ethers.providers.JsonRpcProvider;
+  fromIsNative: boolean;
+  fromAmount: string;
   targetAddress: string;
   signer: ethers.Wallet | ethers.Signer;
-  sourceChain: ChainData;
+  fromChain: ChainData;
   infiniteApproval?: boolean;
 };
 
@@ -203,7 +210,7 @@ export type GetStatus = {
   transactionId: string;
   routeType: string;
   destinationAddress?: string;
-  destinationChainId?: number | string;
+  toChain?: number | string;
   fromBlock?: number;
   toBlock?: number;
 };
@@ -214,4 +221,25 @@ export type StatusResponse = {
   gasStatus: string;
   destinationTransactionId: string;
   blockNumber: number;
+};
+
+export type GasCost = {
+  type: string;
+  token: TokenData;
+  amount: string;
+  amountUSD: string;
+  gasPrice: string;
+  maxFeePerGas: string;
+  maxPriorityFeePerGas: string;
+  estimate: string;
+  limit: string;
+};
+
+export type FeeCost = {
+  name: string;
+  description: string;
+  percentage: string;
+  token: TokenData;
+  amount: string;
+  amountUSD: string;
 };

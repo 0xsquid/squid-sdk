@@ -13,8 +13,8 @@ jest.mock("ethers");
 describe("SquidSdk approve method", () => {
   const getMocked = jest.fn().mockResolvedValue({
     data: {
-      status: true,
-      data: { chains: chainsData, tokens: supportedTokens }
+      chains: chainsData,
+      tokens: supportedTokens
     }
   });
   const mockedAxios = (axios.create as jest.Mock).mockReturnValue({

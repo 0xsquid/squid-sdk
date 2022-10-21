@@ -13,14 +13,21 @@ const excecuteTradeSendTrade = async (
   isSrcNative = false,
   isDestNative = false
 ) => {
-  const params = getTradeSendTrade(squid, fromNetwork, toNetwork, amount);
+  const params = getTradeSendTrade(
+    squid,
+    fromNetwork,
+    toNetwork,
+    amount,
+    isSrcNative,
+    isDestNative
+  );
   console.log("\n");
   console.log(
     `> tradeSendTrade: ${fromNetwork}=>${toNetwork} from ${
       isSrcNative ? chalk.red("Native") : chalk.green("Token")
-    } ${params.sourceTokenAddress} to ${
+    } ${params.fromToken} to ${
       isDestNative ? chalk.red("Native") : chalk.green("Token")
-    } ${params.destinationTokenAddress}`
+    } ${params.toToken}`
   );
 
   const { route } = await squid.getRoute(params);

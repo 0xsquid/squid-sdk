@@ -12,23 +12,23 @@ import {
 import { nativeTokenConstant } from "../constants/index";
 
 const buildParam = (
-  sourceChainId: number | string,
-  destinationChainId: number | string,
-  sourceTokenAddress: string,
-  sourceTokenDecimals: number,
-  sourceAmount: string,
-  destinationTokenAddress: string,
-  recipientAddress: string
+  fromChain: number | string,
+  toChain: number | string,
+  fromToken: string,
+  fromTokenDecimals: number,
+  fromAmount: string,
+  toToken: string,
+  toAddress: string
 ): GetRoute => {
   return {
-    sourceChainId,
-    destinationChainId,
-    sourceTokenAddress,
-    destinationTokenAddress,
-    sourceAmount: ethers.utils
-      .parseUnits(sourceAmount, sourceTokenDecimals)
+    fromChain,
+    toChain,
+    fromToken,
+    toToken,
+    fromAmount: ethers.utils
+      .parseUnits(fromAmount, fromTokenDecimals)
       .toString(),
-    recipientAddress,
+    toAddress,
     slippage: 1
   } as GetRoute;
 };
@@ -100,7 +100,7 @@ export const getSendTrade = (
     "source and destination squid executable address missmatch"
   );
 
-  const recipientAddress = getSignerForChain(destChainName)?.address as string;
+  const toAddress = getSignerForChain(destChainName)?.address as string;
   // select ether native constant for destination chain or wrapped native
   const destWrappedNative = isDestNative
     ? nativeTokenConstant
@@ -114,7 +114,7 @@ export const getSendTrade = (
     6,
     amount,
     destWrappedNative,
-    recipientAddress
+    toAddress
   );
   return route;
 };
@@ -148,7 +148,7 @@ export const getTradeSend = (
       "source and destination squid executable address missmatch"
     );
   }
-  const recipientAddress = recipientAdd
+  const toAddress = recipientAdd
     ? recipientAdd
     : (getSignerForChain(destChainName)?.address as string);
 
@@ -160,7 +160,7 @@ export const getTradeSend = (
     18,
     amount, // Wrapped native
     dstCrosschainToken,
-    recipientAddress
+    toAddress
   );
 
   return route;
@@ -195,7 +195,7 @@ export const getTradeSendTrade = (
     "source and destination squid executable address missmatch"
   );
 
-  const recipientAddress = getSignerForChain(destChainName)?.address as string;
+  const toAddress = getSignerForChain(destChainName)?.address as string;
 
   // WNT swaps --> USDC/axlUSDC => axlUSDC/USDC --> swap WNT
   const route: GetRoute = buildParam(
@@ -205,7 +205,7 @@ export const getTradeSendTrade = (
     18,
     amount,
     destWrapperNativeToken,
-    recipientAddress
+    toAddress
   );
 
   return route;
@@ -242,7 +242,7 @@ export const getSendOnly = (
     );
   }
 
-  const recipientAddress = recipientAdd
+  const toAddress = recipientAdd
     ? recipientAdd
     : (getSignerForChain(destChainName)?.address as string);
 
@@ -254,7 +254,7 @@ export const getSendOnly = (
     6,
     amount,
     destGatewayToken,
-    recipientAddress
+    toAddress
   );
   return route;
 };
