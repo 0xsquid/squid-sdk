@@ -14,21 +14,21 @@ const getSDK = (): Squid => {
     const squid = getSDK();
     await squid.init();
     const provider = new ethers.providers.JsonRpcProvider(
-      process.env.ethereumRpcEndPoint // "https://ropsten.infura.io/v3/510b6d5b3c56497b8070626a54f565a9"
+      "http://localhost:8500/0" // "https://ropsten.infura.io/v3/510b6d5b3c56497b8070626a54f565a9"
     );
     const signer = new ethers.Wallet(
-      process.env.privateKey as string, // "05628be03b65c6766668898da5b419a4669aa67891bbea16718a455874bce422",
+      "0x6db76b64b8019ea6d646ee8b70a9e4f7c3aa0f943b42eb700d4a798b3544a094" as string, // "05628be03b65c6766668898da5b419a4669aa67891bbea16718a455874bce422",
       provider
     );
 
     const { route } = await squid.getRoute({
-      sourceChainId: "1",
-      sourceTokenAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-      destinationChainId: "43114",
-      destinationTokenAddress: "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664", // "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      sourceAmount: "1000000000000000000",
-      recipientAddress: signer.address,
-      slippage: 10
+      toAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
+      fromChain: 1,
+      fromToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      fromAmount: "15000000",
+      toChain: 1284,
+      toToken: "0x8f552a71efe5eefc207bf75485b356a0b3f01ec9",
+      slippage: 99
     });
     console.log(
       "> route: ",

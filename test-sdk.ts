@@ -32,13 +32,13 @@ const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
     );
 
     const { route } = await squid.getRoute({
-      sourceChainId: "43114",
-      sourceTokenAddress: WAVAX,
-      destinationChainId: "1",
-      destinationTokenAddress: USDC,
-      sourceAmount: "10000000000000000000",
-      recipientAddress: signer.address,
-      slippage: 10
+      toAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
+      fromChain: 43114,
+      fromToken: "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC",
+      fromAmount: "2000000000",
+      toChain: 1,
+      toToken: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+      slippage: 99
     });
     console.log(
       "> route: ",
@@ -52,7 +52,7 @@ const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
     });
     const txReceipt = await tx.wait();
     console.log("> txReceipt: ", txReceipt);
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
   }
 })();
