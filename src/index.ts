@@ -25,6 +25,7 @@ import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
+import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -37,12 +38,14 @@ export class Squid {
   public chains: ChainsData = [] as ChainData[];
 
   constructor(config = {} as Config) {
-    this.axiosInstance = axios.create({
-      baseURL: config?.baseUrl || baseUrl,
-      headers: {
-        // 'api-key': config.apiKey
-      }
-    });
+    this.axiosInstance = setAxiosInterceptors(
+      axios.create({
+        baseURL: config?.baseUrl || baseUrl,
+        headers: {
+          // 'api-key': config.apiKey
+        }
+      })
+    );
 
     this.config = {
       baseUrl: config?.baseUrl || baseUrl,
@@ -181,18 +184,10 @@ export class Squid {
   }
 
   public async init() {
-    try {
-      const response = await this.axiosInstance.get("/v1/sdk-info");
-      this.tokens = response.data.tokens;
-      this.chains = response.data.chains;
-      this.initialized = true;
-    } catch (error) {
-      throw new SquidError({
-        message: `Squid inititalization failed ${error}`,
-        errorType: ErrorType.InitError,
-        logErrors: this.config.logErrors
-      });
-    }
+    const response = await this.axiosInstance.get("/v1/sdk-info");
+    this.tokens = response.data.tokens;
+    this.chains = response.data.chains;
+    this.initialized = true;
   }
 
   public setConfig(config: Config) {
