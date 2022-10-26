@@ -87,6 +87,7 @@ export type Config = {
   executionSettings?: {
     infiniteApproval?: boolean;
   };
+  logErrors?: boolean;
 };
 
 export type GetRoute = {
