@@ -44,7 +44,8 @@ export class Squid {
         headers: {
           // 'api-key': config.apiKey
         }
-      })
+      }),
+      config
     );
 
     this.config = {
@@ -59,7 +60,8 @@ export class Squid {
         message:
           "SquidSdk must be initialized! Please call the SquidSdk.init method",
         errorType: ErrorType.InitError,
-        logErrors: this.config.logErrors
+        loggin: this.config.loggin,
+        logLevel: this.config.logLevel
       });
     }
   }
@@ -90,7 +92,8 @@ export class Squid {
         throw new SquidError({
           message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
-          logErrors: this.config.logErrors
+          loggin: this.config.loggin,
+          logLevel: this.config.logLevel
         });
       }
 
@@ -125,7 +128,8 @@ export class Squid {
         throw new SquidError({
           message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
-          logErrors: this.config.logErrors
+          loggin: this.config.loggin,
+          logLevel: this.config.logLevel
         });
       }
     }
@@ -145,7 +149,8 @@ export class Squid {
       throw new SquidError({
         message: `fromChain not found for ${fromChain}`,
         errorType: ErrorType.ValidationError,
-        logErrors: this.config.logErrors
+        loggin: this.config.loggin,
+        logLevel: this.config.logLevel
       });
     }
 
@@ -154,7 +159,8 @@ export class Squid {
       throw new SquidError({
         message: `toChain not found for ${fromChain}`,
         errorType: ErrorType.ValidationError,
-        logErrors: this.config.logErrors
+        loggin: this.config.loggin,
+        logLevel: this.config.logLevel
       });
     }
 
@@ -283,7 +289,8 @@ export class Squid {
         throw new SquidError({
           message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
-          logErrors: this.config.logErrors
+          loggin: this.config.loggin,
+          logLevel: this.config.logLevel
         });
       }
 
@@ -296,7 +303,8 @@ export class Squid {
         throw new SquidError({
           message: `Insufficent allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
-          logErrors: this.config.logErrors
+          loggin: this.config.loggin,
+          logLevel: this.config.logLevel
         });
       }
 
@@ -313,7 +321,8 @@ export class Squid {
         throw new SquidError({
           message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
-          logErrors: this.config.logErrors
+          loggin: this.config.loggin,
+          logLevel: this.config.logLevel
         });
       }
 
@@ -369,7 +378,8 @@ export class Squid {
       throw new SquidError({
         message: `Token not found for ${tokenAddress}`,
         errorType: ErrorType.ValidationError,
-        logErrors: this.config.logErrors
+        loggin: this.config.loggin,
+        logLevel: this.config.logLevel
       });
     }
 
@@ -381,7 +391,8 @@ export class Squid {
       throw new SquidError({
         message: `Chain not found for ${token.chainId}`,
         errorType: ErrorType.ValidationError,
-        logErrors: this.config.logErrors
+        loggin: this.config.loggin,
+        logLevel: this.config.logLevel
       });
     }
 
@@ -408,7 +419,8 @@ export class Squid {
       throw new SquidError({
         message: `Token not found for ${tokenAddress}`,
         errorType: ErrorType.ValidationError,
-        logErrors: this.config.logErrors
+        loggin: this.config.loggin,
+        logLevel: this.config.logLevel
       });
     }
 
@@ -420,7 +432,8 @@ export class Squid {
       throw new SquidError({
         message: `Chain not found for ${token.chainId}`,
         errorType: ErrorType.ValidationError,
-        logErrors: this.config.logErrors
+        loggin: this.config.loggin,
+        logLevel: this.config.logLevel
       });
     }
 
