@@ -80,7 +80,7 @@
     },
     "git": {
       "tagName": "v${version}",
-      "pushRepo": "https://github.com/0xsquid/squid-core.git",
+      "pushRepo": "https://github.com/0xsquid/squid-sdk.git",
       "commitMessage": "chore: branch cut release for api v${version}",
       "requireBranch": "release/*"
     },
