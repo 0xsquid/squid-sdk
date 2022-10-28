@@ -1,6 +1,6 @@
 {
   "name": "@0xsquid/sdk",
-  "version": "1.1.0-beta.10",
+  "version": "1.1.0-beta.11",
   "description": "🛠 An SDK for building applications on top of 0xsquid",
   "repository": {
     "type": "git",
@@ -81,7 +81,7 @@
     "git": {
       "tagName": "v${version}",
       "pushRepo": "https://github.com/0xsquid/squid-sdk.git",
-      "commitMessage": "chore: branch cut release for api v${version}",
+      "commitMessage": "chore: branch cut release for sdk v${version}",
       "requireBranch": "release/*"
     },
     "npm": {
