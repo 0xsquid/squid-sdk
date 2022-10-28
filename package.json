@@ -26,11 +26,17 @@
     "integration:tradesendtrade": "npx ts-node src/scripts/test-sdk.ts -s tradesendtrade",
     "integration:sendOnly": "npx ts-node src/scripts/test-sdk.ts -s sendOnly",
     "integration:sendOnlyCosmos": "npx ts-node src/scripts/test-sdk.ts -s sendOnlyCosmos",
-    "integration:tradeSendCosmos": "npx ts-node src/scripts/test-sdk.ts -s tradeSendCosmos"
+    "integration:tradeSendCosmos": "npx ts-node src/scripts/test-sdk.ts -s tradeSendCosmos",
+    "release": "release-it",
+    "release:pre": "release-it --preRelease=beta",
+    "release:ci": "release-it --ci",
+    "release:dry": "release-it --dry-run"
   },
   "dependencies": {
+    "@release-it/conventional-changelog": "release-it/conventional-changelog",
     "axios": "^0.27.2",
-    "ethers": "^5.7.1"
+    "ethers": "^5.7.1",
+    "release-it": "^15.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
@@ -60,5 +66,26 @@
     "url": "https://github.com/0xsquid/squid-sdk/issues"
   },
   "homepage": "https://github.com/0xsquid/squid-sdk#readme",
-  "author": ""
+  "author": "",
+  "release-it": {
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "conventionalcommits",
+        "infile": "CHANGELOG.md"
+      }
+    },
+    "github": {
+      "release": true,
+      "tokenRef": "GITHUB_AUTH"
+    },
+    "git": {
+      "tagName": "v${version}",
+      "pushRepo": "https://github.com/0xsquid/squid-sdk.git",
+      "commitMessage": "chore: branch cut release for api v${version}",
+      "requireBranch": "release/*"
+    },
+    "npm": {
+      "publish": false
+    }
+  }
 }
