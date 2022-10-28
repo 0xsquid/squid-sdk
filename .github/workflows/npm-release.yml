@@ -1,7 +1,5 @@
 name: NPM Release
-
 on: workflow_dispatch
-    
 
 jobs:
   build:
