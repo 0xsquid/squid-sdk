@@ -16,7 +16,7 @@ export const setAxiosInterceptors = (
             message: error.response.statusText,
             errorType: error.response.data.errorType,
             error: error.response.data.error,
-            loggin: config.loggin,
+            logging: config.logging,
             logLevel: config.logLevel
           })
         );
@@ -27,7 +27,7 @@ export const setAxiosInterceptors = (
           message: "There was an error while trying to fetch Squid Api",
           errorType: ErrorType.UnknownError,
           error: error,
-          loggin: config.loggin,
+          logging: config.logging,
           logLevel: config.logLevel
         })
       );

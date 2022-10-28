@@ -88,7 +88,7 @@ export type Config = {
   executionSettings?: {
     infiniteApproval?: boolean;
   };
-  loggin?: boolean;
+  logging?: boolean;
   logLevel?: LogLevel;
 };
 

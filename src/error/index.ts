@@ -10,20 +10,20 @@ export type ErrorConstructor = {
   message: string;
   errorType: ErrorType | string;
   error?: any;
-  loggin?: boolean;
+  logging?: boolean;
   logLevel?: LogLevel;
 };
 
 export class SquidError extends Error {
   errorType: string;
   error: any;
-  loggin = false;
+  logging = false;
   logLevel;
 
   constructor({
     message,
     errorType,
-    loggin,
+    logging,
     error,
     logLevel
   }: ErrorConstructor) {
@@ -31,12 +31,12 @@ export class SquidError extends Error {
     this.message = message;
     this.errorType = errorType;
     this.error = error;
-    this.loggin = !!loggin;
+    this.logging = !!logging;
     this.logLevel = logLevel;
 
     Object.setPrototypeOf(this, SquidError.prototype);
 
-    if (this.loggin) {
+    if (this.logging) {
       if (this.logLevel === "error") {
         console.error(`Error type ${errorType}: ${message}`);
       }
