@@ -36,10 +36,6 @@ jobs:
           node-version: 16.x
           fetch-depth: 0
 
-      - name: Setup secrets.json
-        run: |
-          yarn workspace @squidswap/contracts create:config
-
       - name: Install dependencies
         run: yarn install --immutable --immutable-cache --check-cache --network-concurrency 1
 
