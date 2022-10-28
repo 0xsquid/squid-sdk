@@ -1,0 +1,100 @@
+name: Release Cut
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: Release type (major/minor/patch/prerelease)
+        required: true
+      branch-name:
+        description: Branch name (Optional), defaults to main
+        required: false
+        default: main
+
+jobs:
+  cut-release:
+    if: contains('["0x1NotMe","0x0Koda", "rajat43", "jmdev3"]', github.actor)
+    name: Create release branch and PRs into develop/main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exit if release type argument is invalid (or patch only for release branch)
+        run: exit 1
+        if: ${{ github.event.inputs.release-type != 'major' && github.event.inputs.release-type != 'minor' && github.event.inputs.release-type != 'patch' && github.event.inputs.release-type != 'prerelease'}}
+
+      - name: Checkout ${{ github.event.inputs.branch-name }} for ${{ github.event.inputs.release-type }} release
+        uses: actions/checkout@v3
+        if: ${{ github.event.inputs.branch-name != 'main' }}
+        with:
+          ref: ${{ github.event.inputs.branch-name }}
+          node-version: 16.x
+          fetch-depth: 0
+
+      - name: Checkout main for ${{ github.event.inputs.release-type }} release
+        uses: actions/checkout@v3
+        if: ${{ github.event.inputs.branch-name == 'main' }}
+        with:
+          ref: main
+          node-version: 16.x
+          fetch-depth: 0
+
+      - name: Setup secrets.json
+        run: |
+          yarn workspace @squidswap/contracts create:config
+
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache --check-cache --network-concurrency 1
+
+      - name: Setup git profile
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create release branch and generate PR body
+        id: create-release
+        env:
+          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+        run: |
+          current_version=$(jq -r .version package.json)
+
+          npm version $RELEASE_TYPE --git-tag-version false
+          new_version=$(jq -r .version package.json)
+
+          git reset --hard
+
+          branch_name="release/v${new_version}"
+
+          echo "Current version is $current_version"
+          echo "New version is $new_version"
+          echo "New branch name is $branch_name"
+
+          git checkout -b "$branch_name"
+
+          # Run release-ci command
+          yarn release:ci --i $RELEASE_TYPE --no-git.requireUpstream
+
+          git push --set-upstream origin "$branch_name"
+
+          # Use --depth to get commits to add to rev-list
+          git fetch origin ${{ github.event.inputs.branch-name }} --depth 100
+
+          main_pr_body=$(git rev-list --oneline $branch_name ^origin/${{ github.event.inputs.branch-name }})
+
+
+          echo 'main_pr_body<<END_OF_OUTPUT' >> $GITHUB_ENV
+          echo "$main_pr_body" >> $GITHUB_ENV
+          echo 'END_OF_OUTPUT' >> $GITHUB_ENV
+
+          echo "::set-output name=branch_name::$branch_name"
+
+      - name: Create pull request into ${{ github.event.inputs.branch-name }}
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: ${{ steps.create-release.outputs.branch_name }}
+          destination_branch: "${{ github.event.inputs.branch-name }}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: ${{ steps.create-release.outputs.branch_name }}
+          pr_body: ${{ env.main_pr_body }}
+
+      - name: Publist to NPM
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
