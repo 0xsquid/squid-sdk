@@ -81,7 +81,7 @@
     "git": {
       "tagName": "v${version}",
       "pushRepo": "https://github.com/0xsquid/squid-sdk.git",
-      "commitMessage": "chore: branch cut release for api v${version}",
+      "commitMessage": "chore: branch cut release for sdk v${version}",
       "requireBranch": "release/*"
     },
     "npm": {
