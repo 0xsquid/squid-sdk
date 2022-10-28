@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: Release type (major/minor/patch)
+        description: Release type (major/minor/patch/prerelease)
         required: true
       branch-name:
         description: Branch name (Optional), defaults to main
@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Exit if release type argument is invalid (or patch only for release branch)
         run: exit 1
-        if: ${{ github.event.inputs.release-type != 'major' && github.event.inputs.release-type != 'minor' && github.event.inputs.release-type != 'patch' }}
+        if: ${{ github.event.inputs.release-type != 'major' && github.event.inputs.release-type != 'minor' && github.event.inputs.release-type != 'patch' && github.event.inputs.release-type !='prerelease'}}
 
       - name: Checkout ${{ github.event.inputs.branch-name }} for ${{ github.event.inputs.release-type }} release
         uses: actions/checkout@v3
