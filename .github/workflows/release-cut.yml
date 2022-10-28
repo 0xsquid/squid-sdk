@@ -93,3 +93,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_title: ${{ steps.create-release.outputs.branch_name }}
           pr_body: ${{ env.main_pr_body }}
+
+      - name: Publist to NPM
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
