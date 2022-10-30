@@ -76,8 +76,6 @@ export type TokenData = {
   name: string;
   symbol: string;
   decimals: number;
-  crosschain: boolean;
-  commonKey: string;
   logoURI: string;
   coingeckoId: string;
 };

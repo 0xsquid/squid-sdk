@@ -1,9 +1,5 @@
 name: NPM Release
-
-on:
-  push:
-    branches:
-      - "main"
+on: workflow_dispatch
 
 jobs:
   build:
@@ -23,6 +19,7 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           yarn build
+
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
