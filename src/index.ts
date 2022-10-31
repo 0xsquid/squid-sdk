@@ -34,6 +34,7 @@ export class Squid {
   public config: Config | undefined;
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = [] as ChainData[];
+  public axelarscanURL: string | undefined;
 
   constructor(config = {} as Config) {
     this.axiosInstance = axios.create({
@@ -167,6 +168,7 @@ export class Squid {
       const response = await this.axiosInstance.get("/v1/sdk-info");
       this.tokens = response.data.tokens;
       this.chains = response.data.chains;
+      this.axelarscanURL = response.data.axelarscanURL;
       this.initialized = true;
     } catch (error) {
       throw new Error(`Squid inititalization failed ${error}`);
