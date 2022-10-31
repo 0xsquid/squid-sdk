@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { LogLevel } from "../error";
 
 export enum ChainName {
   ETHEREUM = "Ethereum",
@@ -85,6 +86,8 @@ export type Config = {
   executionSettings?: {
     infiniteApproval?: boolean;
   };
+  logging?: boolean;
+  logLevel?: LogLevel;
 };
 
 export type GetRoute = {
