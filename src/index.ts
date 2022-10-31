@@ -36,6 +36,7 @@ export class Squid {
   public config: Config;
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = [] as ChainData[];
+  public axelarscanURL: string | undefined;
 
   constructor(config = {} as Config) {
     this.axiosInstance = setAxiosInterceptors(
@@ -193,6 +194,7 @@ export class Squid {
     const response = await this.axiosInstance.get("/v1/sdk-info");
     this.tokens = response.data.tokens;
     this.chains = response.data.chains;
+    this.axelarscanURL = response.data.axelarscanURL;
     this.initialized = true;
   }
 
