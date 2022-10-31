@@ -7,7 +7,12 @@ jest.mock("axios");
 describe("Squid", () => {
   it("should instance Squid as expected", async () => {
     const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
-      get: jest.fn()
+      get: jest.fn(),
+      interceptors: {
+        response: {
+          use: jest.fn()
+        }
+      }
     });
     const squidSdk = new Squid();
 
@@ -40,7 +45,12 @@ describe("Squid", () => {
       const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
         get: jest.fn().mockResolvedValue({
           data: { status: true, data: { chains: [] }, tokens: [] }
-        })
+        }),
+        interceptors: {
+          response: {
+            use: jest.fn()
+          }
+        }
       });
 
       const squidSdk = new Squid();

@@ -24,6 +24,8 @@ import erc20Abi from "./abi/erc20.json";
 import { getChainData } from "./utils/getChainData";
 import { getTokenData } from "./utils/getTokenData";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
+import { ErrorType, SquidError } from "./error";
+import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -31,18 +33,21 @@ export class Squid {
   private axiosInstance: AxiosInstance;
 
   public initialized = false;
-  public config: Config | undefined;
+  public config: Config;
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainsData = [] as ChainData[];
   public axelarscanURL: string | undefined;
 
   constructor(config = {} as Config) {
-    this.axiosInstance = axios.create({
-      baseURL: config?.baseUrl || baseUrl,
-      headers: {
-        // 'api-key': config.apiKey
-      }
-    });
+    this.axiosInstance = setAxiosInterceptors(
+      axios.create({
+        baseURL: config?.baseUrl || baseUrl,
+        headers: {
+          // 'api-key': config.apiKey
+        }
+      }),
+      config
+    );
 
     this.config = {
       baseUrl: config?.baseUrl || baseUrl,
@@ -52,9 +57,13 @@ export class Squid {
 
   private validateInit() {
     if (!this.initialized) {
-      throw new Error(
-        "SquidSdk must be initialized! Please call the SquidSdk.init method"
-      );
+      throw new SquidError({
+        message:
+          "SquidSdk must be initialized! Please call the SquidSdk.init method",
+        errorType: ErrorType.InitError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
     }
   }
 
@@ -70,6 +79,7 @@ export class Squid {
   }: ValidateBalanceAndApproval) {
     const _sourceAmount = ethers.BigNumber.from(fromAmount);
     let address;
+
     if (signer && ethers.Signer.isSigner(signer)) {
       address = await (signer as ethers.Signer).getAddress();
     } else {
@@ -80,9 +90,12 @@ export class Squid {
       const balance = await fromTokenContract.balanceOf(address);
 
       if (_sourceAmount.gt(balance)) {
-        throw new Error(
-          `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`
-        );
+        throw new SquidError({
+          message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
+          errorType: ErrorType.ValidationError,
+          logging: this.config.logging,
+          logLevel: this.config.logLevel
+        });
       }
 
       const allowance = await fromTokenContract.allowance(
@@ -113,9 +126,12 @@ export class Squid {
       const balance = await fromProvider.getBalance(address);
 
       if (_sourceAmount.gt(balance)) {
-        throw new Error(
-          `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`
-        );
+        throw new SquidError({
+          message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
+          errorType: ErrorType.ValidationError,
+          logging: this.config.logging,
+          logLevel: this.config.logLevel
+        });
       }
     }
   }
@@ -130,12 +146,23 @@ export class Squid {
       this.chains as ChainsData,
       route.params.fromChain
     );
-    const _toChain = getChainData(this.chains as ChainsData, toChain);
     if (!_fromChain) {
-      throw new Error(`fromChain not found for ${fromChain}`);
+      throw new SquidError({
+        message: `fromChain not found for ${fromChain}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
     }
+
+    const _toChain = getChainData(this.chains as ChainsData, toChain);
     if (!_toChain) {
-      throw new Error(`toChain not found for ${toChain}`);
+      throw new SquidError({
+        message: `toChain not found for ${fromChain}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
     }
 
     const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
@@ -164,15 +191,11 @@ export class Squid {
   }
 
   public async init() {
-    try {
-      const response = await this.axiosInstance.get("/v1/sdk-info");
-      this.tokens = response.data.tokens;
-      this.chains = response.data.chains;
-      this.axelarscanURL = response.data.axelarscanURL;
-      this.initialized = true;
-    } catch (error) {
-      throw new Error(`Squid inititalization failed ${error}`);
-    }
+    const response = await this.axiosInstance.get("/v1/sdk-info");
+    this.tokens = response.data.tokens;
+    this.chains = response.data.chains;
+    this.axelarscanURL = response.data.axelarscanURL;
+    this.initialized = true;
   }
 
   public setConfig(config: Config) {
@@ -265,9 +288,12 @@ export class Squid {
       );
 
       if (amount.gt(balance)) {
-        throw new Error(
-          `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`
-        );
+        throw new SquidError({
+          message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
+          errorType: ErrorType.ValidationError,
+          logging: this.config.logging,
+          logLevel: this.config.logLevel
+        });
       }
 
       const allowance = await (fromTokenContract as ethers.Contract).allowance(
@@ -276,9 +302,12 @@ export class Squid {
       );
 
       if (amount.gt(allowance)) {
-        throw new Error(
-          `Insufficent allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`
-        );
+        throw new SquidError({
+          message: `Insufficent allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
+          errorType: ErrorType.ValidationError,
+          logging: this.config.logging,
+          logLevel: this.config.logLevel
+        });
       }
 
       return {
@@ -291,9 +320,12 @@ export class Squid {
       const balance = await fromProvider.getBalance(sender);
 
       if (amount.gt(balance)) {
-        throw new Error(
-          `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`
-        );
+        throw new SquidError({
+          message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
+          errorType: ErrorType.ValidationError,
+          logging: this.config.logging,
+          logLevel: this.config.logLevel
+        });
       }
 
       return {
@@ -345,15 +377,25 @@ export class Squid {
       chainId
     );
     if (!token) {
-      throw new Error("Unsupported token");
+      throw new SquidError({
+        message: `Token not found for ${tokenAddress}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
     }
 
     const chain = getChainData(
       this.chains as ChainsData,
-      token?.chainId as number
+      token.chainId as number
     );
     if (!chain) {
-      throw new Error("Unsupported chain");
+      throw new SquidError({
+        message: `Chain not found for ${token.chainId}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
     }
 
     const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
@@ -376,15 +418,25 @@ export class Squid {
       chainId as number | string
     );
     if (!token) {
-      throw new Error("Unsupported token");
+      throw new SquidError({
+        message: `Token not found for ${tokenAddress}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
     }
 
     const chain = getChainData(
       this.chains as ChainsData,
-      token?.chainId as number | string
+      token.chainId as number | string
     );
     if (!chain) {
-      throw new Error("Unsupported chain");
+      throw new SquidError({
+        message: `Chain not found for ${token.chainId}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
     }
 
     const contract = new ethers.Contract(token.address, erc20Abi, signer);
