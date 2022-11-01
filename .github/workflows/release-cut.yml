@@ -37,7 +37,9 @@ jobs:
           fetch-depth: 0
 
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache --network-concurrency 1
+        run: |
+          yarn install --immutable --immutable-cache --check-cache --network-concurrency 1
+          yarn build
 
       - name: Setup git profile
         run: |
