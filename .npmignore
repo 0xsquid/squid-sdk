@@ -2,3 +2,4 @@ node_modules
 src/scripts
 src/test
 docs
+**/*CHANGELOG.md
