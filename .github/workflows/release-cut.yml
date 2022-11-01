@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          yarn install --frozen-lockfile
+          yarn install --immutable --immutable-cache --check-cache --network-concurrency 1
           yarn build
 
       - name: Setup git profile
