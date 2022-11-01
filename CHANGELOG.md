@@ -1,5 +1,19 @@
 
 
+## [1.1.0-beta.12](https://github.com/0xsquid/api-sdk/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2022-11-01)
+
+
+### Features
+
+* add axelarscan url param to sdk-info api ([#48](https://github.com/0xsquid/api-sdk/issues/48)) ([a0ebca2](https://github.com/0xsquid/api-sdk/commit/a0ebca23994ef54c9d6a21de22628845de86f4a4))
+* improve error handling ([#43](https://github.com/0xsquid/api-sdk/issues/43)) ([1b2ef73](https://github.com/0xsquid/api-sdk/commit/1b2ef7392784421cf950e9a481a2495c71be1e8f))
+
+
+### Bug Fixes
+
+* add build action to release branch GitHub action ([#49](https://github.com/0xsquid/api-sdk/issues/49)) ([c27f4b8](https://github.com/0xsquid/api-sdk/commit/c27f4b808563aae0fa140588c95d3a49c7ae8961))
+* update branch cut commit message ([21c0fb2](https://github.com/0xsquid/api-sdk/commit/21c0fb2e0edb289ba791aae90ad87ba6fd81a74e))
+
 ## 1.1.0-beta.11 (2022-10-28)
 
 
