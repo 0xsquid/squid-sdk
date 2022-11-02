@@ -58,6 +58,10 @@ export type BaseChain = {
     squidRouter?: string;
     squidMulticall?: string;
   };
+  axelarContracts: {
+    gateway: string;
+    forecallable?: string;
+  };
 };
 
 export type EvmChain = BaseChain & {
@@ -66,10 +70,6 @@ export type EvmChain = BaseChain & {
     ensRegistry: string;
     multicall: string;
     usdcToken: string;
-  };
-  axelarContracts: {
-    gateway: string;
-    forecallable: string;
   };
 };
 
