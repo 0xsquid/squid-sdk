@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { LogLevel } from "../error";
 
 export enum ChainName {
+  ALL = "all",
   ETHEREUM = "Ethereum",
   ETHEREUM2 = "Ethereum-2",
   OSMOSIS = "osmosis",
@@ -19,7 +20,16 @@ export enum ChainName {
   JUNO = "juno",
   SECRET = "secret",
   TERRA2 = "terra-2",
-  POLYGON = "Polygon"
+  POLYGON = "Polygon",
+  AGORIC = "Agoric",
+  ASSETMANTLE = "ASSETMANTLE",
+  AXELAR = "AXELAR",
+  COMDEX = "COMDEX",
+  EVMOS = "EVMOS",
+  KI = "KI",
+  REGEN = "REGEN",
+  STARGAZE = "STARGAZE",
+  UMEE = "UMEE"
 }
 
 export enum ChainType {
@@ -27,48 +37,91 @@ export enum ChainType {
   Cosmos = "cosmos"
 }
 
-export type MapChainIdName = {
-  [key: string | number]: ChainName;
-};
-
-export type squidConfig = {
-  type: ChainType;
+export type BaseChain = {
   chainId: number | string;
-  gasUsage: number;
-};
-
-export type ChainData = {
-  chainName: ChainName;
   chainType: ChainType;
-  chainId: number | string;
+  chainName: ChainName;
   networkName: string;
   rpc: string;
+  internalRpc: string;
+  rest?: string;
   blockExplorerUrls: string[];
+  estimatedRouteDuration: number;
   nativeCurrency: {
     name: string;
     symbol: string;
     decimals: number;
     icon: string;
   };
-  chainNativeContracts: {
-    wrappedNativeToken: string;
-    distributionEnsExecutable: string;
-    ensRegistry: string;
-    multicall: string;
+  squidContracts: {
+    defaultCrosschainToken: string;
+    squidRouter?: string;
+    squidMulticall?: string;
   };
   axelarContracts: {
     gateway: string;
-    forecallable: string;
+    forecallable?: string;
   };
-  squidContracts: {
-    squidMain: string;
-    defaultCrosschainToken: string;
-    multicall: string;
-  };
-  estimatedRouteDuration: number;
 };
 
+export type EvmChain = BaseChain & {
+  chainNativeContracts: {
+    wrappedNativeToken: string;
+    ensRegistry: string;
+    multicall: string;
+    usdcToken: string;
+  };
+};
+
+export type CosmosCurrency = {
+  coinDenom: string;
+  coinMinimalDenom: string;
+  coinDecimals: number;
+  coingeckoId?: string;
+};
+
+export type BIP44 = {
+  coinType: number;
+};
+
+export type Bech32Config = {
+  bech32PrefixAccAddr: string;
+  bech32PrefixAccPub: string;
+  bech32PrefixValAddr: string;
+  bech32PrefixValPub: string;
+  bech32PrefixConsAddr: string;
+  bech32PrefixConsPub: string;
+};
+
+export type CosmosGasType = {
+  low: number;
+  average: number;
+  high: number;
+};
+
+export type CosmosChain = BaseChain & {
+  rest: string;
+  stakeCurrency: CosmosCurrency;
+  walletUrl?: string;
+  walletUrlForStaking?: string;
+  bip44: BIP44;
+  alternativeBIP44s?: BIP44[];
+  bech32Config: Bech32Config;
+  currencies: CosmosCurrency[];
+  feeCurrencies: CosmosCurrency[];
+  coinType?: number;
+  features?: string[];
+  gasPriceStep?: CosmosGasType;
+  chainToAxelarChannelId: string;
+};
+
+export type ChainData = EvmChain | CosmosChain;
+
 export type ChainsData = ChainData[];
+
+export type MapChainIdName = {
+  [key: string | number]: ChainName;
+};
 
 export type TokenData = {
   chainId: number | string;
