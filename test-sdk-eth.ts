@@ -28,8 +28,21 @@ const getSDK = (): Squid => {
       fromAmount: "15000000",
       toChain: 1284,
       toToken: "0x8f552a71efe5eefc207bf75485b356a0b3f01ec9",
-      slippage: 99
-    });
+      slippage: 99,
+      endContractCall: [
+        {
+          callType: "",
+          target: "",
+          value: "",
+          callData: "",
+          controllData: {
+            tokenAddress: "",
+            inputPos: 6
+          },
+          estimatedGas: ""
+        }
+      ]
+    } as any);
     console.log(
       "> route: ",
       route,
