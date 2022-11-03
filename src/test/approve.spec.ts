@@ -18,7 +18,12 @@ describe("SquidSdk approve method", () => {
     }
   });
   const mockedAxios = (axios.create as jest.Mock).mockReturnValue({
-    get: getMocked
+    get: getMocked,
+    interceptors: {
+      response: {
+        use: jest.fn()
+      }
+    }
   });
 
   const mockedApprove = jest.fn().mockResolvedValue({});

@@ -4,6 +4,24 @@ exports[`Squid should instance Squid as expected 1`] = `
 Squid {
   "axiosInstance": Object {
     "get": [MockFunction],
+    "interceptors": Object {
+      "response": Object {
+        "use": [MockFunction] {
+          "calls": Array [
+            Array [
+              [Function],
+              [Function],
+            ],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
+          ],
+        },
+      },
+    },
   },
   "chains": Array [],
   "config": Object {
