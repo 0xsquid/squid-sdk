@@ -25,21 +25,21 @@ const getSDK = (): Squid => {
       toAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
       fromChain: 1,
       fromToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      fromAmount: "15000000",
-      toChain: 1284,
-      toToken: "0x8f552a71efe5eefc207bf75485b356a0b3f01ec9",
+      fromAmount: "150000000",
+      toChain: 43114,
+      toToken: "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC", // "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
       slippage: 99,
       endContractCall: [
         {
-          callType: "",
-          target: "",
-          value: "",
-          callData: "",
+          callType: 1,
+          target: "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
+          value: "0",
+          callData: "0x",
           controllData: {
-            tokenAddress: "",
-            inputPos: 6
+            tokenAddress: "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+            inputPos: 0
           },
-          estimatedGas: ""
+          estimatedGas: "400000"
         }
       ]
     } as any);

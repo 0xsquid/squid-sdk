@@ -35,11 +35,37 @@ const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
       toAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
       fromChain: 43114,
       fromToken: "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC",
-      fromAmount: "2000000000",
+      fromAmount: "200000000",
       toChain: 1,
-      toToken: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-      slippage: 99
-    });
+      toToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      slippage: 99,
+      endContractCall: [
+        {
+          callType: 1,
+          target: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          value: "0",
+          callData:
+            "0x095ea7b3000000000000000000000000d9e1ce17f2641f24ae83637ab66a2cca9c378b9fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          controllData: {
+            tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            inputPos: 1
+          },
+          estimatedGas: "400000"
+        },
+        {
+          callType: 1,
+          target: "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
+          value: "0",
+          callData:
+            "0x38ed17390000000000000000000000000000000000000000000000000000000005f5e100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000f72d63c3a6ca33bcbaeff037f068f1de466cca890000000000000000000000000000000000000000000000000000018444c14bdf0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000006b3595068778dd592e39a122f4f5a5cf09c90fe2",
+          controllData: {
+            tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            inputPos: 0
+          },
+          estimatedGas: "400000"
+        }
+      ]
+    } as any);
     console.log(
       "> route: ",
       route,
