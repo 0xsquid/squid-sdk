@@ -22,6 +22,7 @@ const getSDK = (): Squid => {
 
     const sushiRouter = "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506";
     const wetheToken = "0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB";
+    const sushiToken = "0x37B608519F91f70F2EeB0e5Ed9AF4061722e4F76";
     const usdcToken = "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664";
     const wethToken = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
     const amount = "1000000000000000000";
@@ -53,7 +54,7 @@ const getSDK = (): Squid => {
       [
         amount,
         minAmount,
-        [usdcToken, wetheToken],
+        [usdcToken, sushiToken],
         signer.address,
         new Date().getTime() + 1e6
       ]
@@ -69,7 +70,7 @@ const getSDK = (): Squid => {
       toChain: 43114,
       toToken: usdcToken,
       slippage: 99,
-      endContractCall: [
+      customContractCalls: [
         {
           callType: 1,
           target: usdcToken,

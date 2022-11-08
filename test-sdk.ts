@@ -39,7 +39,7 @@ const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
       toChain: 1,
       toToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       slippage: 99,
-      endContractCall: [
+      customContractCalls: [
         {
           callType: 1,
           target: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
