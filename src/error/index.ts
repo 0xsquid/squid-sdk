@@ -9,14 +9,14 @@ export type LogLevel = "info" | "error" | "debug";
 export type ErrorConstructor = {
   message: string;
   errorType: ErrorType | string;
-  error?: any;
+  errors?: any;
   logging?: boolean;
   logLevel?: LogLevel;
 };
 
 export class SquidError extends Error {
   errorType: string;
-  error: any;
+  errors: any;
   logging = false;
   logLevel;
 
@@ -24,13 +24,13 @@ export class SquidError extends Error {
     message,
     errorType,
     logging,
-    error,
+    errors,
     logLevel
   }: ErrorConstructor) {
     super(message);
     this.message = message;
     this.errorType = errorType;
-    this.error = error;
+    this.errors = errors;
     this.logging = !!logging;
     this.logLevel = logLevel;
 

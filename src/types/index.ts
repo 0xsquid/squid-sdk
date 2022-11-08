@@ -143,6 +143,25 @@ export type Config = {
   logLevel?: LogLevel;
 };
 
+export enum SquidCallType {
+  DEFAULT = 0,
+  FULL_TOKEN_BALANCE = 1,
+  FULL_NATIVE_BALANCE = 2,
+  COLLECT_TOKEN_BALANCE = 3
+}
+
+export type ContractCall = {
+  callType: SquidCallType;
+  target: string;
+  value?: string;
+  callData: string;
+  controllData?: {
+    tokenAddress: string;
+    inputPos: number;
+  };
+  estimatedGas: string;
+};
+
 export type GetRoute = {
   fromChain: number | string;
   toChain: number | string;
@@ -153,6 +172,7 @@ export type GetRoute = {
   slippage: number;
   quoteOnly?: boolean;
   enableForecall?: boolean;
+  customContractCalls?: ContractCall[];
 };
 
 export type TransactionRequest = {
