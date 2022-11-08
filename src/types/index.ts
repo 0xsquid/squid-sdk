@@ -155,7 +155,7 @@ export type ContractCall = {
   target: string;
   value?: string;
   callData: string;
-  controllData?: {
+  payload?: {
     tokenAddress: string;
     inputPos: number;
   };
