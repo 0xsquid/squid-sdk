@@ -3,7 +3,6 @@ import { Squid } from "./src";
 
 import erc20Abi from "./src/abi/erc20.json";
 import abi from "./sushiswap.json";
-import curveAbi from "./curveRegistry.json";
 
 import * as dotenv from "dotenv";
 
@@ -21,11 +20,10 @@ const getSDK = (): Squid => {
     const squid = getSDK();
     await squid.init();
 
-    const curve = "0x890f4e345B1dAED0367A877a1612f86A1f86985f";
     const sushiRouter = "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506";
+    const wetheToken = "0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB";
     const sushiToken = "0x37B608519F91f70F2EeB0e5Ed9AF4061722e4F76";
-    const usdcToken = "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E";
-    const axlusdcToken = "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC";
+    const usdcToken = "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664";
     const wethToken = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
     const amount = "1000000000000000000";
     const minAmount = "0";
@@ -38,13 +36,15 @@ const getSDK = (): Squid => {
       provider
     );
 
-    const tokenInterface = new ethers.utils.Interface(erc20Abi as any);
-    const curveInterface = new ethers.utils.Interface(curveAbi as any);
+    const usdcContractInterface = new ethers.utils.Interface(erc20Abi as any);
 
-    const approveEncodeData = tokenInterface.encodeFunctionData("approve", [
-      sushiRouter,
-      "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-    ]);
+    const approveEncodeData = usdcContractInterface.encodeFunctionData(
+      "approve",
+      [
+        sushiRouter,
+        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      ]
+    );
 
     console.log("> approveEncodeData: ", approveEncodeData);
 
@@ -68,42 +68,10 @@ const getSDK = (): Squid => {
       fromToken: wethToken,
       fromAmount: amount,
       toChain: 43114,
-      toToken: axlusdcToken,
+      toToken: usdcToken,
       slippage: 99,
       customContractCalls: [
         {
-          callType: 1,
-          target: axlusdcToken,
-          value: 0,
-          callData: tokenInterface.encodeFunctionData("approve", [curve, 0]),
-          controllData: {
-            tokenAddress: axlusdcToken,
-            inputPos: 1
-          },
-          estimatedGas: "400000"
-        },
-        {
-          callType: 1,
-          target: curve,
-          value: 0,
-          callData: curveInterface.encodeFunctionData(
-            "exchange(address,address,address,uint256,uint256,address)",
-            [
-              "0xd7bb79aee866672419999a0496d99c54741d67b5",
-              axlusdcToken,
-              usdcToken,
-              0,
-              0,
-              signer.address
-            ]
-          ),
-          controllData: {
-            tokenAddress: axlusdcToken,
-            inputPos: 3
-          },
-          estimatedGas: "400000"
-        }
-        /* {
           callType: 1,
           target: usdcToken,
           value: "0",
@@ -124,7 +92,7 @@ const getSDK = (): Squid => {
             inputPos: 0
           },
           estimatedGas: "400000"
-        } */
+        }
       ]
     } as any);
 
