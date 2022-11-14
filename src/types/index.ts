@@ -186,20 +186,45 @@ export type TransactionRequest = {
   maxPriorityFeePerGas: string;
 };
 
-export type RouteData = SwapData[];
+export type RouteData = Call[];
 
-export type SwapData = {
+export enum CallType {
+  SWAP = "SWAP",
+  BRIDGE = "BRIDGE",
+  CUSTOM = "CUSTOM"
+}
+
+export type Swap = {
   dex: {
     chainName: string;
     dexName: string;
     swapRouter: string;
   };
+  squidCallType: SquidCallType;
   path: string[];
   fromToken: TokenData;
   toToken: TokenData;
   fromAmount: string;
   toAmount: string;
   toAmountMin: string;
+  exchangeRate: string;
+  priceImpact: string;
+  dynamicSlippage?: number;
+};
+
+export type Bridge = {
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromAmount: string;
+  toAmount: string;
+  toAmountMin: string;
+  exchangeRate: string;
+  priceImpact: string;
+};
+
+export type Call = {
+  type: CallType;
+  callDetails: Swap | ContractCall | Bridge;
 };
 
 export type Estimate = {
