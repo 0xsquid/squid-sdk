@@ -194,7 +194,11 @@ export enum CallType {
   CUSTOM = "CUSTOM"
 }
 
-export type Swap = {
+export type BaseCall = {
+  type: CallType;
+};
+
+export type Swap = BaseCall & {
   dex: {
     chainName: string;
     dexName: string;
@@ -212,7 +216,7 @@ export type Swap = {
   dynamicSlippage?: number;
 };
 
-export type Bridge = {
+export type Bridge = BaseCall & {
   fromToken: TokenData;
   toToken: TokenData;
   fromAmount: string;
@@ -222,10 +226,9 @@ export type Bridge = {
   priceImpact: string;
 };
 
-export type Call = {
-  type: CallType;
-  callDetails: Swap | ContractCall | Bridge;
-};
+export type CustomCall = BaseCall & ContractCall;
+
+export type Call = Swap | CustomCall | Bridge;
 
 export type Estimate = {
   fromAmount: string;

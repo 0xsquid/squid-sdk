@@ -11,7 +11,8 @@ import {
   TokenData,
   ContractCall,
   FeeCost,
-  GasCost
+  GasCost,
+  CustomCall
 } from "../../types";
 
 const removeEmpty = (obj: any) => {
@@ -35,20 +36,19 @@ export const parseBridge = (response: any): Call => {
   } = response as Bridge;
   return {
     type: CallType.BRIDGE,
-    callDetails: {
-      fromToken,
-      toToken,
-      fromAmount,
-      toAmount,
-      toAmountMin,
-      exchangeRate,
-      priceImpact
-    }
+    fromToken,
+    toToken,
+    fromAmount,
+    toAmount,
+    toAmountMin,
+    exchangeRate,
+    priceImpact
   };
 };
 
 export const parseSwap = (response: any): Call => {
   const {
+    type,
     dex: { chainName, dexName, swapRouter },
     squidCallType,
     path,
@@ -62,45 +62,48 @@ export const parseSwap = (response: any): Call => {
     dynamicSlippage
   } = response as Swap;
   return removeEmpty({
-    type: CallType.SWAP,
-    callDetails: {
-      dex: { chainName, dexName, swapRouter },
-      squidCallType,
-      path,
-      fromToken,
-      toToken,
-      fromAmount,
-      toAmount,
-      toAmountMin,
-      exchangeRate,
-      priceImpact,
-      dynamicSlippage
-    }
+    type,
+    dex: { chainName, dexName, swapRouter },
+    squidCallType,
+    path,
+    fromToken,
+    toToken,
+    fromAmount,
+    toAmount,
+    toAmountMin,
+    exchangeRate,
+    priceImpact,
+    dynamicSlippage
   });
 };
 
 export const parseCustom = (response: any): Call => {
-  const { callType, target, value, callData, estimatedGas, payload } =
-    response as ContractCall;
+  const { type, callType, target, value, callData, estimatedGas, payload } =
+    response as CustomCall;
   return removeEmpty({
-    type: CallType.CUSTOM,
-    callDetails: { callType, target, value, callData, estimatedGas, payload }
+    type,
+    callType,
+    target,
+    value,
+    callData,
+    estimatedGas,
+    payload
   });
 };
 
 export const parseRouteData = (response: any): RouteData[] => {
   const routeData: RouteData[] = response
-    .filter((call: any) =>
+    .filter((call: Call) =>
       [CallType.BRIDGE, CallType.CUSTOM, CallType.SWAP].includes(call.type)
     )
     .map((call: any) => {
       switch (call.type as CallType) {
         case CallType.BRIDGE:
-          return parseBridge(call.callDetails);
+          return parseBridge(call);
         case CallType.SWAP:
-          return parseSwap(call.callDetails);
+          return parseSwap(call);
         case CallType.CUSTOM:
-          return parseCustom(call.callDetails);
+          return parseCustom(call);
       }
     });
   return routeData;
