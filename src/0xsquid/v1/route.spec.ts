@@ -1,6 +1,13 @@
 import { describe, expect } from "@jest/globals";
 import { CallType, SquidCallType, TokenData } from "../../types";
-import { parseBridge, parseSwap, parseCustom, parseRouteData } from "./route";
+import {
+  parseBridge,
+  parseSwap,
+  parseCustom,
+  parseRouteData,
+  parseFeeCost,
+  parseGasCost
+} from "./route";
 
 describe("route", () => {
   describe("parseBridge", () => {
@@ -282,6 +289,129 @@ describe("route", () => {
       const expected = parseRouteData(data);
       it("contain filter unsupported elements", () => {
         expect(expected.length).toBe(2);
+      });
+    });
+  });
+  describe("parseFeeCost", () => {
+    describe("exact match", () => {
+      const data = [
+        {
+          name: "name",
+          description: "description",
+          percentage: "ss",
+          token: {} as TokenData,
+          amount: "1222",
+          amountUSD: "1.2"
+        }
+      ];
+      const expected = parseFeeCost(data);
+      console.log(expected);
+      it("contain all elements", () => {
+        expect(expected.length).toBe(1);
+      });
+      it("should have property name", () => {
+        expect(expected[0]).toHaveProperty("name");
+      });
+      it("should have property token", () => {
+        expect(expected[0]).toHaveProperty("token");
+      });
+      it("should have property description", () => {
+        expect(expected[0]).toHaveProperty("description");
+      });
+      it("should have property percentage", () => {
+        expect(expected[0]).toHaveProperty("percentage");
+      });
+      it("should have property amount", () => {
+        expect(expected[0]).toHaveProperty("amount");
+      });
+      it("should have property amountUSD", () => {
+        expect(expected[0]).toHaveProperty("amountUSD");
+      });
+    });
+    describe("additional properties", () => {
+      const data = [
+        {
+          name: "name",
+          description: "description",
+          percentage: "ss",
+          token: {} as TokenData,
+          amount: "1222",
+          amountUSD: "1.2",
+          additional: ""
+        }
+      ];
+      const expected = parseFeeCost(data);
+      it("should filter additional properties", () => {
+        expect(expected[0]).not.toHaveProperty("additional");
+      });
+    });
+  });
+  describe("parseGasCost", () => {
+    describe("exact match", () => {
+      const data = [
+        {
+          type: "dhd",
+          token: {} as TokenData,
+          amount: "1222",
+          amountUSD: "1.2",
+          gasPrice: "122",
+          maxFeePerGas: "19299",
+          maxPriorityFeePerGas: "22718",
+          estimate: "3367167",
+          limit: "2663"
+        }
+      ];
+      const expected = parseGasCost(data);
+      console.log(expected);
+      it("contain all elements", () => {
+        expect(expected.length).toBe(1);
+      });
+      it("should have property type", () => {
+        expect(expected[0]).toHaveProperty("type");
+      });
+      it("should have property token", () => {
+        expect(expected[0]).toHaveProperty("token");
+      });
+      it("should have property amount", () => {
+        expect(expected[0]).toHaveProperty("amount");
+      });
+      it("should have property amountUSD", () => {
+        expect(expected[0]).toHaveProperty("amountUSD");
+      });
+      it("should have property gasPrice", () => {
+        expect(expected[0]).toHaveProperty("gasPrice");
+      });
+      it("should have property maxFeePerGas", () => {
+        expect(expected[0]).toHaveProperty("maxFeePerGas");
+      });
+      it("should have property maxPriorityFeePerGas", () => {
+        expect(expected[0]).toHaveProperty("maxPriorityFeePerGas");
+      });
+      it("should have property estimate", () => {
+        expect(expected[0]).toHaveProperty("estimate");
+      });
+      it("should have property limit", () => {
+        expect(expected[0]).toHaveProperty("limit");
+      });
+    });
+    describe("additional properties", () => {
+      const data = [
+        {
+          type: "dhd",
+          token: {} as TokenData,
+          amount: "1222",
+          amountUSD: "1.2",
+          gasPrice: "122",
+          maxFeePerGas: "19299",
+          maxPriorityFeePerGas: "22718",
+          estimate: "3367167",
+          limit: "2663",
+          additional: "2663"
+        }
+      ];
+      const expected = parseGasCost(data);
+      it("should filter additional properties", () => {
+        expect(expected[0]).not.toHaveProperty("additional");
       });
     });
   });
