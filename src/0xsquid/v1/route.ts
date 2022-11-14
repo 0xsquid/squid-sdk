@@ -14,66 +14,83 @@ import {
   GasCost
 } from "../../types";
 
-export const parseBridge = (respBridge: any): Call => {
-  const bridge = {
-    fromToken: respBridge.fromToken,
-    toToken: respBridge.toToken,
-    fromAmount: respBridge.fromAmount,
-    toAmount: respBridge.toAmount,
-    toAmountMin: respBridge.toAmountMin,
-    exchangeRate: respBridge.exchangeRate,
-    priceImpact: respBridge.priceImpact
-  } as Bridge;
+const removeEmpty = (obj: any) => {
+  const newObj: any = {};
+  Object.keys(obj).forEach(key => {
+    if (obj[key] === Object(obj[key])) newObj[key] = removeEmpty(obj[key]);
+    else if (obj[key] !== undefined) newObj[key] = obj[key];
+  });
+  return newObj;
+};
+
+export const parseBridge = (response: any): Call => {
+  const {
+    fromToken,
+    toToken,
+    fromAmount,
+    toAmount,
+    toAmountMin,
+    exchangeRate,
+    priceImpact
+  } = response as Bridge;
   return {
     type: CallType.BRIDGE,
-    callDetails: bridge
+    callDetails: {
+      fromToken,
+      toToken,
+      fromAmount,
+      toAmount,
+      toAmountMin,
+      exchangeRate,
+      priceImpact
+    }
   };
 };
 
-export const parseSwap = (respSwap: any): Call => {
-  const swap = {
-    dex: {
-      chainName: respSwap.dex.chainName,
-      dexName: respSwap.dex.dexName,
-      swapRouter: respSwap.dex.swapRouter
-    },
-    squidCallType: respSwap.squidCallType,
-    path: respSwap.path,
-    fromToken: respSwap.fromToken as TokenData,
-    toToken: respSwap.toToken as TokenData,
-    fromAmount: respSwap.fromAmount,
-    toAmount: respSwap.toAmount,
-    toAmountMin: respSwap.toAmountMin,
-    exchangeRate: respSwap.exchangeRate,
-    priceImpact: respSwap.priceImpact
-  } as Swap;
-  respSwap.dynamicSlippage
-    ? (swap.dynamicSlippage = respSwap.dynamicSlippage)
-    : undefined;
-  return {
+export const parseSwap = (response: any): Call => {
+  const {
+    dex: { chainName, dexName, swapRouter },
+    squidCallType,
+    path,
+    fromToken,
+    toToken,
+    fromAmount,
+    toAmount,
+    toAmountMin,
+    exchangeRate,
+    priceImpact,
+    dynamicSlippage
+  } = response as Swap;
+  return removeEmpty({
     type: CallType.SWAP,
-    callDetails: swap
-  };
+    callDetails: {
+      dex: { chainName, dexName, swapRouter },
+      squidCallType,
+      path,
+      fromToken,
+      toToken,
+      fromAmount,
+      toAmount,
+      toAmountMin,
+      exchangeRate,
+      priceImpact,
+      dynamicSlippage
+    }
+  });
 };
 
-export const parseCustom = (respCustom: any): Call => {
-  const customCall = {
-    callType: respCustom.callType,
-    target: respCustom.target,
-    callData: respCustom.callData,
-    estimatedGas: respCustom.estimatedGas
-  } as ContractCall;
-  respCustom.value ? (customCall.value = respCustom.value) : undefined;
-  respCustom.payload ? (customCall.payload = respCustom.payload) : undefined;
-  return {
+export const parseCustom = (response: any): Call => {
+  const { callType, target, value, callData, estimatedGas, payload } =
+    response as ContractCall;
+  return removeEmpty({
     type: CallType.CUSTOM,
-    callDetails: customCall
-  };
+    callDetails: { callType, target, value, callData, estimatedGas, payload }
+  });
 };
 
-export const parseRouteData = (respRouteData: any): RouteData[] => {
-  const routeData: RouteData[] = respRouteData
-    .filter(call =>
+export const parseRouteData = (response: any): RouteData[] => {
+  const routeData: RouteData[] = response
+    .filter((call: any) =>
       [CallType.BRIDGE, CallType.CUSTOM, CallType.SWAP].includes(call.type)
     )
     .map((call: any) => {
@@ -89,8 +106,8 @@ export const parseRouteData = (respRouteData: any): RouteData[] => {
   return routeData;
 };
 
-export const parseFeeCost = (respFeeCost: any): FeeCost[] =>
-  respFeeCost.map((item: any) => {
+export const parseFeeCost = (response: any): FeeCost[] =>
+  response.map((item: any) => {
     return {
       name: item.name,
       description: item.description,
@@ -101,35 +118,107 @@ export const parseFeeCost = (respFeeCost: any): FeeCost[] =>
     };
   });
 
-export const parseGasCost = (respGasCost: any): GasCost[] =>
-  respGasCost.map((item: any) => {
+export const parseGasCost = (response: any): GasCost[] =>
+  response.map((item: any) => {
+    const {
+      type,
+      token,
+      amount,
+      amountUSD,
+      gasPrice,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      estimate,
+      limit
+    } = item as GasCost;
     return {
-      type: item.type,
-      token: item.token as TokenData,
-      amount: item.amount,
-      amountUSD: item.amountUSD,
-      gasPrice: item.gasPrice,
-      maxFeePerGas: item.maxFeePerGas,
-      maxPriorityFeePerGas: item.maxPriorityFeePerGas,
-      estimate: item.estimate,
-      limit: item.limit
+      type,
+      token: token as TokenData,
+      amount,
+      amountUSD,
+      gasPrice,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      estimate,
+      limit
     };
   });
 
-export const parseEstimate = (respEstimate: any): Estimate => {
+export const parseEstimate = (response: any): Estimate => {
+  const {
+    fromAmount,
+    sendAmount,
+    toAmount,
+    toAmountMin,
+    route,
+    exchangeRate,
+    estimatedRouteDuration,
+    aggregatePriceImpact,
+    feeCosts,
+    gasCosts
+  } = response as Estimate;
+
   const estimate = {
-    fromAmount: respEstimate.fromAmount,
-    sendAmount: respEstimate.sendAmount,
-    toAmount: respEstimate.toAmount,
-    toAmountMin: respEstimate.toAmountMin,
-    route: parseRouteData(respEstimate.route),
-    exchangeRate: respEstimate.exchangeRate,
-    estimatedRouteDuration: respEstimate.estimatedRouteDuration,
-    aggregatePriceImpact: respEstimate.aggregatePriceImpact,
-    feeCosts: parseFeeCost(respEstimate.FeeCost),
-    gasCosts: respEstimate.GasCost
+    fromAmount,
+    sendAmount,
+    toAmount,
+    toAmountMin,
+    route: parseRouteData(route),
+    exchangeRate,
+    estimatedRouteDuration,
+    aggregatePriceImpact,
+    feeCosts: parseFeeCost(feeCosts),
+    gasCosts: parseGasCost(gasCosts)
   } as Estimate;
   return estimate;
+};
+
+export const parseTransactionRequest = (response: any) => {
+  const {
+    routeType,
+    targetAddress,
+    data,
+    value,
+    gasLimit,
+    gasPrice,
+    maxFeePerGas,
+    maxPriorityFeePerGas
+  } = response as TransactionRequest;
+  return {
+    routeType,
+    targetAddress,
+    data,
+    value,
+    gasLimit,
+    gasPrice,
+    maxFeePerGas,
+    maxPriorityFeePerGas
+  };
+};
+
+export const parseParams = (response: any): RouteParams => {
+  const {
+    fromChain,
+    toChain,
+    fromToken,
+    toToken,
+    toAddress,
+    slippage,
+    quoteOnly,
+    enableForecall,
+    customContractCalls
+  } = response as RouteParams;
+  return removeEmpty({
+    fromChain,
+    toChain,
+    fromToken: fromToken as TokenData,
+    toToken: toToken as TokenData,
+    toAddress,
+    slippage,
+    quoteOnly,
+    enableForecall,
+    customContractCalls
+  });
 };
 
 export const parseRouteResponse = (response: any): RouteResponse => {

@@ -1,5 +1,6 @@
 import { describe, expect } from "@jest/globals";
 import { CallType, SquidCallType, TokenData } from "../../types";
+
 import {
   parseBridge,
   parseSwap,
@@ -104,6 +105,7 @@ describe("route", () => {
         expect(expected.callDetails).toHaveProperty("priceImpact");
       });
       it("should not contain optional dynamicSlippage", () => {
+        console.log(expected.callDetails);
         expect(expected.callDetails).not.toHaveProperty("dynamicSlippage");
       });
     });
