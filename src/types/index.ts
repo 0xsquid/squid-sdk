@@ -186,7 +186,7 @@ export type TransactionRequest = {
   maxPriorityFeePerGas: string;
 };
 
-export type RouteData = Call[];
+export type RouteData = Call;
 
 export enum CallType {
   SWAP = "SWAP",
@@ -238,6 +238,11 @@ export type Estimate = {
   aggregatePriceImpact: string;
   feeCosts: FeeCost[];
   gasCosts: GasCost[];
+};
+
+export type RouteParams = GetRoute & {
+  fromToken: TokenData;
+  toToken: TokenData;
 };
 
 export type Route = {

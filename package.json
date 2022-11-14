@@ -18,7 +18,7 @@
     "lint:fix": "eslint --ext .js,.ts,.json . --fix",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "prepare": "husky install",
-    "test": "jest ./*/*.spec.ts",
+    "test": "jest ./*/*.spec.ts --verbose",
     "build": "tsc",
     "integration": "npx ts-node src/scripts/test-sdk.ts",
     "integration:sendtrade": "npx ts-node src/scripts/test-sdk.ts -s sendtrade",

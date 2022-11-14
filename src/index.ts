@@ -91,7 +91,7 @@ export class Squid {
 
       if (_sourceAmount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -127,7 +127,7 @@ export class Squid {
 
       if (_sourceAmount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -289,7 +289,7 @@ export class Squid {
 
       if (amount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -303,7 +303,7 @@ export class Squid {
 
       if (amount.gt(allowance)) {
         throw new SquidError({
-          message: `Insufficent allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
+          message: `Insufficient allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -321,7 +321,7 @@ export class Squid {
 
       if (amount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
