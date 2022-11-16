@@ -186,7 +186,7 @@ export type TransactionRequest = {
   maxPriorityFeePerGas: string;
 };
 
-export type RouteData = Call;
+export type RouteData = Call[];
 
 export enum CallType {
   SWAP = "SWAP",
@@ -202,6 +202,8 @@ export type Swap = BaseCall & {
   dex: {
     chainName: string;
     dexName: string;
+    factory: string;
+    isStable: boolean;
     swapRouter: string;
   };
   squidCallType: SquidCallType;
