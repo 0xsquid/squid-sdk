@@ -438,8 +438,8 @@ describe("route", () => {
   });
   describe("parseRouteData", () => {
     describe("exact match", () => {
-      const data = [
-        [
+      const data = {
+        fromChain: [
           {
             type: CallType.CUSTOM,
             callType: 1,
@@ -473,7 +473,7 @@ describe("route", () => {
             priceImpact: "0"
           }
         ],
-        [
+        toChain: [
           {
             type: CallType.CUSTOM,
             callType: 1,
@@ -483,18 +483,18 @@ describe("route", () => {
             estimatedGas: "400000"
           }
         ]
-      ];
+      };
       const expected = parseRouteData(data);
       it("should match provided data", () => {
         expect(expected).toEqual(data);
       });
       it("contain all elements", () => {
-        expect(expected[0].length).toBe(3);
+        expect(expected.fromChain.length).toBe(3);
       });
     });
     describe("optionals", () => {
-      const data = [
-        [
+      const data = {
+        fromChain: [
           {
             type: CallType.CUSTOM,
             callType: 1,
@@ -516,11 +516,12 @@ describe("route", () => {
             exchangeRate: "1",
             priceImpact: "0"
           }
-        ]
-      ];
+        ],
+        toChain: []
+      };
       const expected = parseRouteData(data);
       it("contain filter unsupported elements", () => {
-        expect(expected[0].length).toBe(2);
+        expect(expected.fromChain.length).toBe(2);
       });
     });
   });
@@ -684,8 +685,8 @@ describe("route", () => {
         sendAmount: "114162617",
         toAmount: "3439190381416687260",
         toAmountMin: "3439190381416687260",
-        route: [
-          [
+        route: {
+          fromChain: [
             {
               type: "SWAP",
               dex: {
@@ -728,7 +729,7 @@ describe("route", () => {
               dynamicSlippage: 68.37722339831622
             }
           ],
-          [
+          toChain: [
             {
               type: "SWAP",
               dex: {
@@ -771,7 +772,7 @@ describe("route", () => {
               dynamicSlippage: 68.37722339831622
             }
           ]
-        ],
+        },
         feeCosts: [
           {
             name: "Gas Receiver Fee",

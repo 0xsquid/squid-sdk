@@ -12,7 +12,8 @@ import {
   FeeCost,
   GasCost,
   CustomCall,
-  ContractCall
+  ContractCall,
+  OptimalRoutes
 } from "../../types";
 
 //@typescript-eslint/no-explicit-any
@@ -110,7 +111,7 @@ export const parseCustom = (response: any): Call => {
   } as CustomCall);
 };
 
-export const parseCalls = (response: any): Call[] => {
+export const parseCalls = (response: any[]): Call[] => {
   const calls = response
     .filter((call: Call) =>
       [CallType.BRIDGE, CallType.CUSTOM, CallType.SWAP].includes(call.type)
@@ -128,11 +129,12 @@ export const parseCalls = (response: any): Call[] => {
   return calls;
 };
 
-export const parseRouteData = (response: any[]): RouteData[] => {
-  const routeData: RouteData[] = [];
-  for (const entry of response) {
-    routeData.push(parseCalls(entry));
-  }
+export const parseRouteData = (response: any): RouteData => {
+  const { fromChain, toChain } = response;
+  const routeData = {
+    fromChain: parseCalls(fromChain),
+    toChain: parseCalls(toChain)
+  };
   return routeData;
 };
 

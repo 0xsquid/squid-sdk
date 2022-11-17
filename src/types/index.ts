@@ -186,7 +186,10 @@ export type TransactionRequest = {
   maxPriorityFeePerGas: string;
 };
 
-export type RouteData = Call[];
+export type RouteData = {
+  fromChain: Call[];
+  toChain: Call[];
+};
 
 export enum CallType {
   SWAP = "SWAP",
@@ -237,7 +240,7 @@ export type Estimate = {
   sendAmount: string;
   toAmount: string;
   toAmountMin: string;
-  route: RouteData[];
+  route: OptimalRoutes;
   exchangeRate?: string;
   estimatedRouteDuration: number;
   aggregatePriceImpact: string;
