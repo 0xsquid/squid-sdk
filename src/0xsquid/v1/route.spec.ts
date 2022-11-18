@@ -4,12 +4,12 @@ import { CallType, SquidCallType, TokenData } from "../../types";
 import {
   parseBridge,
   parseCustom,
-  parseCalls,
+  parseRoute,
   parseEstimate,
   parseFeeCost,
   parseGasCost,
   parseParams,
-  parseRouteData,
+  parseOptimalRoute,
   parseSwap,
   parseTokenData,
   parseTransactionRequest
@@ -141,7 +141,7 @@ describe("route", () => {
       });
     });
   });
-  describe("parseCalls", () => {
+  describe("parseRoute", () => {
     describe("exact match", () => {
       const data = [
         {
@@ -177,7 +177,7 @@ describe("route", () => {
           priceImpact: "0"
         }
       ];
-      const expected = parseCalls(data);
+      const expected = parseRoute(data);
       it("should match provided data", () => {
         expect(expected).toEqual(data);
       });
@@ -209,7 +209,7 @@ describe("route", () => {
           priceImpact: "0"
         }
       ];
-      const expected = parseCalls(data);
+      const expected = parseRoute(data);
       it("contain filter unsupported elements", () => {
         expect(expected.length).toBe(2);
       });
@@ -436,7 +436,7 @@ describe("route", () => {
       });
     });
   });
-  describe("parseRouteData", () => {
+  describe("parseOptimalRoute", () => {
     describe("exact match", () => {
       const data = {
         fromChain: [
@@ -484,7 +484,7 @@ describe("route", () => {
           }
         ]
       };
-      const expected = parseRouteData(data);
+      const expected = parseOptimalRoute(data);
       it("should match provided data", () => {
         expect(expected).toEqual(data);
       });
@@ -519,7 +519,7 @@ describe("route", () => {
         ],
         toChain: []
       };
-      const expected = parseRouteData(data);
+      const expected = parseOptimalRoute(data);
       it("contain filter unsupported elements", () => {
         expect(expected.fromChain.length).toBe(2);
       });

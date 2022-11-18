@@ -2,12 +2,14 @@ import { ethers } from "ethers";
 import { LogLevel } from "../error";
 
 export enum ChainName {
-  ALL = "all",
   ETHEREUM = "Ethereum",
   ETHEREUM2 = "Ethereum-2",
   OSMOSIS = "osmosis",
   OSMOSIS4 = "osmosis-4",
   MOONBEAM = "Moonbeam",
+  FANTOM = "Fantom",
+  AURORA = "aurora",
+  BINANCE = "binance",
   AVALANCHE = "Avalanche",
   COSMOS = "cosmoshub",
   AXELARNET = "Axelarnet",
@@ -29,7 +31,8 @@ export enum ChainName {
   KI = "KI",
   REGEN = "REGEN",
   STARGAZE = "STARGAZE",
-  UMEE = "UMEE"
+  UMEE = "UMEE",
+  AURA = "AURA"
 }
 
 export enum ChainType {
@@ -44,7 +47,7 @@ export type BaseChain = {
   networkName: string;
   rpc: string;
   internalRpc: string;
-  rest?: string;
+  chainIconURI: string;
   blockExplorerUrls: string[];
   estimatedRouteDuration: number;
   nativeCurrency: {
@@ -186,10 +189,12 @@ export type TransactionRequest = {
   maxPriorityFeePerGas: string;
 };
 
-export type RouteData = {
-  fromChain: Call[];
-  toChain: Call[];
+export type OptimalRoute = {
+  fromChain: Route;
+  toChain: Route;
 };
+
+export type Route = Call[];
 
 export enum CallType {
   SWAP = "SWAP",
@@ -240,7 +245,7 @@ export type Estimate = {
   sendAmount: string;
   toAmount: string;
   toAmountMin: string;
-  route: OptimalRoutes;
+  route: OptimalRoute;
   exchangeRate?: string;
   estimatedRouteDuration: number;
   aggregatePriceImpact: string;
@@ -253,14 +258,18 @@ export type RouteParams = GetRoute & {
   toToken: TokenData;
 };
 
-export type Route = {
+export type RouteData = {
   estimate: Estimate;
   transactionRequest: TransactionRequest;
   params: GetRoute & { fromToken: TokenData; toToken: TokenData };
 };
 
 export type RouteResponse = {
-  route: Route;
+  route: RouteData;
+};
+
+export type ChainsResponse = {
+  chains: ChainsData;
 };
 
 export type ExecuteRoute = {

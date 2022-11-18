@@ -3,6 +3,7 @@ import {
   RouteResponse,
   TransactionRequest,
   RouteParams,
+  Route,
   RouteData,
   Call,
   CallType,
@@ -13,26 +14,13 @@ import {
   GasCost,
   CustomCall,
   ContractCall,
-  OptimalRoutes
+  OptimalRoute
 } from "../../types";
+import { removeEmpty } from "./util";
 
-//@typescript-eslint/no-explicit-any
-const removeEmpty = (obj: any) => {
-  const newObj: any = {};
-  Object.keys(obj).forEach(key => {
-    if (obj[key] === Object(obj[key])) {
-      if (obj[key].length >= 0) newObj[key] = obj[key]; //handle array
-      else newObj[key] = removeEmpty(obj[key]);
-    } else if (obj[key] !== undefined) {
-      newObj[key] = obj[key];
-    }
-  });
-  return newObj;
-};
-
-export const parseTokenData = (response: any): TokenData => {
+export const parseTokenData = (data: any): TokenData => {
   const { chainId, address, name, symbol, decimals, logoURI, coingeckoId } =
-    response;
+    data;
   return {
     chainId,
     address,
@@ -44,7 +32,7 @@ export const parseTokenData = (response: any): TokenData => {
   };
 };
 
-export const parseBridge = (response: any): Call => {
+export const parseBridge = (data: any): Call => {
   const {
     fromToken,
     toToken,
@@ -53,7 +41,7 @@ export const parseBridge = (response: any): Call => {
     toAmountMin,
     exchangeRate,
     priceImpact
-  } = response;
+  } = data;
   return {
     type: CallType.BRIDGE,
     fromToken,
@@ -66,7 +54,7 @@ export const parseBridge = (response: any): Call => {
   } as Bridge;
 };
 
-export const parseSwap = (response: any): Call => {
+export const parseSwap = (data: any): Call => {
   const {
     type,
     dex: { chainName, dexName, factory, isStable, swapRouter },
@@ -80,7 +68,7 @@ export const parseSwap = (response: any): Call => {
     exchangeRate,
     priceImpact,
     dynamicSlippage
-  } = response;
+  } = data;
   return removeEmpty({
     type,
     dex: { chainName, dexName, factory, isStable, swapRouter },
@@ -97,9 +85,9 @@ export const parseSwap = (response: any): Call => {
   } as Swap);
 };
 
-export const parseCustom = (response: any): Call => {
+export const parseCustom = (data: any): Call => {
   const { type, callType, target, value, callData, estimatedGas, payload } =
-    response;
+    data;
   return removeEmpty({
     type,
     callType,
@@ -111,8 +99,8 @@ export const parseCustom = (response: any): Call => {
   } as CustomCall);
 };
 
-export const parseCalls = (response: any[]): Call[] => {
-  const calls = response
+export const parseRoute = (data: any[]): Route => {
+  const calls = data
     .filter((call: Call) =>
       [CallType.BRIDGE, CallType.CUSTOM, CallType.SWAP].includes(call.type)
     )
@@ -129,17 +117,17 @@ export const parseCalls = (response: any[]): Call[] => {
   return calls;
 };
 
-export const parseRouteData = (response: any): RouteData => {
-  const { fromChain, toChain } = response;
+export const parseOptimalRoute = (data: any): OptimalRoute => {
+  const { fromChain, toChain } = data;
   const routeData = {
-    fromChain: parseCalls(fromChain),
-    toChain: parseCalls(toChain)
+    fromChain: parseRoute(fromChain),
+    toChain: parseRoute(toChain)
   };
   return routeData;
 };
 
-export const parseFeeCost = (response: any): FeeCost[] =>
-  response.map((item: any) => {
+export const parseFeeCost = (data: any): FeeCost[] =>
+  data.map((item: any) => {
     return {
       name: item.name,
       description: item.description,
@@ -150,8 +138,8 @@ export const parseFeeCost = (response: any): FeeCost[] =>
     };
   });
 
-export const parseGasCost = (response: any): GasCost[] =>
-  response.map((item: any) => {
+export const parseGasCost = (data: any): GasCost[] =>
+  data.map((item: any) => {
     const {
       type,
       token,
@@ -176,7 +164,7 @@ export const parseGasCost = (response: any): GasCost[] =>
     } as GasCost;
   });
 
-export const parseEstimate = (response: any): Estimate => {
+export const parseEstimate = (data: any): Estimate => {
   const {
     fromAmount,
     sendAmount,
@@ -188,13 +176,13 @@ export const parseEstimate = (response: any): Estimate => {
     aggregatePriceImpact,
     feeCosts,
     gasCosts
-  } = response;
+  } = data;
   const estimate = {
     fromAmount,
     sendAmount,
     toAmount,
     toAmountMin,
-    route: parseRouteData(route),
+    route: parseOptimalRoute(route),
     exchangeRate,
     estimatedRouteDuration,
     aggregatePriceImpact,
@@ -204,7 +192,7 @@ export const parseEstimate = (response: any): Estimate => {
   return estimate;
 };
 
-export const parseTransactionRequest = (response: any): TransactionRequest => {
+export const parseTransactionRequest = (request: any): TransactionRequest => {
   const {
     routeType,
     targetAddress,
@@ -215,7 +203,7 @@ export const parseTransactionRequest = (response: any): TransactionRequest => {
     gasCosts,
     maxFeePerGas,
     maxPriorityFeePerGas
-  } = response;
+  } = request;
   return {
     routeType,
     targetAddress,
@@ -229,19 +217,19 @@ export const parseTransactionRequest = (response: any): TransactionRequest => {
   } as TransactionRequest;
 };
 
-export const parseCustomContractCall = (response: any): ContractCall => {
-  const { callType, target, value, callData, estimatedGas } = response;
+export const parseCustomContractCall = (data: any): ContractCall => {
+  const { callType, target, value, callData, estimatedGas } = data;
   return removeEmpty({
     callType,
     target,
     value, //optional
     callData,
-    payload: response.payload ? response.payload : undefined,
+    payload: data.payload ? data.payload : undefined,
     estimatedGas
   } as ContractCall);
 };
 
-export const parseParams = (response: any): RouteParams => {
+export const parseParams = (data: any): RouteParams => {
   const {
     fromChain,
     toChain,
@@ -252,7 +240,7 @@ export const parseParams = (response: any): RouteParams => {
     slippage,
     quoteOnly, //optional
     enableForecall //optional
-  } = response;
+  } = data;
   return removeEmpty({
     fromChain,
     toChain,
@@ -263,8 +251,8 @@ export const parseParams = (response: any): RouteParams => {
     slippage,
     quoteOnly,
     enableForecall: enableForecall ? enableForecall : undefined,
-    customContractCalls: response.customContractCalls
-      ? parseCustomContractCall(response.customContractCalls)
+    customContractCalls: data.customContractCalls
+      ? parseCustomContractCall(data.customContractCalls)
       : undefined
   });
 };
