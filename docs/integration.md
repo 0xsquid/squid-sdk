@@ -19,7 +19,7 @@ yarn integration:tradesendtrade
 ## Examples to interact with the Squid API - testnet supported
 
 API endpoint documentation
-https://app.gitbook.com/o/bX90yMGYDBu3T1Hqg4EA/s/tXbXyuWIO2PwzNc5Dets/integrate-squid/api
+<https://docs.0xsquid.com/api>
 
 - install package dependancies "yarn install"
 - configuration in .env file (rename example to .env)
