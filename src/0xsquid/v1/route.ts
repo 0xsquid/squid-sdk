@@ -111,7 +111,7 @@ export const parseOptimalRoute = (data: any): OptimalRoute => {
   return routeData;
 };
 
-export const parseFeeCost = (data: any): FeeCost[] =>
+export const parseFeeCost = (data: any[]): FeeCost[] =>
   data.map((item: any) => {
     return {
       name: item.name,
