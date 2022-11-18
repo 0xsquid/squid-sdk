@@ -2,7 +2,6 @@ import {
   parseEvmChain,
   parseBaseChain,
   parseChainData,
-  parseChainsResponse,
   parseCosmosChain,
   parseSquidContracts,
   parseAxelarContracts

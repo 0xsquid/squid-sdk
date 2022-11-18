@@ -264,6 +264,12 @@ export type RouteData = {
   params: GetRoute & { fromToken: TokenData; toToken: TokenData };
 };
 
+export type SdkInfoResponse = {
+  chains: ChainsData;
+  tokens: TokenData[];
+  axelarscanURL: string;
+};
+
 export type RouteResponse = {
   route: RouteData;
 };
