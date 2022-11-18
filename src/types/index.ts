@@ -272,6 +272,10 @@ export type ChainsResponse = {
   chains: ChainsData;
 };
 
+export type TokensResponse = {
+  tokens: TokenData[];
+};
+
 export type ExecuteRoute = {
   signer: ethers.Wallet | ethers.Signer;
   route: Route;

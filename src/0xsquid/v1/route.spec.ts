@@ -11,7 +11,6 @@ import {
   parseParams,
   parseOptimalRoute,
   parseSwap,
-  parseTokenData,
   parseTransactionRequest
 } from "./route";
 
@@ -622,57 +621,6 @@ describe("route", () => {
         dynamicSlippage: ""
       };
       const expected = parseSwap(data);
-      it("should exclude additional properties", () => {
-        expect(expected).not.toHaveProperty("additional");
-      });
-    });
-  });
-  describe("parseTokenData", () => {
-    describe("exact match", () => {
-      const data = {
-        chainId: "1",
-        address: "address",
-        name: "name",
-        symbol: "SBF",
-        decimals: 12,
-        logoURI: "https://someURL",
-        coingeckoId: "coin"
-      };
-      const expected = parseTokenData(data);
-      it("should match provided data", () => {
-        expect(expected).toEqual(data);
-      });
-      it("should contain chainId", () => {
-        expect(expected).toHaveProperty("chainId");
-      });
-      it("should contain address", () => {
-        expect(expected).toHaveProperty("address");
-      });
-      it("should contain name", () => {
-        expect(expected).toHaveProperty("name");
-      });
-      it("should contain symbol", () => {
-        expect(expected).toHaveProperty("symbol");
-      });
-      it("should contain decimals", () => {
-        expect(expected).toHaveProperty("decimals");
-      });
-      it("should contain logoURI", () => {
-        expect(expected).toHaveProperty("logoURI");
-      });
-    });
-    describe("additional properties", () => {
-      const data = {
-        chainId: "1",
-        address: "address",
-        name: "name",
-        symbol: "SBF",
-        decimals: 12,
-        logoURI: "https://someURL",
-        coingeckoId: "coin",
-        additional: "non standard"
-      };
-      const expected = parseBridge(data);
       it("should exclude additional properties", () => {
         expect(expected).not.toHaveProperty("additional");
       });

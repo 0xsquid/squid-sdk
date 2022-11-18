@@ -4,12 +4,10 @@ import {
   TransactionRequest,
   RouteParams,
   Route,
-  RouteData,
   Call,
   CallType,
   Bridge,
   Swap,
-  TokenData,
   FeeCost,
   GasCost,
   CustomCall,
@@ -17,20 +15,7 @@ import {
   OptimalRoute
 } from "../../types";
 import { removeEmpty } from "./util";
-
-export const parseTokenData = (data: any): TokenData => {
-  const { chainId, address, name, symbol, decimals, logoURI, coingeckoId } =
-    data;
-  return {
-    chainId,
-    address,
-    name,
-    symbol,
-    decimals,
-    logoURI,
-    coingeckoId
-  };
-};
+import { parseTokenData } from "./tokens";
 
 export const parseBridge = (data: any): Call => {
   const {
