@@ -1,3 +1,5 @@
+import { ChainName, ChainType } from "../../types";
+
 const ethBase = {
   name: "Ethereum",
   symbol: "ETH",
@@ -24,45 +26,35 @@ const moonbeamBase = {
 
 export const chainsData = [
   {
-    chainType: "evm",
+    chainName: ChainName.ETHEREUM,
+    chainType: ChainType.EVM,
     rpc: "http://localhost:8500/0",
+    internalRpc: "http://localhost:8500/0",
     networkName: "Ethereum Local",
     chainId: 1,
     nativeCurrency: ethBase,
-    blockExplorerUrls: [],
+    chainIconURI: "https://axelarscan.io/logos/chains/ethereum.svg",
+    blockExplorerUrls: ["https://etherscan.io/"],
     chainNativeContracts: {
       wrappedNativeToken: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-      distributionEnsExecutable: "0xd67877578aA2ffd9508a164E14e60680c6b96619",
       ensRegistry: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
-      multicall: "0x431E942ff3960CBa17044B1e6Be9cF62e3b63055"
+      multicall: "0x5e227AD1969Ea493B43F840cfF78d08a6fc17796",
+      usdcToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
     },
-    squidConfig: [
-      {
-        type: "singleSwap",
-        chainId: 1,
-        gasUsage: 3000000
-      },
-      {
-        type: "doubleSwap",
-        chainId: 1,
-        gasUsage: 6000000
-      }
-    ],
     axelarContracts: {
       gateway: "0x4F4495243837681061C4743b74B3eEdf548D56A5",
       forecallable: ""
     },
     squidContracts: {
-      squidMain: "0x9BDFDef799b4884D134c6783d0Ae98079e1b04b9",
-      defaultCrosschainToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      squidRouter: "0x70E0A431B3260fdC1671f252dAeD4F8D8FE0AA69",
+      defaultCrosschainToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      squidMulticall: "0xdEC4984419dE1ce9c572169901FEBE441B67F631"
     },
-    integrationContracts: {
-      dexUniswapV2: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
-      dexCurve: ""
-    }
+    estimatedRouteDuration: 900
   },
   {
-    chainType: "evm",
+    chainName: ChainName.AVALANCHE,
+    chainType: ChainType.EVM,
     rpc: "http://localhost:8500/1",
     networkName: "Avalanche Local",
     chainId: 43114,
@@ -100,7 +92,8 @@ export const chainsData = [
     }
   },
   {
-    chainType: "evm",
+    chainName: ChainName.MOONBEAM,
+    chainType: ChainType.EVM,
     rpc: "http://localhost:8500/2",
     networkName: "Moonbeam Local",
     chainId: 1284,

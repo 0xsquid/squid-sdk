@@ -3,6 +3,12 @@ import { ChainName, MapChainIdName } from "../types";
 export const mapChainIdName: MapChainIdName = {
   1: ChainName.ETHEREUM,
   3: ChainName.ETHEREUM,
+  56: ChainName.BINANCE,
+  97: ChainName.BINANCE,
+  250: ChainName.FANTOM,
+  4002: ChainName.FANTOM,
+  1313161554: ChainName.AURORA,
+  1313161555: ChainName.AURORA,
   43113: ChainName.AVALANCHE,
   43114: ChainName.AVALANCHE,
   1287: ChainName.MOONBEAM,
