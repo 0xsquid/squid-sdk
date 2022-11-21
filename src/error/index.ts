@@ -1,5 +1,6 @@
 export enum ErrorType {
   UnknownError = "UnknownError",
+  RouteResponseError = "RouteResponseError",
   ValidationError = "ValidationError",
   InitError = "InitError"
 }

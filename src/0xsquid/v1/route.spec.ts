@@ -1,5 +1,5 @@
 import { describe, expect } from "@jest/globals";
-import { CallType, SquidCallType, TokenData } from "types";
+import { CallType, SquidCallType, TokenData } from "../../types";
 
 import {
   parseBridge,
@@ -11,7 +11,8 @@ import {
   parseParams,
   parseOptimalRoute,
   parseSwap,
-  parseTransactionRequest
+  parseTransactionRequest,
+  parseRouteResponse
 } from "./route";
 
 describe("route", () => {
@@ -837,6 +838,15 @@ describe("route", () => {
       });
       it("should contain maxPriorityFeePerGas", () => {
         expect(result).toHaveProperty("maxPriorityFeePerGas");
+      });
+    });
+  });
+  describe("parseRouteResponse", () => {
+    describe("exact match", () => {
+      const selected = fullResponse;
+      const result = parseRouteResponse(selected);
+      it("should match provided data", () => {
+        expect(result).toEqual(selected);
       });
     });
   });

@@ -1,4 +1,4 @@
-import { ApiBasicResponse, TransactionStatus } from "types";
+import { ApiBasicResponse, TransactionStatus } from "../../types";
 import { parseChainData } from "./chains";
 import { removeEmpty } from "./util";
 
