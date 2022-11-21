@@ -20,8 +20,7 @@ import {
 } from "./types";
 
 import erc20Abi from "./abi/erc20.json";
-import { getChainData } from "./utils/getChainData";
-import { getTokenData } from "./utils/getTokenData";
+import { getChainData, getTokenData } from "./utils";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
