@@ -13,7 +13,7 @@ import {
   CustomCall,
   ContractCall,
   OptimalRoute
-} from "types";
+} from "../../types";
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
 
@@ -243,11 +243,14 @@ export const parseParams = (data: any): RouteParams => {
 };
 
 export const parseRouteResponse = (response: any): RouteResponse => {
+  const {
+    route: { estimate, transactionRequest, params }
+  } = response;
   const routeResponse = {
     route: {
-      estimate: parseEstimate(response.estimate),
-      transactionRequest: parseTransactionRequest(response.transactionRequest),
-      params: parseParams(response.params)
+      estimate: parseEstimate(estimate),
+      transactionRequest: parseTransactionRequest(transactionRequest),
+      params: parseParams(params)
     }
   };
   return routeResponse;

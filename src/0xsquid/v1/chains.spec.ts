@@ -6,7 +6,7 @@ import {
   parseSquidContracts,
   parseAxelarContracts
 } from "./chains";
-import { ChainType, CosmosChain } from "types";
+import { ChainType, CosmosChain } from "../../types";
 
 describe("chains", () => {
   const data = {

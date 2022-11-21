@@ -6,7 +6,7 @@ import {
   ChainType,
   CosmosChain,
   EvmChain
-} from "types";
+} from "../../types";
 
 export const parseChainNativeContracts = (
   data: any

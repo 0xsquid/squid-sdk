@@ -1,4 +1,4 @@
-import { SdkInfoResponse } from "types";
+import { SdkInfoResponse } from "../../types";
 import { parseTokenDataList } from "./tokens";
 import { parseChainData } from "./chains";
 
