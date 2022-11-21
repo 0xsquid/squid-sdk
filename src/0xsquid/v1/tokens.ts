@@ -1,5 +1,4 @@
-import { removeEmpty } from "./util";
-import { TokenData, TokensResponse } from "../../types";
+import { TokenData, TokensResponse } from "types";
 
 export const parseTokenData = (data: any): TokenData => {
   const { chainId, address, name, symbol, decimals, logoURI, coingeckoId } =

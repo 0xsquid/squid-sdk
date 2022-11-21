@@ -1,5 +1,5 @@
 import { describe, expect } from "@jest/globals";
-import { CallType, SquidCallType, TokenData } from "../../types";
+import { CallType, SquidCallType, TokenData } from "types";
 
 import {
   parseBridge,

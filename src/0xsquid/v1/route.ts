@@ -13,7 +13,7 @@ import {
   CustomCall,
   ContractCall,
   OptimalRoute
-} from "../../types";
+} from "types";
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
 
