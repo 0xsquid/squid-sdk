@@ -1,17 +1,17 @@
 {
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "sourceMap": true,
     "outDir": "dist",
     "declaration": true,
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
+  "include": ["src/**/*.ts"],
   "paths": {
-    "~*": ["src"]
+    "~/*": ["src/*"]
   },
-  "include": ["src"],
   "exclude": [
     "node_modules",
     "**/*.spec.ts",

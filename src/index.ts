@@ -192,7 +192,15 @@ export class Squid {
 
   public async init() {
     const response = await this.axiosInstance.get("/v1/sdk-info");
-    const typeResponse = parseSdkInfoResponse(response);
+    if (response.status != 200) {
+      throw new SquidError({
+        message: `SDK initialization failed`,
+        errorType: ErrorType.InitError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+    const typeResponse = parseSdkInfoResponse(response.data);
     this.tokens = typeResponse.tokens;
     this.chains = typeResponse.chains;
     this.axelarscanURL = typeResponse.axelarscanURL;
@@ -212,7 +220,17 @@ export class Squid {
   public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
     const response = await this.axiosInstance.get("/v1/route", { params });
-    const route: RouteResponse = parseRouteResponse(response);
+    if (response.status != 200) {
+      response.data.error;
+      throw new SquidError({
+        message: response.data.error,
+        errorType: ErrorType.RouteResponseError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+
+    const route: RouteResponse = parseRouteResponse(response.data);
     return route;
   }
 
