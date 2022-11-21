@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: Release type (major/minor/patch/prerelease)
+        description: Release type (major/minor/patch/premajor/preminor/prerelease)
         required: true
       branch-name:
         description: Branch name (Optional), defaults to main
@@ -66,8 +66,9 @@ jobs:
 
           git checkout -b "$branch_name"
 
+
           # Run release-ci command
-          yarn release:ci --i $RELEASE_TYPE --no-git.requireUpstream
+          yarn release:ci --i $RELEASE_TYPE --preid beta --no-git.requireUpstream
 
           git push --set-upstream origin "$branch_name"
 
