@@ -1,5 +1,17 @@
 
 
+### [1.1.1-0](https://github.com/0xsquid/api-sdk/compare/v1.1.0-beta.12...v1.1.1-0) (2022-11-21)
+
+
+### Features
+
+* add custom contract calls type ([#53](https://github.com/0xsquid/api-sdk/issues/53)) ([80dc35b](https://github.com/0xsquid/api-sdk/commit/80dc35b7dbd7b3d410e82bf8a5a3094b9dfe691c))
+
+
+### Bug Fixes
+
+* update api docs endpoint in readme ([#54](https://github.com/0xsquid/api-sdk/issues/54)) ([be60dcc](https://github.com/0xsquid/api-sdk/commit/be60dcc877dc59cb330e85bdb8f05ed5162a2762))
+
 ## [1.1.0](https://github.com/0xsquid/api-sdk/compare/v1.1.0-beta.12...v1.1.0) (2022-11-02)
 
 ## [1.1.0-beta.12](https://github.com/0xsquid/api-sdk/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2022-11-01)
