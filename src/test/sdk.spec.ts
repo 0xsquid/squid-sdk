@@ -1,13 +1,19 @@
 import axios from "axios";
 
 import { Squid } from "../index";
+import { chainsData } from "./constants/chains";
+import { supportedTokens } from "./constants/tokens";
 
 jest.mock("axios");
 
 describe("Squid", () => {
   it("should instance Squid as expected", async () => {
-    const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
-      get: jest.fn(),
+    const getMocked = jest.fn().mockResolvedValue({
+      chains: chainsData,
+      tokens: supportedTokens
+    });
+    const mockedAxios = (axios.create as jest.Mock).mockReturnValue({
+      get: getMocked,
       interceptors: {
         response: {
           use: jest.fn()
@@ -42,10 +48,12 @@ describe("Squid", () => {
 
   describe("axios module", () => {
     it("get", async () => {
-      const axiosInstance = (axios.create as jest.Mock).mockReturnValue({
-        get: jest.fn().mockResolvedValue({
-          data: { status: true, data: { chains: [] }, tokens: [] }
-        }),
+      const getMocked = jest.fn().mockResolvedValue({
+        chains: chainsData,
+        tokens: supportedTokens
+      });
+      const mockedAxios = (axios.create as jest.Mock).mockReturnValue({
+        get: getMocked,
         interceptors: {
           response: {
             use: jest.fn()

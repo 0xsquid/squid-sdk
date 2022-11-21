@@ -14,8 +14,8 @@ export const setAxiosInterceptors = (
         return Promise.reject(
           new SquidError({
             message: error.response.statusText,
-            errorType: error.response.data.errorType,
-            error: error.response.data.error,
+            errorType: error.response.data.errors[0].errorType,
+            errors: error.response.data.errors,
             logging: config.logging,
             logLevel: config.logLevel
           })
@@ -26,7 +26,7 @@ export const setAxiosInterceptors = (
         new SquidError({
           message: "There was an error while trying to fetch Squid Api",
           errorType: ErrorType.UnknownError,
-          error: error,
+          errors: [error],
           logging: config.logging,
           logLevel: config.logLevel
         })

@@ -5,7 +5,6 @@ import {
   Allowance,
   Approve,
   ApproveRoute,
-  ChainsData,
   Config,
   ExecuteRoute,
   GetRoute,
@@ -14,18 +13,19 @@ import {
   RouteResponse,
   TokenData,
   IsRouteApproved,
-  Route,
+  RouteData,
   RoutePopulatedData,
   ValidateBalanceAndApproval,
   ChainData
 } from "./types";
 
 import erc20Abi from "./abi/erc20.json";
-import { getChainData } from "./utils/getChainData";
-import { getTokenData } from "./utils/getTokenData";
+import { getChainData, getTokenData } from "./utils";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
+import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
+import { parseRouteResponse } from "./0xsquid/v1/route";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -35,7 +35,7 @@ export class Squid {
   public initialized = false;
   public config: Config;
   public tokens: TokenData[] = [] as TokenData[];
-  public chains: ChainsData = [] as ChainData[];
+  public chains: ChainData[] = [] as ChainData[];
   public axelarscanURL: string | undefined;
 
   constructor(config = {} as Config) {
@@ -91,7 +91,7 @@ export class Squid {
 
       if (_sourceAmount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -127,7 +127,7 @@ export class Squid {
 
       if (_sourceAmount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${address} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -136,14 +136,14 @@ export class Squid {
     }
   }
 
-  private validateRouteData(route: Route): RoutePopulatedData {
+  private validateRouteData(route: RouteData): RoutePopulatedData {
     const {
       params: { fromChain, toChain, fromToken, toToken },
       transactionRequest: { targetAddress }
     } = route;
 
     const _fromChain = getChainData(
-      this.chains as ChainsData,
+      this.chains as ChainData[],
       route.params.fromChain
     );
     if (!_fromChain) {
@@ -155,7 +155,7 @@ export class Squid {
       });
     }
 
-    const _toChain = getChainData(this.chains as ChainsData, toChain);
+    const _toChain = getChainData(this.chains as ChainData[], toChain);
     if (!_toChain) {
       throw new SquidError({
         message: `toChain not found for ${fromChain}`,
@@ -192,9 +192,10 @@ export class Squid {
 
   public async init() {
     const response = await this.axiosInstance.get("/v1/sdk-info");
-    this.tokens = response.data.tokens;
-    this.chains = response.data.chains;
-    this.axelarscanURL = response.data.axelarscanURL;
+    const typeResponse = parseSdkInfoResponse(response);
+    this.tokens = typeResponse.tokens;
+    this.chains = typeResponse.chains;
+    this.axelarscanURL = typeResponse.axelarscanURL;
     this.initialized = true;
   }
 
@@ -211,7 +212,8 @@ export class Squid {
   public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
     const response = await this.axiosInstance.get("/v1/route", { params });
-    return { route: response.data.route };
+    const route: RouteResponse = parseRouteResponse(response);
+    return route;
   }
 
   public async executeRoute({
@@ -289,7 +291,7 @@ export class Squid {
 
       if (amount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -303,7 +305,7 @@ export class Squid {
 
       if (amount.gt(allowance)) {
         throw new SquidError({
-          message: `Insufficent allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
+          message: `Insufficient allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -321,7 +323,7 @@ export class Squid {
 
       if (amount.gt(balance)) {
         throw new SquidError({
-          message: `Insufficent funds for account: ${sender} on chain ${fromChain.chainId}`,
+          message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -343,7 +345,7 @@ export class Squid {
 
     const {
       params: { fromAmount }
-    } = route as Route;
+    } = route as RouteData;
 
     if (fromIsNative) {
       return true;
@@ -386,7 +388,7 @@ export class Squid {
     }
 
     const chain = getChainData(
-      this.chains as ChainsData,
+      this.chains as ChainData[],
       token.chainId as number
     );
     if (!chain) {
@@ -427,7 +429,7 @@ export class Squid {
     }
 
     const chain = getChainData(
-      this.chains as ChainsData,
+      this.chains as ChainData[],
       token.chainId as number | string
     );
     if (!chain) {
