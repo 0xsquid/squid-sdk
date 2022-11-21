@@ -120,8 +120,6 @@ export type CosmosChain = BaseChain & {
 
 export type ChainData = EvmChain | CosmosChain;
 
-export type ChainsData = ChainData[];
-
 export type MapChainIdName = {
   [key: string | number]: ChainName;
 };
@@ -265,7 +263,7 @@ export type RouteData = {
 };
 
 export type SdkInfoResponse = {
-  chains: ChainsData;
+  chains: ChainData[];
   tokens: TokenData[];
   axelarscanURL: string;
 };
@@ -275,7 +273,7 @@ export type RouteResponse = {
 };
 
 export type ChainsResponse = {
-  chains: ChainsData;
+  chains: ChainData[];
 };
 
 export type TokensResponse = {
@@ -284,7 +282,7 @@ export type TokensResponse = {
 
 export type ExecuteRoute = {
   signer: ethers.Wallet | ethers.Signer;
-  route: Route;
+  route: RouteData;
   executionSettings?: {
     infiniteApproval?: boolean;
   };
@@ -306,12 +304,12 @@ export type Approve = {
 };
 
 export type IsRouteApproved = {
-  route: Route;
+  route: RouteData;
   sender: string;
 };
 
 export type ApproveRoute = {
-  route: Route;
+  route: RouteData;
   signer: ethers.Wallet | ethers.Signer;
 };
 
