@@ -32,14 +32,18 @@ const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
     );
 
     const { route } = await squid.getRoute({
-      toAddress: "0xF72d63C3A6cA33bCbaEFf037F068f1dE466CCA89",
+      toAddress: signer.address,
       fromChain: 43114,
-      fromToken: "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC",
+      fromToken: squid.tokens.find(
+        t => t.symbol.toLowerCase() == "axlusdc" && t.chainId === 43114
+      )?.address,
       fromAmount: "200000000",
       toChain: 1,
-      toToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      slippage: 99,
-      customContractCalls: [
+      toToken: squid.tokens.find(
+        t => t.symbol.toLowerCase() == "weth" && t.chainId === 1
+      )?.address,
+      slippage: 99
+      /*       customContractCalls: [
         {
           callType: 1,
           target: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -64,14 +68,9 @@ const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
           },
           estimatedGas: "400000"
         }
-      ]
+      ] */
     } as any);
-    console.log(
-      "> route: ",
-      route,
-      route.estimate.route[0],
-      route.estimate.route[1]
-    );
+    console.log("> route: ", JSON.stringify(route, null, 4));
     const tx = await squid.executeRoute({
       signer,
       route
