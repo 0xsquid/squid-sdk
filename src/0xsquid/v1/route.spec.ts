@@ -207,30 +207,30 @@ describe("route", () => {
         exchangeRate: "1",
         priceImpact: "0"
       };
-      const expected = parseBridge(selected);
+      const result = parseBridge(selected);
       it("should match provided data", () => {
-        expect(expected).toEqual(selected);
+        expect(result).toEqual(selected);
       });
       it("should have Bridge type", () => {
-        expect(expected.type).toBe(CallType.BRIDGE);
+        expect(result.type).toBe(CallType.BRIDGE);
       });
       it("should contain fromToken", () => {
-        expect(expected).toHaveProperty("fromToken");
+        expect(result).toHaveProperty("fromToken");
       });
       it("should contain toToken", () => {
-        expect(expected).toHaveProperty("toToken");
+        expect(result).toHaveProperty("toToken");
       });
       it("should contain fromAmount", () => {
-        expect(expected).toHaveProperty("fromAmount");
+        expect(result).toHaveProperty("fromAmount");
       });
       it("should contain toAmountMin", () => {
-        expect(expected).toHaveProperty("toAmountMin");
+        expect(result).toHaveProperty("toAmountMin");
       });
       it("should contain exchangeRate", () => {
-        expect(expected).toHaveProperty("exchangeRate");
+        expect(result).toHaveProperty("exchangeRate");
       });
       it("should contain priceImpact", () => {
-        expect(expected).toHaveProperty("priceImpact");
+        expect(result).toHaveProperty("priceImpact");
       });
     });
     describe("additional properties", () => {
@@ -245,9 +245,9 @@ describe("route", () => {
         priceImpact: "0",
         additional: ""
       };
-      const expected = parseBridge(selected);
+      const result = parseBridge(selected);
       it("should exclude additional properties", () => {
-        expect(expected).not.toHaveProperty("additional");
+        expect(result).not.toHaveProperty("additional");
       });
     });
   });
@@ -261,27 +261,27 @@ describe("route", () => {
           "0x095ea7b3000000000000000000000000d9e1ce17f2641f24ae83637ab66a2cca9c378b9fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
         estimatedGas: "400000"
       };
-      const expected = parseCustom(data);
+      const result = parseCustom(data);
       it("should match provided data", () => {
-        expect(expected).toEqual(data);
+        expect(result).toEqual(data);
       });
       it("should have type Custom", () => {
-        expect(expected.type).toBe(CallType.CUSTOM);
+        expect(result.type).toBe(CallType.CUSTOM);
       });
       it("should contain callType", () => {
-        expect(expected).toHaveProperty("callType");
+        expect(result).toHaveProperty("callType");
       });
       it("should contain target", () => {
-        expect(expected).toHaveProperty("target");
+        expect(result).toHaveProperty("target");
       });
       it("should contain callData", () => {
-        expect(expected).toHaveProperty("callData");
+        expect(result).toHaveProperty("callData");
       });
       it("should not contain optional value", () => {
-        expect(expected).not.toHaveProperty("value");
+        expect(result).not.toHaveProperty("value");
       });
       it("should not contain optional payload", () => {
-        expect(expected).not.toHaveProperty("payload");
+        expect(result).not.toHaveProperty("payload");
       });
     });
     describe("optionals", () => {
@@ -297,12 +297,12 @@ describe("route", () => {
         },
         estimatedGas: "400000"
       };
-      const expected = parseCustom(data);
+      const result = parseCustom(data);
       it("should contain optional value", () => {
-        expect(expected).toHaveProperty("value");
+        expect(result).toHaveProperty("value");
       });
       it("should contain optional payload", () => {
-        expect(expected).toHaveProperty("payload");
+        expect(result).toHaveProperty("payload");
       });
     });
     describe("additional properties", () => {
@@ -314,9 +314,9 @@ describe("route", () => {
         estimatedGas: "400000",
         additional: "223"
       };
-      const expected = parseBridge(data);
+      const result = parseBridge(data);
       it("should exclude additional properties", () => {
-        expect(expected).not.toHaveProperty("additional");
+        expect(result).not.toHaveProperty("additional");
       });
     });
   });
@@ -356,12 +356,12 @@ describe("route", () => {
           priceImpact: "0"
         }
       ];
-      const expected = parseRoute(data);
+      const result = parseRoute(data);
       it("should match provided data", () => {
-        expect(expected).toEqual(data);
+        expect(result).toEqual(data);
       });
       it("contain all elements", () => {
-        expect(expected.length).toBe(3);
+        expect(result.length).toBe(3);
       });
     });
     describe("optionals", () => {
@@ -388,72 +388,72 @@ describe("route", () => {
           priceImpact: "0"
         }
       ];
-      const expected = parseRoute(data);
+      const result = parseRoute(data);
       it("contain filter unsupported elements", () => {
-        expect(expected.length).toBe(2);
+        expect(result.length).toBe(2);
       });
     });
   });
   describe("parseGasCost", () => {
     describe("exact match", () => {
       const selected = fullResponse.route.estimate.gasCosts;
-      const expected = parseGasCost(selected);
+      const result = parseGasCost(selected);
       it("contain all elements", () => {
-        expect(expected.length).toBe(1);
+        expect(result.length).toBe(1);
       });
       it("should have property type", () => {
-        expect(expected[0]).toHaveProperty("type");
+        expect(result[0]).toHaveProperty("type");
       });
       it("should have property token", () => {
-        expect(expected[0]).toHaveProperty("token");
+        expect(result[0]).toHaveProperty("token");
       });
       it("should have property amount", () => {
-        expect(expected[0]).toHaveProperty("amount");
+        expect(result[0]).toHaveProperty("amount");
       });
       it("should have property amountUSD", () => {
-        expect(expected[0]).toHaveProperty("amountUSD");
+        expect(result[0]).toHaveProperty("amountUSD");
       });
       it("should have property gasPrice", () => {
-        expect(expected[0]).toHaveProperty("gasPrice");
+        expect(result[0]).toHaveProperty("gasPrice");
       });
       it("should have property maxFeePerGas", () => {
-        expect(expected[0]).toHaveProperty("maxFeePerGas");
+        expect(result[0]).toHaveProperty("maxFeePerGas");
       });
       it("should have property maxPriorityFeePerGas", () => {
-        expect(expected[0]).toHaveProperty("maxPriorityFeePerGas");
+        expect(result[0]).toHaveProperty("maxPriorityFeePerGas");
       });
       it("should have property estimate", () => {
-        expect(expected[0]).toHaveProperty("estimate");
+        expect(result[0]).toHaveProperty("estimate");
       });
       it("should have property limit", () => {
-        expect(expected[0]).toHaveProperty("limit");
+        expect(result[0]).toHaveProperty("limit");
       });
     });
   });
   describe("parseFeeCost", () => {
     describe("exact match", () => {
       const selected = fullResponse.route.estimate.feeCosts;
-      const expected = parseFeeCost(selected);
+      const result = parseFeeCost(selected);
       it("contain all elements", () => {
-        expect(expected.length).toBe(1);
+        expect(result.length).toBe(1);
       });
       it("should have property name", () => {
-        expect(expected[0]).toHaveProperty("name");
+        expect(result[0]).toHaveProperty("name");
       });
       it("should have property token", () => {
-        expect(expected[0]).toHaveProperty("token");
+        expect(result[0]).toHaveProperty("token");
       });
       it("should have property description", () => {
-        expect(expected[0]).toHaveProperty("description");
+        expect(result[0]).toHaveProperty("description");
       });
       it("should have property percentage", () => {
-        expect(expected[0]).toHaveProperty("percentage");
+        expect(result[0]).toHaveProperty("percentage");
       });
       it("should have property amount", () => {
-        expect(expected[0]).toHaveProperty("amount");
+        expect(result[0]).toHaveProperty("amount");
       });
       it("should have property amountUSD", () => {
-        expect(expected[0]).toHaveProperty("amountUSD");
+        expect(result[0]).toHaveProperty("amountUSD");
       });
     });
     describe("additional properties", () => {
@@ -468,9 +468,9 @@ describe("route", () => {
           additional: ""
         }
       ];
-      const expected = parseFeeCost(data);
+      const result = parseFeeCost(data);
       it("should filter additional properties", () => {
-        expect(expected[0]).not.toHaveProperty("additional");
+        expect(result[0]).not.toHaveProperty("additional");
       });
     });
   });
@@ -503,27 +503,27 @@ describe("route", () => {
         toChain: "5",
         fromChain: "43113"
       };
-      const expected = parseParams(data);
+      const result = parseParams(data);
       it("should have property slippage", () => {
-        expect(expected).toHaveProperty("slippage");
+        expect(result).toHaveProperty("slippage");
       });
       it("should have property toAddress", () => {
-        expect(expected).toHaveProperty("toAddress");
+        expect(result).toHaveProperty("toAddress");
       });
       it("should have property fromAmount", () => {
-        expect(expected).toHaveProperty("fromAmount");
+        expect(result).toHaveProperty("fromAmount");
       });
       it("should have property fromToken", () => {
-        expect(expected).toHaveProperty("fromToken");
+        expect(result).toHaveProperty("fromToken");
       });
       it("should have property toChain", () => {
-        expect(expected).toHaveProperty("toChain");
+        expect(result).toHaveProperty("toChain");
       });
       it("should have property fromChain", () => {
-        expect(expected).toHaveProperty("fromChain");
+        expect(result).toHaveProperty("fromChain");
       });
       it("should not include optional property enableForecall", () => {
-        expect(expected).not.toHaveProperty("enableForecall");
+        expect(result).not.toHaveProperty("enableForecall");
       });
     });
     describe("optional properties", () => {
@@ -565,12 +565,12 @@ describe("route", () => {
           }
         ]
       };
-      const expected = parseParams(data);
+      const result = parseParams(data);
       it("should have optional property enableForecall", () => {
-        expect(expected).toHaveProperty("enableForecall");
+        expect(result).toHaveProperty("enableForecall");
       });
       it("should have optional property customContractCalls", () => {
-        expect(expected).toHaveProperty("customContractCalls");
+        expect(result).toHaveProperty("customContractCalls");
       });
     });
   });
@@ -622,12 +622,12 @@ describe("route", () => {
           }
         ]
       };
-      const expected = parseOptimalRoute(data);
+      const result = parseOptimalRoute(data);
       it("should match provided data", () => {
-        expect(expected).toEqual(data);
+        expect(result).toEqual(data);
       });
       it("contain all elements", () => {
-        expect(expected.fromChain.length).toBe(3);
+        expect(result.fromChain.length).toBe(3);
       });
     });
     describe("optionals", () => {
@@ -657,9 +657,9 @@ describe("route", () => {
         ],
         toChain: []
       };
-      const expected = parseOptimalRoute(data);
+      const result = parseOptimalRoute(data);
       it("contain filter unsupported elements", () => {
-        expect(expected.fromChain.length).toBe(2);
+        expect(result.fromChain.length).toBe(2);
       });
     });
   });
@@ -685,39 +685,39 @@ describe("route", () => {
         priceImpact: "0"
       };
 
-      const expected = parseSwap(data);
+      const result = parseSwap(data);
       it("should match provided data", () => {
-        expect(expected).toEqual(data);
+        expect(result).toEqual(data);
       });
       it("should have type SWAP", () => {
-        expect(expected.type).toBe(CallType.SWAP);
+        expect(result.type).toBe(CallType.SWAP);
       });
       it("should contain dex", () => {
-        expect(expected).toHaveProperty("dex");
+        expect(result).toHaveProperty("dex");
       });
       it("should contain path", () => {
-        expect(expected).toHaveProperty("path");
+        expect(result).toHaveProperty("path");
       });
       it("should contain fromToken", () => {
-        expect(expected).toHaveProperty("fromToken");
+        expect(result).toHaveProperty("fromToken");
       });
       it("should contain toToken", () => {
-        expect(expected).toHaveProperty("toToken");
+        expect(result).toHaveProperty("toToken");
       });
       it("should contain fromAmount", () => {
-        expect(expected).toHaveProperty("fromAmount");
+        expect(result).toHaveProperty("fromAmount");
       });
       it("should contain toAmountMin", () => {
-        expect(expected).toHaveProperty("toAmountMin");
+        expect(result).toHaveProperty("toAmountMin");
       });
       it("should contain exchangeRate", () => {
-        expect(expected).toHaveProperty("exchangeRate");
+        expect(result).toHaveProperty("exchangeRate");
       });
       it("should contain priceImpact", () => {
-        expect(expected).toHaveProperty("priceImpact");
+        expect(result).toHaveProperty("priceImpact");
       });
       it("should not contain optional dynamicSlippage", () => {
-        expect(expected).not.toHaveProperty("dynamicSlippage");
+        expect(result).not.toHaveProperty("dynamicSlippage");
       });
     });
     describe("optionals", () => {
@@ -740,9 +740,9 @@ describe("route", () => {
         priceImpact: "0",
         dynamicSlippage: "sww"
       };
-      const expected = parseSwap(data);
+      const result = parseSwap(data);
       it("should contain dynamicSlippage", () => {
-        expect(expected).toHaveProperty("dynamicSlippage");
+        expect(result).toHaveProperty("dynamicSlippage");
       });
     });
     describe("additional properties", () => {
@@ -759,84 +759,84 @@ describe("route", () => {
         priceImpact: "0",
         dynamicSlippage: ""
       };
-      const expected = parseSwap(data);
+      const result = parseSwap(data);
       it("should exclude additional properties", () => {
-        expect(expected).not.toHaveProperty("additional");
+        expect(result).not.toHaveProperty("additional");
       });
     });
   });
   describe("parseEstimate", () => {
     describe("exact match", () => {
       const selected = fullResponse.route.estimate;
-      const expected = parseEstimate(selected);
+      const result = parseEstimate(selected);
       it("should match provided data", () => {
-        expect(expected).toEqual(selected);
+        expect(result).toEqual(selected);
       });
       it("should contain fromAmount", () => {
-        expect(expected).toHaveProperty("fromAmount");
+        expect(result).toHaveProperty("fromAmount");
       });
       it("should contain sendAmount", () => {
-        expect(expected).toHaveProperty("sendAmount");
+        expect(result).toHaveProperty("sendAmount");
       });
       it("should contain toAmount", () => {
-        expect(expected).toHaveProperty("toAmount");
+        expect(result).toHaveProperty("toAmount");
       });
       it("should contain toAmountMin", () => {
-        expect(expected).toHaveProperty("toAmountMin");
+        expect(result).toHaveProperty("toAmountMin");
       });
       it("should contain route", () => {
-        expect(expected).toHaveProperty("route");
+        expect(result).toHaveProperty("route");
       });
       it("should contain feeCosts", () => {
-        expect(expected).toHaveProperty("feeCosts");
+        expect(result).toHaveProperty("feeCosts");
       });
       it("should contain gasCosts", () => {
-        expect(expected).toHaveProperty("gasCosts");
+        expect(result).toHaveProperty("gasCosts");
       });
       it("should contain estimatedRouteDuration", () => {
-        expect(expected).toHaveProperty("estimatedRouteDuration");
+        expect(result).toHaveProperty("estimatedRouteDuration");
       });
       it("should contain exchangeRate", () => {
-        expect(expected).toHaveProperty("exchangeRate");
+        expect(result).toHaveProperty("exchangeRate");
       });
       it("should contain aggregatePriceImpact", () => {
-        expect(expected).toHaveProperty("aggregatePriceImpact");
+        expect(result).toHaveProperty("aggregatePriceImpact");
       });
     });
   });
   describe("parseTransactionRequest", () => {
     describe("exact match", () => {
       const selected = fullResponse.route.transactionRequest;
-      const expected = parseTransactionRequest(selected);
+      const result = parseTransactionRequest(selected);
       it("should match provided data", () => {
-        expect(expected).toEqual(selected);
+        expect(result).toEqual(selected);
       });
       it("should contain routeType", () => {
-        expect(expected).toHaveProperty("routeType");
+        expect(result).toHaveProperty("routeType");
       });
       it("should contain targetAddress", () => {
-        expect(expected).toHaveProperty("targetAddress");
+        expect(result).toHaveProperty("targetAddress");
       });
       it("should contain data", () => {
-        expect(expected).toHaveProperty("data");
+        expect(result).toHaveProperty("data");
       });
       it("should contain value", () => {
-        expect(expected).toHaveProperty("value");
+        expect(result).toHaveProperty("value");
       });
       it("should contain gasLimit", () => {
-        expect(expected).toHaveProperty("gasLimit");
+        expect(result).toHaveProperty("gasLimit");
       });
       it("should contain gasPrice", () => {
-        expect(expected).toHaveProperty("gasPrice");
+        expect(result).toHaveProperty("gasPrice");
       });
       it("should contain gasCosts", () => {
-        expect(expected).toHaveProperty("gasCosts");
+        expect(result).toHaveProperty("gasCosts");
       });
       it("should contain maxFeePerGas", () => {
-        expect(expected).toHaveProperty("maxFeePerGas");
+        expect(result).toHaveProperty("maxFeePerGas");
       });
       it("should contain maxPriorityFeePerGas", () => {
-        expect(expected).toHaveProperty("maxPriorityFeePerGas");
+        expect(result).toHaveProperty("maxPriorityFeePerGas");
       });
     });
   });

@@ -140,15 +140,15 @@ describe("sdk-info", () => {
   describe("parseSdkInfoResponse", () => {
     describe("exact match", () => {
       const selected = data;
-      const expected = parseSdkInfoResponse(selected);
+      const result = parseSdkInfoResponse(selected);
       it("should contain two chains", () => {
-        expect(expected.chains.length).toEqual(2);
+        expect(result.chains.length).toEqual(2);
       });
       it("should contain 3 tokens", () => {
-        expect(expected.tokens.length).toEqual(3);
+        expect(result.tokens.length).toEqual(3);
       });
       it("should contain axelarscanURL", () => {
-        expect(expected).toHaveProperty("axelarscanURL");
+        expect(result).toHaveProperty("axelarscanURL");
       });
     });
   });

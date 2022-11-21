@@ -346,14 +346,6 @@ export type GetStatus = {
   toBlock?: number;
 };
 
-export type StatusResponse = {
-  id: string;
-  status: string;
-  gasStatus: string;
-  destinationTransactionId: string;
-  blockNumber: number;
-};
-
 export type GasCost = {
   type: string;
   token: TokenData;
@@ -373,4 +365,33 @@ export type FeeCost = {
   token: TokenData;
   amount: string;
   amountUSD: string;
+};
+
+export type TransactionStatus = {
+  transactionId: string;
+  blockNumber: string;
+  callEventStatus: string;
+  callEventLog: Array<any>;
+  chainData: ChainData;
+  transactionUrl: string;
+};
+
+export type YupError = {
+  path: string;
+  message: string;
+};
+
+export type ApiBasicResponse = {
+  error?: string | YupError[] | any;
+  errorType?: string;
+};
+
+export type StatusResponse = ApiBasicResponse & {
+  id: string;
+  status: string;
+  gasStatus: string;
+  isGMPTransaction?: boolean;
+  axelarTransactionUrl: string;
+  fromChain?: TransactionStatus;
+  toChain?: TransactionStatus;
 };
