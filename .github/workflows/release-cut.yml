@@ -3,12 +3,16 @@ on:
   workflow_dispatch:
     inputs:
       release-type:
-        description: Release type (major/minor/patch/prerelease)
+        description: Release type (major/minor/patch/premajor/preminor/prerelease/prepatch)
         required: true
       branch-name:
         description: Branch name (Optional), defaults to main
         required: false
         default: main
+      pre-id:
+        description: Prerelease id (Optional), defaults to beta
+        required: false
+        default: beta
 
 jobs:
   cut-release:
@@ -16,9 +20,9 @@ jobs:
     name: Create release branch and PRs into develop/main
     runs-on: ubuntu-latest
     steps:
-      - name: Exit if release type argument is invalid (or patch only for release branch)
+      - name: Exit if release type argument is invalid
         run: exit 1
-        if: ${{ github.event.inputs.release-type != 'major' && github.event.inputs.release-type != 'minor' && github.event.inputs.release-type != 'patch' && github.event.inputs.release-type != 'prerelease'}}
+        if: "!contains('["major","minor", "patch", "premajor", "preminor", "prerelease", "prepatch"]', github.event.inputs.release-type)"
 
       - name: Checkout ${{ github.event.inputs.branch-name }} for ${{ github.event.inputs.release-type }} release
         uses: actions/checkout@v3
@@ -50,10 +54,11 @@ jobs:
         id: create-release
         env:
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+          PRE-ID: ${{ github.event.inputs.pre-id }}
         run: |
           current_version=$(jq -r .version package.json)
 
-          npm version $RELEASE_TYPE --git-tag-version false
+          npm version $RELEASE_TYPE --preid $PRE-ID --git-tag-version false
           new_version=$(jq -r .version package.json)
 
           git reset --hard
@@ -66,8 +71,9 @@ jobs:
 
           git checkout -b "$branch_name"
 
+
           # Run release-ci command
-          yarn release:ci --i $RELEASE_TYPE --no-git.requireUpstream
+          yarn release:ci --i $RELEASE_TYPE  --preid $PRE-ID --no-git.requireUpstream
 
           git push --set-upstream origin "$branch_name"
 
