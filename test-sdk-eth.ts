@@ -2,6 +2,10 @@ import { ethers } from "ethers";
 import { Squid } from "./src";
 import { nativeTokenConstant } from "./src/constants";
 
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
 const getSDK = (): Squid => {
   const squid = new Squid({
     baseUrl: "http://localhost:3000"
@@ -26,10 +30,10 @@ const getSDK = (): Squid => {
       fromChain: 1,
       fromToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       fromAmount: "150000000",
-      toChain: 43114,
-      toToken: "0xfaB550568C688d5D8A52C7d794cb93Edc26eC0eC", // "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
-      slippage: 99,
-      endContractCall: [
+      toChain: 137,
+      toToken: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+      slippage: 99
+      /* endContractCall: [
         {
           callType: 1,
           target: "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
@@ -41,14 +45,9 @@ const getSDK = (): Squid => {
           },
           estimatedGas: "400000"
         }
-      ]
+      ] */
     } as any);
-    console.log(
-      "> route: ",
-      route,
-      route.estimate.route[0],
-      route.estimate.route[1]
-    );
+    console.log("> route: ", JSON.stringify(route, null, 4));
     const tx = await squid.executeRoute({
       signer,
       route
