@@ -22,7 +22,7 @@ jobs:
     steps:
       - name: Exit if release type argument is invalid
         run: exit 1
-        if: "!contains('["major","minor", "patch", "premajor", "preminor", "prerelease", "prepatch"]', github.event.inputs.release-type)"
+        if: ${{ !contains('["major","minor", "patch", "premajor", "preminor", "prerelease", "prepatch"]', github.event.inputs.release-type) }}
 
       - name: Checkout ${{ github.event.inputs.branch-name }} for ${{ github.event.inputs.release-type }} release
         uses: actions/checkout@v3
