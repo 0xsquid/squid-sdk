@@ -9,10 +9,20 @@ on:
         description: Branch name (Optional), defaults to main
         required: false
         default: main
+      npm-release:
+        type: boolean
+        description: Toggle for NPM package release (Optional), defaults to false
+        required: false
+        default: false
       pre-id:
         description: Prerelease id (Optional), defaults to beta
         required: false
         default: beta
+      dry-run:
+        type: boolean
+        description: Runs NPM publish with the --dry-run flag to prevent publication, defaults to false
+        required: false
+        default: false
 
 jobs:
   cut-release:
@@ -54,11 +64,11 @@ jobs:
         id: create-release
         env:
           RELEASE_TYPE: ${{ github.event.inputs.release-type }}
-          PRE-ID: ${{ github.event.inputs.pre-id }}
+          PRE_ID: ${{ github.event.inputs.pre-id }}
         run: |
           current_version=$(jq -r .version package.json)
 
-          npm version $RELEASE_TYPE --preid $PRE-ID --git-tag-version false
+          npm version $RELEASE_TYPE --preid $PRE_ID --git-tag-version false
           new_version=$(jq -r .version package.json)
 
           git reset --hard
@@ -73,7 +83,7 @@ jobs:
 
 
           # Run release-ci command
-          yarn release:ci --i $RELEASE_TYPE  --preid $PRE-ID --no-git.requireUpstream
+          yarn release:ci --i $RELEASE_TYPE  --preReleaseId $PRE_ID --no-git.requireUpstream
 
           git push --set-upstream origin "$branch_name"
 
@@ -98,7 +108,14 @@ jobs:
           pr_title: ${{ steps.create-release.outputs.branch_name }}
           pr_body: ${{ env.main_pr_body }}
 
-      - name: Publist to NPM
+      - name: Publish to NPM
+        id: publish
         uses: JS-DevTools/npm-publish@v1
+        if: ${{ github.event.inputs.npm-release == 'true' }}
         with:
           token: ${{ secrets.NPM_TOKEN }}
+          dry-run: ${{ github.event.inputs.dry-run }}
+
+      - if: ${{ github.event.inputs.npm-release == 'true' && steps.publish.outputs.type != 'none' && github.event.inputs.dry-run == 'false'}}
+        run: |
+          echo "Version changed: ${{ steps.publish.outputs.old-version }} => ${{ steps.publish.outputs.version }}"
