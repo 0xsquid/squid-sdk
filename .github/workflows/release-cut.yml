@@ -108,7 +108,7 @@ jobs:
           pr_title: ${{ steps.create-release.outputs.branch_name }}
           pr_body: ${{ env.main_pr_body }}
 
-      - name: Publist to NPM
+      - name: Publish to NPM
         id: publish
         uses: JS-DevTools/npm-publish@v1
         if: ${{ github.event.inputs.npm-release == 'true' }}
