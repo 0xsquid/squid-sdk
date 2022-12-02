@@ -83,7 +83,7 @@ jobs:
 
 
           # Run release-ci command
-          yarn release:ci --i $RELEASE_TYPE  --preRelease $PRE_ID --no-git.requireUpstream
+          yarn release:ci --i $RELEASE_TYPE  --preReleaseId $PRE_ID --no-git.requireUpstream
 
           git push --set-upstream origin "$branch_name"
 
