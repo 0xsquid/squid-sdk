@@ -1,5 +1,17 @@
 
 
+## [1.3.0](https://github.com/0xsquid/api-sdk/compare/v1.2.0...v1.3.0) (2022-12-08)
+
+
+### Features
+
+* add new route api params for usdc value ([#61](https://github.com/0xsquid/api-sdk/issues/61)) ([300b538](https://github.com/0xsquid/api-sdk/commit/300b538a298879fcc5bc32f3749e3bd88b6737a5))
+
+
+### Bug Fixes
+
+* release cut action script formatting error ([#59](https://github.com/0xsquid/api-sdk/issues/59)) ([e45b9ba](https://github.com/0xsquid/api-sdk/commit/e45b9ba036eb1e919aad7e62d9807c702082275a))
+
 ## [1.2.0](https://github.com/0xsquid/api-sdk/compare/v1.1.0-beta.12...v1.2.0) (2022-11-21)
 
 
