@@ -803,6 +803,12 @@ describe("route", () => {
       it("should contain aggregatePriceImpact", () => {
         expect(result).toHaveProperty("aggregatePriceImpact");
       });
+      it("should contain fromAmountUSD", () => {
+        expect(result).toHaveProperty("fromAmountUSD");
+      });
+      it("should contain toAmountUSD", () => {
+        expect(result).toHaveProperty("toAmountUSD");
+      });
     });
   });
   describe("parseTransactionRequest", () => {
