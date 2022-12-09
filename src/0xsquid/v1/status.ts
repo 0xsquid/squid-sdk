@@ -34,7 +34,8 @@ export const parseStatusResponse = (response: any) => {
     isGMPTransaction,
     axelarTransactionUrl,
     fromChain,
-    toChain
+    toChain,
+    timeSpent
   } = response;
   return removeEmpty({
     id,
@@ -44,6 +45,7 @@ export const parseStatusResponse = (response: any) => {
     axelarTransactionUrl,
     fromChain: parseTransactionStatus(fromChain),
     toChain: parseTransactionStatus(toChain),
+    timeSpent: timeSpent,
     ...apiBasicResponse
   });
 };
