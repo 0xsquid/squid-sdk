@@ -209,7 +209,7 @@ export class Squid {
 
   public setConfig(config: Config) {
     this.axiosInstance = axios.create({
-      baseURL: config.baseUrl || baseUrl,
+      baseURL: config.baseUrl ? config.baseUrl : baseUrl,
       headers: {
         // 'api-key': config.apiKey
       }
