@@ -7,7 +7,7 @@ export const getTokenData = (
 ): TokenData | undefined =>
   tokens.find(
     e =>
-      e.address.toLowerCase() === address?.toLowerCase() && e.chainId == chainId
+      e.address.toLowerCase() === address.toLowerCase() && e.chainId == chainId
   );
 
 export const getChainData = (
