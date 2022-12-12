@@ -41,7 +41,7 @@ export class Squid {
   constructor(config = {} as Config) {
     this.axiosInstance = setAxiosInterceptors(
       axios.create({
-        baseURL: config ? config.baseUrl : baseUrl,
+        baseURL: config ? config.baseUrl || baseUrl : baseUrl,
         headers: {
           // 'api-key': config.apiKey
         }
@@ -50,7 +50,7 @@ export class Squid {
     );
 
     this.config = {
-      baseUrl: config ? config.baseUrl : baseUrl,
+      baseUrl: config ? config.baseUrl || baseUrl : baseUrl,
       ...config
     };
   }
