@@ -41,7 +41,7 @@ export class Squid {
   constructor(config = {} as Config) {
     this.axiosInstance = setAxiosInterceptors(
       axios.create({
-        baseURL: config?.baseUrl || baseUrl,
+        baseURL: config ? config.baseUrl : baseUrl,
         headers: {
           // 'api-key': config.apiKey
         }
@@ -50,7 +50,7 @@ export class Squid {
     );
 
     this.config = {
-      baseUrl: config?.baseUrl || baseUrl,
+      baseUrl: config ? config.baseUrl : baseUrl,
       ...config
     };
   }
@@ -109,9 +109,9 @@ export class Squid {
         if (infiniteApproval === false) {
           amountToApprove = _sourceAmount;
         }
-
         if (
-          this.config?.executionSettings?.infiniteApproval === false &&
+          (this.config.executionSettings &&
+            this.config.executionSettings.infiniteApproval) === false &&
           !infiniteApproval
         ) {
           amountToApprove = ethers.BigNumber.from(uint256MaxValue);
@@ -259,7 +259,9 @@ export class Squid {
         fromIsNative,
         fromAmount: params.fromAmount,
         fromChain,
-        infiniteApproval: executionSettings?.infiniteApproval,
+        infiniteApproval: executionSettings
+          ? executionSettings.infiniteApproval
+          : undefined,
         signer
       });
     }
@@ -371,7 +373,11 @@ export class Squid {
 
     let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
 
-    if (this.config?.executionSettings?.infiniteApproval === false) {
+    if (
+      this.config &&
+      this.config.executionSettings &&
+      this.config.executionSettings.infiniteApproval === false
+    ) {
       amountToApprove = ethers.BigNumber.from(fromAmount);
     }
 
