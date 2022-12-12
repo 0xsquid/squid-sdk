@@ -1,5 +1,21 @@
 
 
+### [1.3.1-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.2.0...v1.3.1-beta.0) (2022-12-12)
+
+
+### Features
+
+* add new route api params for usdc value ([#61](https://github.com/0xsquid/api-sdk/issues/61)) ([300b538](https://github.com/0xsquid/api-sdk/commit/300b538a298879fcc5bc32f3749e3bd88b6737a5))
+* add timeSpent param in status response ([#63](https://github.com/0xsquid/api-sdk/issues/63)) ([c979277](https://github.com/0xsquid/api-sdk/commit/c979277ab339e20faaf2713864b41d0fd959d41c))
+* remove optional chaining from syntax ([013b961](https://github.com/0xsquid/api-sdk/commit/013b9612ba44222a8587c8cdbe9df81861e64ec6))
+
+
+### Bug Fixes
+
+* one line es6 logic ([d4b2e35](https://github.com/0xsquid/api-sdk/commit/d4b2e35be5c0d14b697ea4cc913620fb86d3ab10))
+* refactor code for optional chaining ([b3b2ee2](https://github.com/0xsquid/api-sdk/commit/b3b2ee2384dd485eb0a031b3599d3c86101c3b72))
+* release cut action script formatting error ([#59](https://github.com/0xsquid/api-sdk/issues/59)) ([e45b9ba](https://github.com/0xsquid/api-sdk/commit/e45b9ba036eb1e919aad7e62d9807c702082275a))
+
 ## [1.3.0](https://github.com/0xsquid/api-sdk/compare/v1.2.0...v1.3.0) (2022-12-08)
 
 
