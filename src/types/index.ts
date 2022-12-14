@@ -244,9 +244,11 @@ export type Call = Swap | CustomCall | Bridge;
 
 export type Estimate = {
   fromAmount: string;
+  fromAmountUSD: string;
   sendAmount: string;
   toAmount: string;
   toAmountMin: string;
+  toAmountUSD: string;
   route: OptimalRoute;
   exchangeRate?: string;
   estimatedRouteDuration: number;
@@ -341,11 +343,6 @@ export type ValidateBalanceAndApproval = {
 
 export type GetStatus = {
   transactionId: string;
-  routeType: string;
-  destinationAddress?: string;
-  toChain?: number | string;
-  fromBlock?: number;
-  toBlock?: number;
 };
 
 export type GasCost = {
@@ -396,4 +393,5 @@ export type StatusResponse = ApiBasicResponse & {
   axelarTransactionUrl: string;
   fromChain?: TransactionStatus;
   toChain?: TransactionStatus;
+  timeSpent?: Record<string, number>;
 };
