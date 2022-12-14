@@ -393,4 +393,5 @@ export type StatusResponse = ApiBasicResponse & {
   axelarTransactionUrl: string;
   fromChain?: TransactionStatus;
   toChain?: TransactionStatus;
+  timeSpent?: Record<string, number>;
 };
