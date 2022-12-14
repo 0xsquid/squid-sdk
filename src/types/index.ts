@@ -244,9 +244,11 @@ export type Call = Swap | CustomCall | Bridge;
 
 export type Estimate = {
   fromAmount: string;
+  fromAmountUSD: string;
   sendAmount: string;
   toAmount: string;
   toAmountMin: string;
+  toAmountUSD: string;
   route: OptimalRoute;
   exchangeRate?: string;
   estimatedRouteDuration: number;
