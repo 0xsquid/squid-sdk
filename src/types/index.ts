@@ -343,11 +343,6 @@ export type ValidateBalanceAndApproval = {
 
 export type GetStatus = {
   transactionId: string;
-  routeType: string;
-  destinationAddress?: string;
-  toChain?: number | string;
-  fromBlock?: number;
-  toBlock?: number;
 };
 
 export type GasCost = {
