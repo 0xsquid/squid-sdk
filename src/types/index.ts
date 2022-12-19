@@ -297,7 +297,7 @@ export type ExecuteRoute = {
   executionSettings?: {
     infiniteApproval?: boolean;
   };
-  override?: TransactionRequestParam;
+  overrides?: TransactionRequestParam;
 };
 
 export type Allowance = {
