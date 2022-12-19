@@ -288,7 +288,7 @@ export type TokensResponse = {
 
 export type TransactionRequestParam = Omit<
   ethers.providers.TransactionRequest,
-  "to" | "data"
+  "to" | "data" | "value" | "from"
 >;
 
 export type ExecuteRoute = {
