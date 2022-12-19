@@ -1,5 +1,12 @@
 
 
+### [1.3.3-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.2...v1.3.3-beta.0) (2022-12-19)
+
+
+### Features
+
+* add overrides parameter to executeRoute function ([#71](https://github.com/0xsquid/api-sdk/issues/71)) ([1dadf95](https://github.com/0xsquid/api-sdk/commit/1dadf95fcb8d73269786bc8ce7a08d23c4d7b021))
+
 ### [1.3.2](https://github.com/0xsquid/api-sdk/compare/v1.3.1...v1.3.2) (2022-12-14)
 
 ### [1.3.1](https://github.com/0xsquid/api-sdk/compare/v1.2.0...v1.3.1) (2022-12-13)
