@@ -237,7 +237,8 @@ export class Squid {
   public async executeRoute({
     signer,
     route,
-    executionSettings
+    executionSettings,
+    overrides
   }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
     this.validateInit();
 
@@ -275,7 +276,8 @@ export class Squid {
     if (transactionRequest.routeType !== "SEND") {
       tx = {
         ...tx,
-        value
+        value,
+        ...overrides
       };
     }
 
