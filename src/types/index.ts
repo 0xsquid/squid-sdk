@@ -286,12 +286,18 @@ export type TokensResponse = {
   tokens: TokenData[];
 };
 
+export type TransactionRequestParam = Omit<
+  ethers.providers.TransactionRequest,
+  "to" | "data"
+>;
+
 export type ExecuteRoute = {
   signer: ethers.Wallet | ethers.Signer;
   route: RouteData;
   executionSettings?: {
     infiniteApproval?: boolean;
   };
+  override?: TransactionRequestParam;
 };
 
 export type Allowance = {
