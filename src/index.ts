@@ -253,10 +253,11 @@ export class Squid {
       targetAddress
     } = this.validateRouteData(route);
 
-    const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } = transactionRequest;
+    const { maxFeePerGas, maxPriorityFeePerGas, gasPrice, gasLimit } =
+      transactionRequest;
     const _gasParams = gasPrice
-      ? { gasPrice }
-      : { maxFeePerGas, maxPriorityFeePerGas };
+      ? { gasPrice, gasLimit }
+      : { maxFeePerGas, maxPriorityFeePerGas, gasLimit };
     const _overrides = overrides
       ? {
           ..._gasParams,
