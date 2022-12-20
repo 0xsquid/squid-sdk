@@ -286,7 +286,7 @@ export type TokensResponse = {
   tokens: TokenData[];
 };
 
-export type TransactionRequestParam = Omit<
+export type OverrideParams = Omit<
   ethers.providers.TransactionRequest,
   "to" | "data" | "value" | "from"
 >;
@@ -297,7 +297,7 @@ export type ExecuteRoute = {
   executionSettings?: {
     infiniteApproval?: boolean;
   };
-  overrides?: TransactionRequestParam;
+  overrides?: OverrideParams;
 };
 
 export type Allowance = {
@@ -313,6 +313,7 @@ export type Approve = {
   tokenAddress: string;
   amount?: string;
   chainId: number | string;
+  overrides?: OverrideParams;
 };
 
 export type IsRouteApproved = {
@@ -323,6 +324,7 @@ export type IsRouteApproved = {
 export type ApproveRoute = {
   route: RouteData;
   signer: ethers.Wallet | ethers.Signer;
+  overrides?: OverrideParams;
 };
 
 export type RoutePopulatedData = {
@@ -345,6 +347,7 @@ export type ValidateBalanceAndApproval = {
   signer: ethers.Wallet | ethers.Signer;
   fromChain: ChainData;
   infiniteApproval?: boolean;
+  overrides?: OverrideParams;
 };
 
 export type GetStatus = {

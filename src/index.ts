@@ -75,7 +75,8 @@ export class Squid {
     fromProvider,
     fromChain,
     signer,
-    infiniteApproval
+    infiniteApproval,
+    overrides
   }: ValidateBalanceAndApproval) {
     const _sourceAmount = ethers.BigNumber.from(fromAmount);
     let address;
@@ -119,7 +120,7 @@ export class Squid {
 
         const approveTx = await fromTokenContract
           .connect(signer)
-          .approve(targetAddress, amountToApprove);
+          .approve(targetAddress, amountToApprove, overrides);
         await approveTx.wait();
       }
     } else {
@@ -261,7 +262,8 @@ export class Squid {
         fromAmount: params.fromAmount,
         fromChain,
         infiniteApproval: executionSettings?.infiniteApproval,
-        signer
+        signer,
+        overrides
       });
     }
 
@@ -357,7 +359,11 @@ export class Squid {
     }
   }
 
-  public async approveRoute({ route, signer }: ApproveRoute): Promise<boolean> {
+  public async approveRoute({
+    route,
+    signer,
+    overrides
+  }: ApproveRoute): Promise<boolean> {
     this.validateInit();
 
     const { fromIsNative, fromTokenContract, targetAddress } =
@@ -379,7 +385,7 @@ export class Squid {
 
     const approveTx = await (fromTokenContract as ethers.Contract)
       .connect(signer)
-      .approve(targetAddress, amountToApprove);
+      .approve(targetAddress, amountToApprove, overrides);
     await approveTx.wait();
 
     return true;
@@ -430,7 +436,8 @@ export class Squid {
     spender,
     tokenAddress,
     amount,
-    chainId
+    chainId,
+    overrides
   }: Approve): Promise<ethers.providers.TransactionResponse> {
     this.validateInit();
 
@@ -462,7 +469,11 @@ export class Squid {
     }
 
     const contract = new ethers.Contract(token.address, erc20Abi, signer);
-    return await contract.approve(spender, amount || uint256MaxValue);
+    return await contract.approve(
+      spender,
+      amount || uint256MaxValue,
+      overrides
+    );
   }
 
   public async getStatus(params: GetStatus): Promise<StatusResponse> {
