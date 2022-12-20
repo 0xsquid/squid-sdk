@@ -253,6 +253,19 @@ export class Squid {
       targetAddress
     } = this.validateRouteData(route);
 
+    const { maxFeePerGas, maxPriorityFeePerGas, gasPrice } = transactionRequest;
+    const _gasParams = gasPrice
+      ? { gasPrice }
+      : { maxFeePerGas, maxPriorityFeePerGas };
+    const _overrides = overrides
+      ? {
+          ..._gasParams,
+          ...overrides
+        }
+      : {
+          ..._gasParams
+        };
+
     if (!fromIsNative) {
       await this.validateBalanceAndApproval({
         fromTokenContract: fromTokenContract as ethers.Contract,
@@ -263,7 +276,7 @@ export class Squid {
         fromChain,
         infiniteApproval: executionSettings?.infiniteApproval,
         signer,
-        overrides
+        overrides: _overrides
       });
     }
 
@@ -272,14 +285,14 @@ export class Squid {
     let tx = {
       to: targetAddress,
       data: transactionRequest.data,
-      gasLimit: transactionRequest.gasLimit
+      gasLimit: transactionRequest.gasLimit,
+      ..._overrides
     } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
 
     if (transactionRequest.routeType !== "SEND") {
       tx = {
         ...tx,
-        value,
-        ...overrides
+        value
       };
     }
 
