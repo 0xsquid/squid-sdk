@@ -49,7 +49,8 @@ describe("SquidSdk approve method", () => {
 
     expect(mockedApprove).toHaveBeenCalledWith(
       "0x6972A415e0572bd2E5E3c7DF307d0AFe32D30955",
-      uint256MaxValue
+      uint256MaxValue,
+      undefined
     );
     expect(approval).toStrictEqual({});
   });
@@ -69,7 +70,8 @@ describe("SquidSdk approve method", () => {
 
     expect(mockedApprove).toHaveBeenCalledWith(
       "0x6972A415e0572bd2E5E3c7DF307d0AFe32D30955",
-      "100"
+      "100",
+      undefined
     );
     expect(approval).toStrictEqual({});
   });
