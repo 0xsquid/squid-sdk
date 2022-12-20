@@ -1,5 +1,12 @@
 
 
+### [1.3.4-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.4-beta.0) (2022-12-20)
+
+
+### Features
+
+* add override param to approval action ([#73](https://github.com/0xsquid/api-sdk/issues/73)) ([a111768](https://github.com/0xsquid/api-sdk/commit/a1117686d7bb206ad5bed5ee9ee80e8e06b21860))
+
 ### [1.3.3-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.2...v1.3.3-beta.0) (2022-12-19)
 
 
