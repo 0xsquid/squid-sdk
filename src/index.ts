@@ -286,7 +286,6 @@ export class Squid {
     let tx = {
       to: targetAddress,
       data: transactionRequest.data,
-      gasLimit: transactionRequest.gasLimit,
       ..._overrides
     } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
 
