@@ -1,5 +1,13 @@
 
 
+### [1.3.4](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.4) (2022-12-21)
+
+
+### Features
+
+* add override param to approval action ([#73](https://github.com/0xsquid/api-sdk/issues/73)) ([a111768](https://github.com/0xsquid/api-sdk/commit/a1117686d7bb206ad5bed5ee9ee80e8e06b21860))
+* prioritise-eip1559-transactions ([#75](https://github.com/0xsquid/api-sdk/issues/75)) ([babcdb3](https://github.com/0xsquid/api-sdk/commit/babcdb38677537f2c2838d1f6d8bf4df221715a5))
+
 ### [1.3.4-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.4-beta.0) (2022-12-20)
 
 
