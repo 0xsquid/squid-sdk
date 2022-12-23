@@ -371,7 +371,7 @@ export class Squid {
   public async approveRoute({
     route,
     signer,
-    overrides
+    overrides = {}
   }: ApproveRoute): Promise<boolean> {
     this.validateInit();
 
