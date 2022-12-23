@@ -324,6 +324,9 @@ export type IsRouteApproved = {
 export type ApproveRoute = {
   route: RouteData;
   signer: ethers.Wallet | ethers.Signer;
+  executionSettings?: {
+    infiniteApproval?: boolean;
+  };
   overrides?: OverrideParams;
 };
 
