@@ -371,6 +371,7 @@ export class Squid {
   public async approveRoute({
     route,
     signer,
+    executionSettings,
     overrides = {}
   }: ApproveRoute): Promise<boolean> {
     this.validateInit();
@@ -388,7 +389,7 @@ export class Squid {
 
     let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
 
-    if (this.config?.executionSettings?.infiniteApproval === false) {
+    if (executionSettings?.infiniteApproval === false) {
       amountToApprove = ethers.BigNumber.from(fromAmount);
     }
 
