@@ -178,7 +178,7 @@ export type GetRoute = {
   quoteOnly?: boolean;
   enableForecall?: boolean;
   customContractCalls?: ContractCall[];
-  prefer?: string;
+  prefer?: string[];
 };
 
 export type TransactionRequest = {
