@@ -179,6 +179,7 @@ export type GetRoute = {
   enableForecall?: boolean;
   customContractCalls?: ContractCall[];
   prefer?: string[];
+  receiveGasOnDestination?: boolean;
 };
 
 export type TransactionRequest = {
