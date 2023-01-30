@@ -1,5 +1,12 @@
 
 
+### [1.3.7](https://github.com/0xsquid/api-sdk/compare/v1.3.5...v1.3.7) (2023-01-30)
+
+
+### Features
+
+* add receiveGasOnDestination param to getRoute ([#84](https://github.com/0xsquid/api-sdk/issues/84)) ([a16afb1](https://github.com/0xsquid/api-sdk/commit/a16afb117bd9242c5734655516eb64954dbb8745))
+
 ### [1.3.7-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.6-beta.0...v1.3.7-beta.0) (2023-01-30)
 
 ### [1.3.6-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.5...v1.3.6-beta.0) (2023-01-30)
