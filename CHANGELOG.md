@@ -1,5 +1,19 @@
 
 
+### [1.3.7-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.6-beta.0...v1.3.7-beta.0) (2023-01-30)
+
+### [1.3.6-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.5...v1.3.6-beta.0) (2023-01-30)
+
+
+### Features
+
+* add receiveGasOnDestination param to getRoute ([#84](https://github.com/0xsquid/api-sdk/issues/84)) ([a16afb1](https://github.com/0xsquid/api-sdk/commit/a16afb117bd9242c5734655516eb64954dbb8745))
+
+
+### Bug Fixes
+
+* allow ignore gasPrice from api ([3188897](https://github.com/0xsquid/api-sdk/commit/31888970ddc8219ab079d91c0cd19a649d9e6ea4))
+
 ### [1.3.5](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.5) (2023-01-12)
 
 
