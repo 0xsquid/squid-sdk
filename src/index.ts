@@ -255,13 +255,17 @@ export class Squid {
 
     const { maxFeePerGas, maxPriorityFeePerGas, gasPrice, gasLimit } =
       transactionRequest;
-    const _gasParams = maxPriorityFeePerGas
-      ? { maxFeePerGas, maxPriorityFeePerGas, gasLimit }
-      : { gasPrice, gasLimit };
 
-    const _overrides = overrides
-      ? { ..._gasParams, ...overrides }
-      : { ..._gasParams };
+    let _overrides = overrides;
+    if (executionSettings?.setGasPrice) {
+      const _gasParams = maxPriorityFeePerGas
+        ? { maxFeePerGas, maxPriorityFeePerGas, gasLimit }
+        : { gasPrice, gasLimit };
+
+      _overrides = overrides
+        ? { ..._gasParams, ...overrides }
+        : { ..._gasParams };
+    }
 
     if (!fromIsNative) {
       await this.validateBalanceAndApproval({
