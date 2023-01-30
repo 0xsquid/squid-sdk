@@ -1,5 +1,7 @@
 
 
+### [1.3.7-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.6-beta.0...v1.3.7-beta.0) (2023-01-30)
+
 ### [1.3.6-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.5...v1.3.6-beta.0) (2023-01-30)
 
 
