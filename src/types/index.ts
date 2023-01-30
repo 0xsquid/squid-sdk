@@ -298,6 +298,7 @@ export type ExecuteRoute = {
   route: RouteData;
   executionSettings?: {
     infiniteApproval?: boolean;
+    setGasPrice?: boolean;
   };
   overrides?: OverrideParams;
 };
