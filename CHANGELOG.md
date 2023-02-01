@@ -1,5 +1,12 @@
 
 
+### [1.3.9](https://github.com/0xsquid/api-sdk/compare/v1.3.8...v1.3.9) (2023-02-01)
+
+
+### Bug Fixes
+
+* gasLimit issues ([#91](https://github.com/0xsquid/api-sdk/issues/91)) ([3d67599](https://github.com/0xsquid/api-sdk/commit/3d6759945b56eedf34ae0d3635424da1c5040a09))
+
 ### [1.3.8](https://github.com/0xsquid/api-sdk/compare/v1.3.7...v1.3.8) (2023-01-31)
 
 ### [1.3.7](https://github.com/0xsquid/api-sdk/compare/v1.3.5...v1.3.7) (2023-01-30)
