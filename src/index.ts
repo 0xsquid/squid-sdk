@@ -243,6 +243,15 @@ export class Squid {
   }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
     this.validateInit();
 
+    if (!route.transactionRequest) {
+      throw new SquidError({
+        message: `transactionRequest property is missing in route object`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+
     const { transactionRequest, params } = route;
 
     const {
