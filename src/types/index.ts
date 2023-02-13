@@ -333,7 +333,7 @@ export type ApproveRoute = {
   overrides?: OverrideParams;
 };
 
-export type RoutePopulatedData = {
+export type RouteParamsData = {
   fromChain: ChainData;
   toChain: ChainData;
   fromToken: TokenData | undefined;

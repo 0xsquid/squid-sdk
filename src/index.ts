@@ -14,7 +14,7 @@ import {
   TokenData,
   IsRouteApproved,
   RouteData,
-  RoutePopulatedData,
+  RouteParamsData,
   ValidateBalanceAndApproval,
   ChainData,
   RouteParams,
@@ -139,7 +139,7 @@ export class Squid {
     }
   }
 
-  private validateRouteData(params: RouteParams): RoutePopulatedData {
+  private validateRouteParams(params: RouteParams): RouteParamsData {
     const { fromChain, toChain, fromToken, toToken } = params;
 
     const _fromChain = getChainData(
@@ -267,7 +267,7 @@ export class Squid {
     const { transactionRequest, params } = route;
 
     const { fromIsNative, fromChain, fromTokenContract, fromProvider } =
-      this.validateRouteData(route.params);
+      this.validateRouteParams(route.params);
 
     const {
       targetAddress,
@@ -329,7 +329,7 @@ export class Squid {
     this.validateInit();
 
     const { fromIsNative, fromChain, fromProvider, fromTokenContract } =
-      this.validateRouteData(route.params);
+      this.validateRouteParams(route.params);
     const { targetAddress } = this.validateTransactionRequest(
       route.transactionRequest
     );
@@ -401,7 +401,7 @@ export class Squid {
   }: ApproveRoute): Promise<boolean> {
     this.validateInit();
 
-    const { fromIsNative, fromTokenContract } = this.validateRouteData(
+    const { fromIsNative, fromTokenContract } = this.validateRouteParams(
       route.params
     );
     const targetAddress = this.validateTransactionRequest(
