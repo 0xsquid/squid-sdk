@@ -250,7 +250,7 @@ export const parseRouteResponse = (response: any): RouteResponse => {
   const {
     route: { estimate, transactionRequest, params }
   } = response;
-  const routeResponse = removeEmpty({
+  const routeResponse = {
     route: {
       estimate: parseEstimate(estimate),
       transactionRequest: transactionRequest
@@ -258,6 +258,6 @@ export const parseRouteResponse = (response: any): RouteResponse => {
         : undefined,
       params: parseParams(params)
     }
-  });
+  };
   return routeResponse;
 };
