@@ -266,7 +266,7 @@ export type RouteParams = GetRoute & {
 
 export type RouteData = {
   estimate: Estimate;
-  transactionRequest: TransactionRequest;
+  transactionRequest?: TransactionRequest;
   params: GetRoute & { fromToken: TokenData; toToken: TokenData };
 };
 
@@ -333,7 +333,7 @@ export type ApproveRoute = {
   overrides?: OverrideParams;
 };
 
-export type RoutePopulatedData = {
+export type RouteParamsData = {
   fromChain: ChainData;
   toChain: ChainData;
   fromToken: TokenData | undefined;
@@ -341,7 +341,6 @@ export type RoutePopulatedData = {
   fromTokenContract: ethers.Contract | undefined;
   fromProvider: ethers.providers.JsonRpcProvider;
   fromIsNative: boolean;
-  targetAddress: string;
 };
 
 export type ValidateBalanceAndApproval = {

@@ -253,7 +253,9 @@ export const parseRouteResponse = (response: any): RouteResponse => {
   const routeResponse = {
     route: {
       estimate: parseEstimate(estimate),
-      transactionRequest: parseTransactionRequest(transactionRequest),
+      transactionRequest: transactionRequest
+        ? parseTransactionRequest(transactionRequest)
+        : undefined,
       params: parseParams(params)
     }
   };
