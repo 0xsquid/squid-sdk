@@ -16,7 +16,9 @@ import {
   RouteData,
   RoutePopulatedData,
   ValidateBalanceAndApproval,
-  ChainData
+  ChainData,
+  RouteParams,
+  TransactionRequest
 } from "./types";
 
 import erc20Abi from "./abi/erc20.json";
@@ -137,15 +139,12 @@ export class Squid {
     }
   }
 
-  private validateRouteData(route: RouteData): RoutePopulatedData {
-    const {
-      params: { fromChain, toChain, fromToken, toToken },
-      transactionRequest: { targetAddress }
-    } = route;
+  private validateRouteData(params: RouteParams): RoutePopulatedData {
+    const { fromChain, toChain, fromToken, toToken } = params;
 
     const _fromChain = getChainData(
       this.chains as ChainData[],
-      route.params.fromChain
+      params.fromChain
     );
     if (!_fromChain) {
       throw new SquidError({
@@ -186,9 +185,22 @@ export class Squid {
       toToken,
       fromTokenContract,
       fromProvider,
-      fromIsNative,
-      targetAddress
+      fromIsNative
     };
+  }
+
+  private validateTransactionRequest(
+    transactionRequest?: TransactionRequest
+  ): TransactionRequest {
+    if (!transactionRequest) {
+      throw new SquidError({
+        message: `transactionRequest param not found in route object`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+    return transactionRequest;
   }
 
   public async init() {
@@ -254,16 +266,16 @@ export class Squid {
 
     const { transactionRequest, params } = route;
 
-    const {
-      fromIsNative,
-      fromChain,
-      fromTokenContract,
-      fromProvider,
-      targetAddress
-    } = this.validateRouteData(route);
+    const { fromIsNative, fromChain, fromTokenContract, fromProvider } =
+      this.validateRouteData(route.params);
 
-    const { maxFeePerGas, maxPriorityFeePerGas, gasPrice, gasLimit } =
-      transactionRequest;
+    const {
+      targetAddress,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      gasPrice,
+      gasLimit
+    } = this.validateTransactionRequest(transactionRequest);
 
     let _gasParams = {};
     if (executionSettings?.setGasPrice) {
@@ -316,13 +328,11 @@ export class Squid {
   }> {
     this.validateInit();
 
-    const {
-      fromIsNative,
-      fromChain,
-      fromProvider,
-      fromTokenContract,
-      targetAddress
-    } = this.validateRouteData(route);
+    const { fromIsNative, fromChain, fromProvider, fromTokenContract } =
+      this.validateRouteData(route.params);
+    const { targetAddress } = this.validateTransactionRequest(
+      route.transactionRequest
+    );
 
     const {
       params: { fromAmount }
@@ -391,9 +401,12 @@ export class Squid {
   }: ApproveRoute): Promise<boolean> {
     this.validateInit();
 
-    const { fromIsNative, fromTokenContract, targetAddress } =
-      this.validateRouteData(route);
-
+    const { fromIsNative, fromTokenContract } = this.validateRouteData(
+      route.params
+    );
+    const targetAddress = this.validateTransactionRequest(
+      route.transactionRequest
+    );
     const {
       params: { fromAmount }
     } = route as RouteData;
