@@ -275,7 +275,7 @@ export class Squid {
       maxPriorityFeePerGas,
       gasPrice,
       gasLimit
-    } = this.validateTransactionRequest(transactionRequest);
+    } = route.transactionRequest;
 
     let _gasParams = {};
     if (executionSettings?.setGasPrice) {
