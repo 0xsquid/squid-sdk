@@ -395,16 +395,16 @@ export type YupError = {
 };
 
 export type ApiBasicResponse = {
-  error?: string | YupError[] | any;
-  errorType?: string;
+  errors?: string | YupError[];
+  status?: string;
 };
 
 export type StatusResponse = ApiBasicResponse & {
-  id: string;
-  status: string;
-  gasStatus: string;
+  id?: string;
+  status?: string;
+  gasStatus?: string;
   isGMPTransaction?: boolean;
-  axelarTransactionUrl: string;
+  axelarTransactionUrl?: string;
   fromChain?: TransactionStatus;
   toChain?: TransactionStatus;
   timeSpent?: Record<string, number>;

@@ -1,4 +1,9 @@
-import { ApiBasicResponse, TransactionStatus } from "../../types";
+import { AxiosResponse } from "axios";
+import {
+  ApiBasicResponse,
+  StatusResponse,
+  TransactionStatus
+} from "../../types";
 import { parseChainData } from "./chains";
 import { removeEmpty } from "./util";
 
@@ -21,11 +26,15 @@ export const parseTransactionStatus = (data: any) => {
   }) as TransactionStatus;
 };
 
-export const parseApiBasicResponse = (response: any) => {
-  const { error, errorType } = response;
-  return removeEmpty({ error, errorType }) as ApiBasicResponse;
+export const parseApiBasicResponse = (response: AxiosResponse) => {
+  const { data, status, statusText } = response;
+  return removeEmpty({
+    errors: data?.errors,
+    status: status < 400 ? data?.status : statusText
+  }) as ApiBasicResponse;
 };
-export const parseStatusResponse = (response: any) => {
+
+export const parseStatusResponse = (response: AxiosResponse) => {
   const apiBasicResponse = parseApiBasicResponse(response);
   const {
     id,
@@ -36,7 +45,7 @@ export const parseStatusResponse = (response: any) => {
     fromChain,
     toChain,
     timeSpent
-  } = response;
+  } = response.data;
   return removeEmpty({
     id,
     status,
@@ -47,5 +56,5 @@ export const parseStatusResponse = (response: any) => {
     toChain: parseTransactionStatus(toChain),
     timeSpent: timeSpent,
     ...apiBasicResponse
-  });
+  }) as StatusResponse;
 };
