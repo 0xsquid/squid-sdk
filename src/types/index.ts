@@ -395,8 +395,8 @@ export type YupError = {
 };
 
 export type ApiBasicResponse = {
-  errors?: string | YupError[];
-  status?: string;
+  error?: string | YupError[] | any;
+  errorType?: string;
 };
 
 export type StatusResponse = ApiBasicResponse & {
