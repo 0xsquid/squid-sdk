@@ -29,10 +29,13 @@ export const parseTransactionStatus = (data: any) => {
 export const parseApiBasicResponse = (response: AxiosResponse) => {
   const { data, status } = response;
   let apiBasicResponse = {};
-  if (status < 400) {
-    const { error, errorType } = data.errors[0];
+  if (status >= 400) {
+    const { message, errorType } = data.errors[0];
 
-    apiBasicResponse = removeEmpty({ error, errorType }) as ApiBasicResponse;
+    apiBasicResponse = removeEmpty({
+      error: message,
+      errorType
+    }) as ApiBasicResponse;
   }
 
   return apiBasicResponse as ApiBasicResponse;

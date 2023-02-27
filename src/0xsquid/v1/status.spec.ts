@@ -129,9 +129,9 @@ describe("status", () => {
   describe("parseApiBasicResponse", () => {
     describe("exact match", () => {
       const selected = fullResponse.data;
-      const expected = { errors: {} };
+      const expected = {};
       const errorResponse = {
-        statusText: "Not found",
+        status: 404,
         data: {
           errors: [
             {
@@ -146,14 +146,11 @@ describe("status", () => {
       it("should match provided data", () => {
         expect(result).toEqual(expected);
       });
-      it("should contain transactionId", () => {
-        expect(result).toHaveProperty("errors");
+      it("should contain errorType", () => {
+        expect(errorResult).toHaveProperty("errorType");
       });
       it("should contain errors", () => {
-        expect(errorResult).toHaveProperty("errors");
-      });
-      it("should contain error.status", () => {
-        expect(errorResult).toHaveProperty("status");
+        expect(errorResult).toHaveProperty("error");
       });
     });
   });
