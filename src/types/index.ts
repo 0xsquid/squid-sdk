@@ -274,6 +274,7 @@ export type SdkInfoResponse = {
   chains: ChainData[];
   tokens: TokenData[];
   axelarscanURL: string;
+  isInMaintenanceMode: boolean;
 };
 
 export type RouteResponse = {
