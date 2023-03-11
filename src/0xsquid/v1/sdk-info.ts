@@ -3,10 +3,11 @@ import { parseTokenDataList } from "./tokens";
 import { parseChainData } from "./chains";
 
 export const parseSdkInfoResponse = (response: any): SdkInfoResponse => {
-  const { chains, tokens, axelarscanURL } = response;
+  const { chains, tokens, axelarscanURL, isInMaintenanceMode } = response;
   return {
     chains: parseChainData(chains),
     tokens: parseTokenDataList(tokens),
-    axelarscanURL
+    axelarscanURL,
+    isInMaintenanceMode
   };
 };
