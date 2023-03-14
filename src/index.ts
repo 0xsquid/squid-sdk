@@ -39,6 +39,7 @@ export class Squid {
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainData[] = [] as ChainData[];
   public axelarscanURL: string | undefined;
+  public isInMaintenanceMode = false;
 
   constructor(config = {} as Config) {
     this.axiosInstance = setAxiosInterceptors(
@@ -217,6 +218,7 @@ export class Squid {
     this.tokens = typeResponse.tokens;
     this.chains = typeResponse.chains;
     this.axelarscanURL = typeResponse.axelarscanURL;
+    this.isInMaintenanceMode = typeResponse.isInMaintenanceMode;
     this.initialized = true;
   }
 
