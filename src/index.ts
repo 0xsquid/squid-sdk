@@ -406,9 +406,11 @@ export class Squid {
     const { fromIsNative, fromTokenContract } = this.validateRouteParams(
       route.params
     );
-    const targetAddress = this.validateTransactionRequest(
+
+    const { targetAddress } = this.validateTransactionRequest(
       route.transactionRequest
     );
+
     const {
       params: { fromAmount }
     } = route as RouteData;
