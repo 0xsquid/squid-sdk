@@ -1,5 +1,19 @@
 
 
+### [1.3.10](https://github.com/0xsquid/api-sdk/compare/v1.3.8...v1.3.10) (2023-03-15)
+
+
+### Features
+
+* add maintenance flag to sdkinfo route ([#95](https://github.com/0xsquid/api-sdk/issues/95)) ([a08cd15](https://github.com/0xsquid/api-sdk/commit/a08cd150d9839b25db87c90a2eebda37dec4f64b))
+
+
+### Bug Fixes
+
+* gasLimit issues ([#91](https://github.com/0xsquid/api-sdk/issues/91)) ([3d67599](https://github.com/0xsquid/api-sdk/commit/3d6759945b56eedf34ae0d3635424da1c5040a09))
+* getRoute response when quoteOnly flag is true ([#93](https://github.com/0xsquid/api-sdk/issues/93)) ([efb3802](https://github.com/0xsquid/api-sdk/commit/efb3802afda76abc419a3bd51358edceab0aace5))
+* provide maintenance attribute in squid class ([#97](https://github.com/0xsquid/api-sdk/issues/97)) ([29fe747](https://github.com/0xsquid/api-sdk/commit/29fe7470ab1029dc12ffbd450500d8edca4c1461))
+
 ### [1.3.9](https://github.com/0xsquid/api-sdk/compare/v1.3.8...v1.3.9) (2023-02-01)
 
 
