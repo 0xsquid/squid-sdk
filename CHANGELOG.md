@@ -1,5 +1,12 @@
 
 
+### [1.3.11](https://github.com/0xsquid/api-sdk/compare/v1.3.10...v1.3.11) (2023-03-15)
+
+
+### Bug Fixes
+
+* targetAddress variable deconstruction ([#99](https://github.com/0xsquid/api-sdk/issues/99)) ([c64952b](https://github.com/0xsquid/api-sdk/commit/c64952b4709f1e05a4fc68185b6689fbae35043c))
+
 ### [1.3.10](https://github.com/0xsquid/api-sdk/compare/v1.3.8...v1.3.10) (2023-03-15)
 
 
