@@ -176,7 +176,7 @@ export type GetRoute = {
   toAddress: string;
   slippage: number;
   quoteOnly?: boolean;
-  enableForecall?: boolean;
+  enableExpress?: boolean;
   customContractCalls?: ContractCall[];
   prefer?: string[];
   receiveGasOnDestination?: boolean;

@@ -228,7 +228,7 @@ export const parseParams = (data: any): RouteParams => {
     toAddress,
     slippage,
     quoteOnly, //optional
-    enableForecall //optional
+    enableExpress //optional
   } = data;
   return removeEmpty({
     fromChain,
@@ -239,7 +239,7 @@ export const parseParams = (data: any): RouteParams => {
     toAddress,
     slippage,
     quoteOnly,
-    enableForecall: enableForecall ? enableForecall : undefined,
+    enableExpress: enableExpress ? enableExpress : undefined,
     customContractCalls: data.customContractCalls
       ? parseCustomContractCall(data.customContractCalls)
       : undefined

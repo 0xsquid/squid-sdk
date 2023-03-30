@@ -157,7 +157,7 @@ describe("route", () => {
         aggregatePriceImpact: "0.69"
       },
       params: {
-        enableForecall: true,
+        enableExpress: true,
         slippage: 1,
         toAddress: "0x5F88eC396607Fc3edb0424E8E6061949e6b624e7",
         fromAmount: "10000000000000000",
@@ -523,13 +523,13 @@ describe("route", () => {
       it("should have property fromChain", () => {
         expect(result).toHaveProperty("fromChain");
       });
-      it("should not include optional property enableForecall", () => {
-        expect(result).not.toHaveProperty("enableForecall");
+      it("should not include optional property enableExpress", () => {
+        expect(result).not.toHaveProperty("enableExpress");
       });
     });
     describe("optional properties", () => {
       const data = {
-        enableForecall: true,
+        enableExpress: true,
         slippage: 90,
         toAddress: "0x5F88eC396607Fc3edb0424E8E6061949e6b624e7",
         fromAmount: "10000000000000000000",
@@ -567,8 +567,8 @@ describe("route", () => {
         ]
       };
       const result = parseParams(data);
-      it("should have optional property enableForecall", () => {
-        expect(result).toHaveProperty("enableForecall");
+      it("should have optional property enableExpress", () => {
+        expect(result).toHaveProperty("enableExpress");
       });
       it("should have optional property customContractCalls", () => {
         expect(result).toHaveProperty("customContractCalls");
