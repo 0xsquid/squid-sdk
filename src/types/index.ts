@@ -176,7 +176,7 @@ export type GetRoute = {
   toAddress: string;
   slippage: number;
   quoteOnly?: boolean;
-  enableForecall?: boolean;
+  enableExpress?: boolean;
   customContractCalls?: ContractCall[];
   prefer?: string[];
   receiveGasOnDestination?: boolean;
@@ -257,6 +257,7 @@ export type Estimate = {
   aggregatePriceImpact: string;
   feeCosts: FeeCost[];
   gasCosts: GasCost[];
+  isExpressSupported: boolean;
 };
 
 export type RouteParams = GetRoute & {
@@ -275,6 +276,7 @@ export type SdkInfoResponse = {
   tokens: TokenData[];
   axelarscanURL: string;
   isInMaintenanceMode: boolean;
+  expressDefaultDisabled: ChainName[];
 };
 
 export type RouteResponse = {
