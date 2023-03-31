@@ -162,7 +162,8 @@ export const parseEstimate = (data: any): Estimate => {
     estimatedRouteDuration,
     aggregatePriceImpact,
     feeCosts,
-    gasCosts
+    gasCosts,
+    isExpressSupported
   } = data;
   const estimate = {
     fromAmount,
@@ -176,7 +177,8 @@ export const parseEstimate = (data: any): Estimate => {
     estimatedRouteDuration,
     aggregatePriceImpact,
     feeCosts: parseFeeCost(feeCosts),
-    gasCosts: parseGasCost(gasCosts)
+    gasCosts: parseGasCost(gasCosts),
+    isExpressSupported
   } as Estimate;
   return estimate;
 };
