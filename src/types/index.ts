@@ -401,11 +401,11 @@ export type ApiBasicResponse = {
 };
 
 export type StatusResponse = ApiBasicResponse & {
-  id: string;
-  status: string;
-  gasStatus: string;
+  id?: string;
+  status?: string;
+  gasStatus?: string;
   isGMPTransaction?: boolean;
-  axelarTransactionUrl: string;
+  axelarTransactionUrl?: string;
   fromChain?: TransactionStatus;
   toChain?: TransactionStatus;
   timeSpent?: Record<string, number>;
