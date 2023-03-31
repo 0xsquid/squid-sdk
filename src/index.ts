@@ -28,6 +28,7 @@ import { ErrorType, SquidError } from "./error";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseRouteResponse } from "./0xsquid/v1/route";
+import { parseStatusResponse } from "./0xsquid/v1/status";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -521,7 +522,8 @@ export class Squid {
   public async getStatus(params: GetStatus): Promise<StatusResponse> {
     const response = await this.axiosInstance.get("/v1/status", { params });
 
-    return response.data;
+    const statusResponse: StatusResponse = parseStatusResponse(response);
+    return statusResponse;
   }
 
   public async getTokenPrice({
