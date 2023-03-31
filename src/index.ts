@@ -40,6 +40,7 @@ export class Squid {
   public tokens: TokenData[] = [] as TokenData[];
   public chains: ChainData[] = [] as ChainData[];
   public axelarscanURL: string | undefined;
+  public isInMaintenanceMode = false;
 
   constructor(config = {} as Config) {
     this.axiosInstance = setAxiosInterceptors(
@@ -218,6 +219,7 @@ export class Squid {
     this.tokens = typeResponse.tokens;
     this.chains = typeResponse.chains;
     this.axelarscanURL = typeResponse.axelarscanURL;
+    this.isInMaintenanceMode = typeResponse.isInMaintenanceMode;
     this.initialized = true;
   }
 
@@ -405,9 +407,11 @@ export class Squid {
     const { fromIsNative, fromTokenContract } = this.validateRouteParams(
       route.params
     );
-    const targetAddress = this.validateTransactionRequest(
+
+    const { targetAddress } = this.validateTransactionRequest(
       route.transactionRequest
     );
+
     const {
       params: { fromAmount }
     } = route as RouteData;

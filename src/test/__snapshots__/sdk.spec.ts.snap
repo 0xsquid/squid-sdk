@@ -28,6 +28,7 @@ Squid {
     "baseUrl": "https://testnet.api.0xsquid.com/",
   },
   "initialized": false,
+  "isInMaintenanceMode": false,
   "tokens": Array [],
 }
 `;
