@@ -1,5 +1,12 @@
 
 
+### [1.4.1](https://github.com/0xsquid/api-sdk/compare/v1.4.0...v1.4.1) (2023-04-05)
+
+
+### Features
+
+* add estimatedExpressRouteDuration property to chain ([#103](https://github.com/0xsquid/api-sdk/issues/103)) ([b03ec36](https://github.com/0xsquid/api-sdk/commit/b03ec36987b4c379093b1c40f6522ad464d3fd50))
+
 ## [1.4.0](https://github.com/0xsquid/api-sdk/compare/v1.3.11...v1.4.0) (2023-03-31)
 
 ### [1.3.11](https://github.com/0xsquid/api-sdk/compare/v1.3.10...v1.3.11) (2023-03-15)
