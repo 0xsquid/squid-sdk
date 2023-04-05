@@ -54,6 +54,7 @@ export type BaseChain = {
   chainIconURI: string;
   blockExplorerUrls: string[];
   estimatedRouteDuration: number;
+  estimatedExpressRouteDuration: number;
   nativeCurrency: {
     name: string;
     symbol: string;
