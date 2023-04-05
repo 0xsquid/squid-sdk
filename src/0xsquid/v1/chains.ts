@@ -54,7 +54,8 @@ export const parseBaseChain = (data: any): BaseChain => {
     blockExplorerUrls,
     axelarContracts,
     squidContracts,
-    estimatedRouteDuration
+    estimatedRouteDuration,
+    estimatedExpressRouteDuration
   } = data;
   return {
     chainName,
@@ -68,7 +69,8 @@ export const parseBaseChain = (data: any): BaseChain => {
     blockExplorerUrls,
     axelarContracts: parseAxelarContracts(axelarContracts),
     squidContracts: parseSquidContracts(squidContracts),
-    estimatedRouteDuration
+    estimatedRouteDuration,
+    estimatedExpressRouteDuration
   } as BaseChain;
 };
 
