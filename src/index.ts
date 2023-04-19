@@ -401,20 +401,17 @@ export class Squid {
       }
     ];
 
-    // TODO: gas price must be obtained from the backend
-    const simulation = await signer.simulate(signerAddress, broadcastMsg, "");
-    const gasMultiplier = 1.3;
-    const gasPrice = GasPrice.fromString("0.025uaxl");
+    // simulate tx to estimate gas cost
+    const estimatedGas = await signer.simulate(signerAddress, broadcastMsg, "");
+    const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
     return await signer.signAndBroadcast(
       signerAddress,
-      [
-        {
-          typeUrl: cosmosMsg.msgTypeUrl,
-          value: cosmosMsg.msg
-        }
-      ],
-      calculateFee(simulation * gasMultiplier, gasPrice)
+      broadcastMsg,
+      calculateFee(
+        Math.trunc(estimatedGas * gasMultiplier),
+        GasPrice.fromString(route.transactionRequest!.gasPrice)
+      )
     );
   }
 
