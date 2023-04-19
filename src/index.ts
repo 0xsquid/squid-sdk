@@ -1,5 +1,13 @@
 import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
+import {
+  Coin,
+  DeliverTxResponse,
+  GasPrice,
+  SigningStargateClient,
+  calculateFee
+} from "@cosmjs/stargate";
+import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 
 import {
   Allowance,
@@ -18,7 +26,8 @@ import {
   ValidateBalanceAndApproval,
   ChainData,
   RouteParams,
-  TransactionRequest
+  TransactionRequest,
+  CosmosMsg
 } from "./types";
 
 import erc20Abi from "./abi/erc20.json";
@@ -205,6 +214,32 @@ export class Squid {
     return transactionRequest;
   }
 
+  private async validateCosmosBalance(
+    signer: SigningStargateClient,
+    signerAddress: string,
+    coin: Coin
+  ): Promise<void> {
+    const signerCoinBalance = await signer.getBalance(
+      signerAddress,
+      coin.denom
+    );
+    console.log(
+      `VALIDATING BALANCE, CURRENT: ${JSON.stringify(signerCoinBalance)}`
+    );
+
+    const currentBalance = ethers.BigNumber.from(signerCoinBalance.amount);
+    const transferAmount = ethers.BigNumber.from(coin.amount);
+
+    if (transferAmount.gt(currentBalance)) {
+      throw new SquidError({
+        message: `transfer amount is greater then account balance`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+  }
+
   public async init() {
     const response = await this.axiosInstance.get("/v1/sdk-info");
     if (response.status != 200) {
@@ -252,11 +287,27 @@ export class Squid {
 
   public async executeRoute({
     signer,
+    signerAddress,
     route,
     executionSettings,
     overrides
-  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
+  }: ExecuteRoute): Promise<
+    ethers.providers.TransactionResponse | DeliverTxResponse
+  > {
     this.validateInit();
+
+    // handle cosmos case
+    if (
+      signer instanceof SigningStargateClient ||
+      signer.constructor.name === "SigningStargateClient"
+    ) {
+      console.log("HERE");
+      return await this.executeRouteCosmos(
+        signer as SigningStargateClient,
+        signerAddress!,
+        route
+      );
+    }
 
     if (!route.transactionRequest) {
       throw new SquidError({
@@ -323,6 +374,48 @@ export class Squid {
     }
 
     return await signer.sendTransaction(tx);
+  }
+
+  private async executeRouteCosmos(
+    signer: SigningStargateClient,
+    signerAddress: string,
+    route: RouteData
+  ): Promise<DeliverTxResponse> {
+    console.log("EXECUTE COSMOS MSG TRIGGERED");
+    const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
+
+    // setting sender address for MsgTransfer since we don't have it on the backend
+    cosmosMsg.msg.sender = signerAddress;
+
+    // validating that user has enough balance for the transfer
+    await this.validateCosmosBalance(
+      signer,
+      signerAddress,
+      cosmosMsg.msg.token!
+    );
+
+    const broadcastMsg = [
+      {
+        typeUrl: cosmosMsg.msgTypeUrl,
+        value: cosmosMsg.msg
+      }
+    ];
+
+    // TODO: gas price must be obtained from the backend
+    const simulation = await signer.simulate(signerAddress, broadcastMsg, "");
+    const gasMultiplier = 1.3;
+    const gasPrice = GasPrice.fromString("0.025uaxl");
+
+    return await signer.signAndBroadcast(
+      signerAddress,
+      [
+        {
+          typeUrl: cosmosMsg.msgTypeUrl,
+          value: cosmosMsg.msg
+        }
+      ],
+      calculateFee(simulation * gasMultiplier, gasPrice)
+    );
   }
 
   public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
