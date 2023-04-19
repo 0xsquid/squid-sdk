@@ -1,5 +1,7 @@
 import { ethers } from "ethers";
 import { LogLevel } from "../error";
+import { SigningStargateClient } from "@cosmjs/stargate";
+import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 
 export enum ChainName {
   AGORIC = "Agoric",
@@ -298,7 +300,8 @@ export type OverrideParams = Omit<
 >;
 
 export type ExecuteRoute = {
-  signer: ethers.Wallet | ethers.Signer;
+  signer: ethers.Wallet | ethers.Signer | SigningStargateClient;
+  signerAddress?: string;
   route: RouteData;
   executionSettings?: {
     infiniteApproval?: boolean;
@@ -412,4 +415,9 @@ export type StatusResponse = ApiBasicResponse & {
   fromChain?: TransactionStatus;
   toChain?: TransactionStatus;
   timeSpent?: Record<string, number>;
+};
+
+export type CosmosMsg = {
+  msgTypeUrl: string;
+  msg: MsgTransfer;
 };
