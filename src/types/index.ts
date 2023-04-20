@@ -143,6 +143,8 @@ export type TokenData = {
   decimals: number;
   logoURI: string;
   coingeckoId: string;
+  commonKey?: string;
+  bridgeOnly?: boolean;
 };
 
 export type Config = {

@@ -1,17 +1,28 @@
 import { TokenData, TokensResponse } from "../../types";
-
+import { removeEmpty } from "./util";
 export const parseTokenData = (data: any): TokenData => {
-  const { chainId, address, name, symbol, decimals, logoURI, coingeckoId } =
-    data;
-  return {
+  const {
     chainId,
     address,
     name,
     symbol,
     decimals,
     logoURI,
+    coingeckoId,
+    commonKey,
+    bridgeOnly
+  } = data;
+  return removeEmpty({
+    chainId,
+    address,
+    name,
+    symbol,
+    decimals,
+    logoURI,
+    bridgeOnly,
+    commonKey,
     coingeckoId
-  };
+  });
 };
 
 export const parseTokenDataList = (data: any[]): TokenData[] => {
