@@ -381,11 +381,7 @@ export class Squid {
     signerAddress: string,
     route: RouteData
   ): Promise<DeliverTxResponse> {
-    console.log("EXECUTE COSMOS MSG TRIGGERED");
     const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
-
-    // setting sender address for MsgTransfer since we don't have it on the backend
-    cosmosMsg.msg.sender = signerAddress;
 
     // validating that user has enough balance for the transfer
     await this.validateCosmosBalance(

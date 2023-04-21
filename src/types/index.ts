@@ -175,6 +175,7 @@ export type GetRoute = {
   toChain: number | string;
   fromToken: string;
   toToken: string;
+  cosmosSignerAddress?: string;
   fromAmount: string;
   toAddress: string;
   slippage: number;
