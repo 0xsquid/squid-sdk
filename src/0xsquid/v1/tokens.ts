@@ -10,7 +10,8 @@ export const parseTokenData = (data: any): TokenData => {
     logoURI,
     coingeckoId,
     commonKey,
-    bridgeOnly
+    bridgeOnly,
+    ibcDenom
   } = data;
   return removeEmpty({
     chainId,
@@ -19,9 +20,10 @@ export const parseTokenData = (data: any): TokenData => {
     symbol,
     decimals,
     logoURI,
-    bridgeOnly,
+    coingeckoId,
     commonKey,
-    coingeckoId
+    bridgeOnly,
+    ibcDenom
   });
 };
 

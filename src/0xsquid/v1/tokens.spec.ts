@@ -34,6 +34,19 @@ describe("tokens", () => {
         logoURI:
           "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png",
         coingeckoId: "dai"
+      },
+      {
+        chainId: "agoric-3",
+        address: "uusdc",
+        name: "Axelar USDC",
+        symbol: "axlUSDC",
+        decimals: 6,
+        logoURI:
+          "https://s2.coinmarketcap.com/static/img/coins/64x64/21420.png",
+        coingeckoId: "axlusdc",
+        commonKey: "uusdc",
+        ibcDenom:
+          "ibc/295548A78785A1007F232DE286149A6FF512F180AF5657780FC89C009E2C348F"
       }
     ]
   };
@@ -61,6 +74,19 @@ describe("tokens", () => {
       });
       it("should contain logoURI", () => {
         expect(expected).toHaveProperty("logoURI");
+      });
+      it("should not contain ibcDenom if it's an evm token", () => {
+        expect(selected.ibcDenom).toBeUndefined();
+      });
+    });
+  });
+  describe("parseCosmosTokenData", () => {
+    describe("exact match", () => {
+      const selected = data.tokens[3];
+      const expected = parseTokenData(selected);
+
+      it("should contain ibcDenom if it's cosmos token", () => {
+        expect(expected.ibcDenom).toBeDefined();
       });
     });
   });
