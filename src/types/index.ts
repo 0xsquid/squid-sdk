@@ -314,6 +314,7 @@ export type ExecuteRoute = {
     setGasPrice?: boolean;
   };
   overrides?: OverrideParams;
+  safeContext?: boolean;
 };
 
 export type Allowance = {
