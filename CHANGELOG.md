@@ -1,5 +1,17 @@
 
 
+## [1.5.0](https://github.com/0xsquid/api-sdk/compare/v1.4.1...v1.5.0) (2023-04-25)
+
+
+### Features
+
+* add filecoin chain ([#105](https://github.com/0xsquid/api-sdk/issues/105)) ([b99c885](https://github.com/0xsquid/api-sdk/commit/b99c885a0fcba9abb3b945af8f6bc1188b60c311))
+
+
+### Bug Fixes
+
+* add bridgeOnly property ([#107](https://github.com/0xsquid/api-sdk/issues/107)) ([42ed8dc](https://github.com/0xsquid/api-sdk/commit/42ed8dc9476854f472b5c3fd7acacadb67c4a95d))
+
 ### [1.4.3](https://github.com/0xsquid/api-sdk/compare/v1.4.1...v1.4.3) (2023-04-20)
 
 
