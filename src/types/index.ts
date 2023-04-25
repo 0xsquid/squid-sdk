@@ -145,6 +145,7 @@ export type TokenData = {
   coingeckoId: string;
   commonKey?: string;
   bridgeOnly?: boolean;
+  ibcDenom?: string;
 };
 
 export type Config = {
