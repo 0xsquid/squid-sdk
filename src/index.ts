@@ -1,8 +1,6 @@
-import { BigNumber, ethers } from "ethers";
+import { SendTransactionsResponse } from "@safe-global/safe-apps-sdk";
 import axios, { AxiosInstance } from "axios";
-import SafeAppsSDK, {
-  SendTransactionsResponse
-} from "@safe-global/safe-apps-sdk";
+import { BigNumber, ethers } from "ethers";
 
 import {
   Allowance,
@@ -32,8 +30,6 @@ import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseStatusResponse } from "./0xsquid/v1/status";
-
-const appsSdk = new SafeAppsSDK({ debug: true });
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
