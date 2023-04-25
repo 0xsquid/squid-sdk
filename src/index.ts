@@ -343,7 +343,7 @@ export class Squid {
         safeTxGas: parseInt(transactionRequest.gasLimit)
       };
 
-      return await appsSdk.txs.send({ txs, params });
+      return await safeContext.txs.send({ txs, params });
     }
 
     return await signer.sendTransaction(tx);
