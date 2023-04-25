@@ -1,5 +1,8 @@
 import { BigNumber, ethers } from "ethers";
 import axios, { AxiosInstance } from "axios";
+import SafeAppsSDK, {
+  SendTransactionsResponse
+} from "@safe-global/safe-apps-sdk";
 
 import {
   Allowance,
@@ -29,6 +32,8 @@ import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseStatusResponse } from "./0xsquid/v1/status";
+
+const appsSdk = new SafeAppsSDK({ debug: true });
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -254,8 +259,11 @@ export class Squid {
     signer,
     route,
     executionSettings,
-    overrides
-  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
+    overrides,
+    safeContext
+  }: ExecuteRoute): Promise<
+    ethers.providers.TransactionResponse | SendTransactionsResponse
+  > {
     this.validateInit();
 
     if (!route.transactionRequest) {
@@ -320,6 +328,22 @@ export class Squid {
         ...tx,
         value
       };
+    }
+
+    if (safeContext) {
+      const txs = [
+        {
+          to: targetAddress,
+          data: transactionRequest.data,
+          value: transactionRequest.value.toString()
+        }
+      ];
+
+      const params = {
+        safeTxGas: parseInt(transactionRequest.gasLimit)
+      };
+
+      return await appsSdk.txs.send({ txs, params });
     }
 
     return await signer.sendTransaction(tx);
