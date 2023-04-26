@@ -1,5 +1,6 @@
-import { BigNumber, ethers } from "ethers";
+import { SendTransactionsResponse } from "@safe-global/safe-apps-sdk";
 import axios, { AxiosInstance } from "axios";
+import { BigNumber, ethers } from "ethers";
 
 import {
   Allowance,
@@ -254,8 +255,11 @@ export class Squid {
     signer,
     route,
     executionSettings,
-    overrides
-  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
+    overrides,
+    safeContext
+  }: ExecuteRoute): Promise<
+    ethers.providers.TransactionResponse | SendTransactionsResponse
+  > {
     this.validateInit();
 
     if (!route.transactionRequest) {
@@ -320,6 +324,22 @@ export class Squid {
         ...tx,
         value
       };
+    }
+
+    if (safeContext) {
+      const txs = [
+        {
+          to: targetAddress,
+          data: transactionRequest.data,
+          value: transactionRequest.value.toString()
+        }
+      ];
+
+      const params = {
+        safeTxGas: parseInt(transactionRequest.gasLimit)
+      };
+
+      return await safeContext.txs.send({ txs, params });
     }
 
     return await signer.sendTransaction(tx);
