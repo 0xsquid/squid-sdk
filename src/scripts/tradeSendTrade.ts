@@ -35,11 +35,11 @@ const excecuteTradeSendTrade = async (
     signer,
     route
   });
-  const txReceipt = await tx.wait();
+  const txReceipt = (await (tx as ethers.TransactionResponse).wait(
+    1
+  )) as ethers.TransactionReceipt;
   console.log(
-    `> txReceipt: , ${
-      txReceipt.transactionHash
-    }, gasUsed: ${txReceipt.gasUsed.toNumber()} `
+    `> txReceipt: , ${txReceipt.hash}, gasUsed: ${txReceipt.gasUsed} `
   );
 };
 

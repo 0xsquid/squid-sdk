@@ -8,7 +8,7 @@ dotenv.config();
 
 const privateKey = process.env.privateKey as string;
 const ethRpcEndPoint = process.env.ethRpcEndPoint as string;
-const provider = new ethers.providers.JsonRpcProvider(ethRpcEndPoint);
+const provider = new ethers.JsonRpcProvider(ethRpcEndPoint);
 
 async function main() {
   const signer = new ethers.Wallet(privateKey, provider);

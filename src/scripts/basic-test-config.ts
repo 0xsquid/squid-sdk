@@ -3,8 +3,8 @@ import { ethers } from "ethers";
 
 export async function getTestCases(squidSdk: Squid, toAddress: string) {
   //constants
-  const tokenAmount = ethers.utils.parseEther(".1").toString(); // 0.1 WETH
-  const usdc = ethers.utils.parseUnits("1", 6).toString(); // 1 aUSDC
+  const tokenAmount = ethers.parseEther(".1").toString(); // 0.1 WETH
+  const usdc = ethers.parseUnits("1", 6).toString(); // 1 aUSDC
   //add test cases here
 
   return [

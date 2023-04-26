@@ -25,9 +25,7 @@ const buildParam = (
     toChain,
     fromToken,
     toToken,
-    fromAmount: ethers.utils
-      .parseUnits(fromAmount, fromTokenDecimals)
-      .toString(),
+    fromAmount: ethers.parseUnits(fromAmount, fromTokenDecimals).toString(),
     toAddress,
     slippage: 1
   } as GetRoute;
@@ -51,19 +49,19 @@ export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
 
   switch (chain) {
     case ChainName.ETHEREUM:
-      provider = new ethers.providers.JsonRpcProvider(ethereumRpc);
+      provider = new ethers.JsonRpcProvider(ethereumRpc);
       signer = new ethers.Wallet(privateKey, provider);
       break;
     case ChainName.AVALANCHE:
-      provider = new ethers.providers.JsonRpcProvider(avalanceRpc);
+      provider = new ethers.JsonRpcProvider(avalanceRpc);
       signer = new ethers.Wallet(privateKey, provider);
       break;
     case ChainName.MOONBEAM:
-      provider = new ethers.providers.JsonRpcProvider(moonbeamRpc);
+      provider = new ethers.JsonRpcProvider(moonbeamRpc);
       signer = new ethers.Wallet(privateKey, provider);
       break;
     case ChainName.POLYGON:
-      provider = new ethers.providers.JsonRpcProvider(polygonRpc);
+      provider = new ethers.JsonRpcProvider(polygonRpc);
       signer = new ethers.Wallet(privateKey, provider);
       break;
   }
