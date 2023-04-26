@@ -1,5 +1,12 @@
 
 
+### [1.5.1](https://github.com/0xsquid/api-sdk/compare/v1.5.0...v1.5.1) (2023-04-26)
+
+
+### Features
+
+* implement Safe Contract sdk execution ([#111](https://github.com/0xsquid/api-sdk/issues/111)) ([cb2f940](https://github.com/0xsquid/api-sdk/commit/cb2f940fe0e68466b2f6171a45a4037a6b29bef9))
+
 ## [1.5.0](https://github.com/0xsquid/api-sdk/compare/v1.4.1...v1.5.0) (2023-04-25)
 
 
