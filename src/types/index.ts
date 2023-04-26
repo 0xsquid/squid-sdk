@@ -303,7 +303,7 @@ export type TokensResponse = {
 };
 
 export type OverrideParams = Omit<
-  ethers.providers.TransactionRequest,
+  ethers.TransactionRequest,
   "to" | "data" | "value" | "from"
 >;
 
@@ -354,13 +354,13 @@ export type RouteParamsData = {
   fromToken: TokenData | undefined;
   toToken: TokenData | undefined;
   fromTokenContract: ethers.Contract | undefined;
-  fromProvider: ethers.providers.JsonRpcProvider;
+  fromProvider: ethers.JsonRpcProvider;
   fromIsNative: boolean;
 };
 
 export type ValidateBalanceAndApproval = {
   fromTokenContract: ethers.Contract;
-  fromProvider: ethers.providers.JsonRpcProvider;
+  fromProvider: ethers.JsonRpcProvider;
   fromIsNative: boolean;
   fromAmount: string;
   targetAddress: string;

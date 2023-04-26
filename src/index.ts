@@ -1,6 +1,6 @@
 import { SendTransactionsResponse } from "@safe-global/safe-apps-sdk";
 import axios, { AxiosInstance } from "axios";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 
 import {
   Allowance,
@@ -83,19 +83,13 @@ export class Squid {
     infiniteApproval,
     overrides
   }: ValidateBalanceAndApproval) {
-    const _sourceAmount = ethers.BigNumber.from(fromAmount);
-    let address;
-
-    if (signer && ethers.Signer.isSigner(signer)) {
-      address = await (signer as ethers.Signer).getAddress();
-    } else {
-      address = (signer as ethers.Wallet).address;
-    }
+    const _sourceAmount = BigInt(fromAmount);
+    const address = await signer.getAddress();
 
     if (!fromIsNative) {
       const balance = await fromTokenContract.balanceOf(address);
 
-      if (_sourceAmount.gt(balance)) {
+      if (_sourceAmount > balance) {
         throw new SquidError({
           message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
@@ -109,8 +103,8 @@ export class Squid {
         targetAddress
       );
 
-      if (_sourceAmount.gt(allowance)) {
-        let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
+      if (_sourceAmount > allowance) {
+        let amountToApprove = BigInt(uint256MaxValue);
 
         if (infiniteApproval === false) {
           amountToApprove = _sourceAmount;
@@ -120,7 +114,7 @@ export class Squid {
           this.config?.executionSettings?.infiniteApproval === false &&
           !infiniteApproval
         ) {
-          amountToApprove = ethers.BigNumber.from(uint256MaxValue);
+          amountToApprove = BigInt(uint256MaxValue);
         }
 
         const approveTx = await fromTokenContract
@@ -131,7 +125,7 @@ export class Squid {
     } else {
       const balance = await fromProvider.getBalance(address);
 
-      if (_sourceAmount.gt(balance)) {
+      if (_sourceAmount > balance) {
         throw new SquidError({
           message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
@@ -168,7 +162,7 @@ export class Squid {
       });
     }
 
-    const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
+    const fromProvider = new ethers.JsonRpcProvider(_fromChain.rpc);
 
     const fromIsNative = fromToken.address === nativeTokenConstant;
     let fromTokenContract;
@@ -258,7 +252,7 @@ export class Squid {
     overrides,
     safeContext
   }: ExecuteRoute): Promise<
-    ethers.providers.TransactionResponse | SendTransactionsResponse
+    ethers.TransactionResponse | SendTransactionsResponse
   > {
     this.validateInit();
 
@@ -311,13 +305,13 @@ export class Squid {
       });
     }
 
-    const value = ethers.BigNumber.from(route.transactionRequest.value);
+    const value = BigInt(route.transactionRequest.value);
 
     let tx = {
       to: targetAddress,
       data: transactionRequest.data,
       ..._overrides
-    } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
+    } as ethers.TransactionRequest;
 
     if (transactionRequest.routeType !== "SEND") {
       tx = {
@@ -361,14 +355,14 @@ export class Squid {
       params: { fromAmount }
     } = route;
 
-    const amount = ethers.BigNumber.from(fromAmount);
+    const amount = BigInt(fromAmount);
 
     if (!fromIsNative) {
       const balance = await (fromTokenContract as ethers.Contract).balanceOf(
         sender
       );
 
-      if (amount.gt(balance)) {
+      if (amount > balance) {
         throw new SquidError({
           message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
@@ -382,7 +376,7 @@ export class Squid {
         targetAddress
       );
 
-      if (amount.gt(allowance)) {
+      if (amount > allowance) {
         throw new SquidError({
           message: `Insufficient allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
@@ -400,7 +394,7 @@ export class Squid {
     } else {
       const balance = await fromProvider.getBalance(sender);
 
-      if (amount.gt(balance)) {
+      if (amount > balance) {
         throw new SquidError({
           message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
@@ -440,10 +434,10 @@ export class Squid {
       return true;
     }
 
-    let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
+    let amountToApprove = BigInt(uint256MaxValue);
 
     if (executionSettings?.infiniteApproval === false) {
-      amountToApprove = ethers.BigNumber.from(fromAmount);
+      amountToApprove = BigInt(fromAmount);
     }
 
     const approveTx = await (fromTokenContract as ethers.Contract)
@@ -459,7 +453,7 @@ export class Squid {
     spender,
     tokenAddress,
     chainId
-  }: Allowance): Promise<BigNumber> {
+  }: Allowance): Promise<bigint> {
     this.validateInit();
 
     const token = getTokenData(
@@ -489,7 +483,7 @@ export class Squid {
       });
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
+    const provider = new ethers.JsonRpcProvider(chain.rpc);
     const contract = new ethers.Contract(token.address, erc20Abi, provider);
     return await contract.allowance(owner, spender);
   }
@@ -501,7 +495,7 @@ export class Squid {
     amount,
     chainId,
     overrides
-  }: Approve): Promise<ethers.providers.TransactionResponse> {
+  }: Approve): Promise<ethers.TransactionResponse> {
     this.validateInit();
 
     const token = getTokenData(
