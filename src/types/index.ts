@@ -359,7 +359,7 @@ export type RouteParamsData = {
 };
 
 export type ValidateBalanceAndApproval = {
-  fromTokenContract: ethers.Contract;
+  fromTokenContract: ethers.Contract | undefined;
   fromProvider: ethers.JsonRpcProvider;
   fromIsNative: boolean;
   fromAmount: string;

@@ -87,7 +87,9 @@ export class Squid {
     const address = await signer.getAddress();
 
     if (!fromIsNative) {
-      const balance = await fromTokenContract.balanceOf(address);
+      const balance = await (fromTokenContract as ethers.Contract).balanceOf(
+        address
+      );
 
       if (_sourceAmount > balance) {
         throw new SquidError({
@@ -98,7 +100,7 @@ export class Squid {
         });
       }
 
-      const allowance = await fromTokenContract.allowance(
+      const allowance = await (fromTokenContract as ethers.Contract).allowance(
         address,
         targetAddress
       );
@@ -117,8 +119,8 @@ export class Squid {
           amountToApprove = BigInt(uint256MaxValue);
         }
 
-        fromTokenContract.connect(signer);
-        const approveTx = await fromTokenContract.approve(
+        (fromTokenContract as ethers.Contract).connect(signer);
+        const approveTx = await (fromTokenContract as ethers.Contract).approve(
           targetAddress,
           amountToApprove,
           overrides
@@ -362,7 +364,9 @@ export class Squid {
     const amount = BigInt(fromAmount);
 
     if (!fromIsNative) {
-      const balance = await fromTokenContract.balanceOf(sender);
+      const balance = await (fromTokenContract as ethers.Contract).balanceOf(
+        sender
+      );
 
       if (amount > balance) {
         throw new SquidError({
@@ -373,7 +377,7 @@ export class Squid {
         });
       }
 
-      const allowance = await fromTokenContract.allowance(
+      const allowance = await (fromTokenContract as ethers.Contract).allowance(
         sender,
         targetAddress
       );
@@ -389,7 +393,9 @@ export class Squid {
 
       return {
         isApproved: true,
-        message: `User has approved Squid to use ${fromAmount} of ${await fromTokenContract.symbol()}`
+        message: `User has approved Squid to use ${fromAmount} of ${await (
+          fromTokenContract as ethers.Contract
+        ).symbol()}`
       };
     } else {
       const balance = await fromProvider.getBalance(sender);
@@ -440,8 +446,8 @@ export class Squid {
       amountToApprove = BigInt(fromAmount);
     }
 
-    fromTokenContract.connect(signer);
-    const approveTx = await fromTokenContract.approve(
+    (fromTokenContract as ethers.Contract).connect(signer);
+    const approveTx = await (fromTokenContract as ethers.Contract).approve(
       targetAddress,
       amountToApprove,
       overrides
