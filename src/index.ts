@@ -119,12 +119,11 @@ export class Squid {
           amountToApprove = BigInt(uint256MaxValue);
         }
 
-        (fromTokenContract as ethers.Contract).connect(signer);
-        const approveTx = await (fromTokenContract as ethers.Contract).approve(
-          targetAddress,
-          amountToApprove,
-          overrides
-        );
+        const _fromTokenContract = fromTokenContract as ethers.Contract;
+
+        const approveTx = await (
+          _fromTokenContract.connect(signer) as ethers.Contract
+        ).approve(targetAddress, amountToApprove, overrides);
         await approveTx.wait();
       }
     } else {
@@ -143,8 +142,7 @@ export class Squid {
 
   private validateRouteParams(params: RouteParams): RouteParamsData {
     const { fromChain, toChain, fromToken, toToken } = params;
-    const contract2 = new ethers.Contract("", erc20Abi);
-    contract2.transfer();
+
     const _fromChain = getChainData(
       this.chains as ChainData[],
       params.fromChain
@@ -446,12 +444,11 @@ export class Squid {
       amountToApprove = BigInt(fromAmount);
     }
 
-    (fromTokenContract as ethers.Contract).connect(signer);
-    const approveTx = await (fromTokenContract as ethers.Contract).approve(
-      targetAddress,
-      amountToApprove,
-      overrides
-    );
+    const _fromTokenContract = fromTokenContract as ethers.Contract;
+
+    const approveTx = await (
+      _fromTokenContract.connect(signer) as ethers.Contract
+    ).approve(targetAddress, amountToApprove, overrides);
     await approveTx.wait();
 
     return true;
