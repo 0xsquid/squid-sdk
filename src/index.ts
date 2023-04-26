@@ -1,6 +1,6 @@
 import { SendTransactionsResponse } from "@safe-global/safe-apps-sdk";
-import axios, { AxiosInstance } from "axios";
 import { ethers } from "ethers";
+import axios, { AxiosInstance } from "axios";
 
 import {
   Allowance,
