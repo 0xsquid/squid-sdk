@@ -1,5 +1,7 @@
 
 
+### [1.4.2-alpha.0](https://github.com/0xsquid/api-sdk/compare/v1.4.1...v1.4.2-alpha.0) (2023-05-03)
+
 ### [1.4.1](https://github.com/0xsquid/api-sdk/compare/v1.4.0...v1.4.1) (2023-04-05)
 
 
