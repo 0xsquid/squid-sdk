@@ -1,4 +1,3 @@
-import SafeAppsSDK from "@safe-global/safe-apps-sdk/dist/src/sdk";
 import { ethers } from "ethers";
 import { LogLevel } from "../error";
 
@@ -315,7 +314,6 @@ export type ExecuteRoute = {
     setGasPrice?: boolean;
   };
   overrides?: OverrideParams;
-  safeContext?: SafeAppsSDK;
 };
 
 export type Allowance = {
