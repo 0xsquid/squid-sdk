@@ -1,5 +1,12 @@
 
 
+## [1.6.0](https://github.com/0xsquid/api-sdk/compare/v1.5.1...v1.6.0) (2023-05-03)
+
+
+### Reverts
+
+* Revert "feat: implement Safe Contract sdk execution (#111)" (#115) ([05b2853](https://github.com/0xsquid/api-sdk/commit/05b2853cc3c91a6afc221b9fa4d6e7d16ca09023)), closes [#111](https://github.com/0xsquid/api-sdk/issues/111) [#115](https://github.com/0xsquid/api-sdk/issues/115)
+
 ### [1.5.1](https://github.com/0xsquid/api-sdk/compare/v1.5.0...v1.5.1) (2023-04-26)
 
 
