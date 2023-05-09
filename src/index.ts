@@ -404,10 +404,11 @@ export class Squid {
     return await signer.signAndBroadcast(
       signerAddress,
       broadcastMsg,
-      calculateFee(
-        Math.trunc(estimatedGas * gasMultiplier),
-        GasPrice.fromString(route.transactionRequest!.gasPrice)
-      )
+      0 // assuming that dydx has no fees, setting them to be 0
+      // calculateFee(
+      //   Math.trunc(estimatedGas * gasMultiplier),
+      //   GasPrice.fromString(route.transactionRequest!.gasPrice)
+      // )
     );
   }
 
