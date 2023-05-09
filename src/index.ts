@@ -398,17 +398,24 @@ export class Squid {
     ];
 
     // simulate tx to estimate gas cost
+    if (route.params.fromChain === "dydxprotocol-testnet") {
+      return await signer.signAndBroadcast(
+        signerAddress,
+        broadcastMsg,
+        0 // assuming that dydx has no fees, setting them to be 0
+      );
+    }
+
     const estimatedGas = await signer.simulate(signerAddress, broadcastMsg, "");
     const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
     return await signer.signAndBroadcast(
       signerAddress,
       broadcastMsg,
-      0 // assuming that dydx has no fees, setting them to be 0
-      // calculateFee(
-      //   Math.trunc(estimatedGas * gasMultiplier),
-      //   GasPrice.fromString(route.transactionRequest!.gasPrice)
-      // )
+      calculateFee(
+        Math.trunc(estimatedGas * gasMultiplier),
+        GasPrice.fromString(route.transactionRequest!.gasPrice)
+      )
     );
   }
 
