@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosResponseHeaders } from "axios";
 import {
   ApiBasicResponse,
   StatusResponse,
@@ -44,7 +44,10 @@ export const parseApiBasicResponse = (response: AxiosResponse) => {
   return apiBasicResponse as ApiBasicResponse;
 };
 
-export const parseStatusResponse = (response: AxiosResponse) => {
+export const parseStatusResponse = (
+  response: any,
+  headers: AxiosResponseHeaders
+) => {
   const apiBasicResponse = parseApiBasicResponse(response);
   const {
     id,
@@ -65,8 +68,14 @@ export const parseStatusResponse = (response: AxiosResponse) => {
     fromChain: parseTransactionStatus(fromChain),
     toChain: parseTransactionStatus(toChain),
     timeSpent: timeSpent,
-    requestId: response.headers["x-request-id"],
-    integratorId: response.headers["x-integrator-id"],
+    requestId:
+      headers && "x-request-id" in headers
+        ? (headers["x-request-id"] as string)
+        : undefined,
+    integratorId:
+      headers && "x-integrator-id" in headers
+        ? (headers["x-integrator-id"] as string)
+        : undefined,
     ...apiBasicResponse
   }) as StatusResponse;
 };

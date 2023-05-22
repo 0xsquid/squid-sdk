@@ -157,7 +157,7 @@ describe("status", () => {
   describe("parseStatusResponse", () => {
     describe("exact match", () => {
       const selected = fullResponse;
-      const result = parseStatusResponse(selected);
+      const result = parseStatusResponse(selected, {});
       it("should match provided data", () => {
         expect(result).toEqual(result);
       });

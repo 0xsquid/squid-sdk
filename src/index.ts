@@ -248,7 +248,10 @@ export class Squid {
       });
     }
 
-    const route: RouteResponse = parseRouteResponse(response.data);
+    const route: RouteResponse = parseRouteResponse(
+      response.data,
+      response.headers
+    );
     return route;
   }
 
@@ -537,7 +540,10 @@ export class Squid {
       }
     });
 
-    const statusResponse: StatusResponse = parseStatusResponse(response);
+    const statusResponse: StatusResponse = parseStatusResponse(
+      response.data,
+      response.headers
+    );
     return statusResponse;
   }
 

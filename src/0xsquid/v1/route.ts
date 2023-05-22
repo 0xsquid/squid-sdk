@@ -16,6 +16,7 @@ import {
 } from "../../types";
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
+import { AxiosResponseHeaders } from "axios";
 
 export const parseBridge = (data: any): Call => {
   const {
@@ -248,13 +249,22 @@ export const parseParams = (data: any): RouteParams => {
   });
 };
 
-export const parseRouteResponse = (response: any): RouteResponse => {
+export const parseRouteResponse = (
+  response: any,
+  headers: AxiosResponseHeaders
+): RouteResponse => {
   const {
     route: { estimate, transactionRequest, params }
   } = response;
   const routeResponse = removeEmpty({
-    requestId: response.headers["x-request-id"],
-    integratorId: response.headers["x-integrator-id"],
+    requestId:
+      headers && "x-request-id" in headers
+        ? (headers["x-request-id"] as string)
+        : undefined,
+    integratorId:
+      headers && "x-integrator-id" in headers
+        ? (headers["x-integrator-id"] as string)
+        : undefined,
     route: {
       estimate: parseEstimate(estimate),
       transactionRequest: transactionRequest
