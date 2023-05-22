@@ -65,6 +65,8 @@ export const parseStatusResponse = (response: AxiosResponse) => {
     fromChain: parseTransactionStatus(fromChain),
     toChain: parseTransactionStatus(toChain),
     timeSpent: timeSpent,
+    requestId: response.headers["x-request-id"],
+    integratorId: response.headers["x-integrator-id"],
     ...apiBasicResponse
   }) as StatusResponse;
 };

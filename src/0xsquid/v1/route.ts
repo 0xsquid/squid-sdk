@@ -252,7 +252,9 @@ export const parseRouteResponse = (response: any): RouteResponse => {
   const {
     route: { estimate, transactionRequest, params }
   } = response;
-  const routeResponse = {
+  const routeResponse = removeEmpty({
+    requestId: response.headers["x-request-id"],
+    integratorId: response.headers["x-integrator-id"],
     route: {
       estimate: parseEstimate(estimate),
       transactionRequest: transactionRequest
@@ -260,6 +262,6 @@ export const parseRouteResponse = (response: any): RouteResponse => {
         : undefined,
       params: parseParams(params)
     }
-  };
+  });
   return routeResponse;
 };
