@@ -2,8 +2,8 @@ import { ethers } from "ethers";
 import { LogLevel } from "../error";
 
 export enum ChainName {
+  ACRECHAIN = "acre",
   AGORIC = "agoric",
-  ALL = "all",
   ARBITRUM = "Arbitrum",
   ARBITRUM2 = "arbitrum",
   ASSETMANTLE = "assetmantle",
@@ -31,6 +31,7 @@ export enum ChainName {
   KI = "ki",
   KUJIRA = "kujira",
   MOONBEAM = "Moonbeam",
+  NEUTRON = "neutron",
   OPTIMISM = "optimism",
   OSMOSIS = "osmosis",
   OSMOSIS5 = "osmosis-5",
@@ -42,7 +43,8 @@ export enum ChainName {
   STARGAZE = "stargaze",
   STRIDE = "stride",
   TERRA2 = "terra-2",
-  UMEE = "umee"
+  UMEE = "umee",
+  XPLA = "xpla"
 }
 
 export enum ChainType {
