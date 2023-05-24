@@ -289,9 +289,16 @@ export class Squid {
       _gasParams = { gasLimit };
     }
 
-    const _overrides = overrides
+    let _overrides = overrides
       ? { ..._gasParams, ...overrides }
       : { ..._gasParams };
+
+    if (_overrides.gasLimit) {
+      _overrides = {
+        ..._overrides,
+        gasLimit: Number(_overrides.gasLimit)
+      };
+    }
 
     if (!fromIsNative) {
       await this.validateBalanceAndApproval({

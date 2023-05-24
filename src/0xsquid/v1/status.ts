@@ -8,6 +8,9 @@ import { parseChainData } from "./chains";
 import { removeEmpty } from "./util";
 
 export const parseTransactionStatus = (data: any) => {
+  if (!data) {
+    return undefined;
+  }
   const {
     transactionId,
     blockNumber,
