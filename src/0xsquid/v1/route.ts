@@ -17,6 +17,7 @@ import {
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
 import { AxiosResponseHeaders } from "axios";
+import { getHeaderTracker } from "utils";
 
 export const parseBridge = (data: any): Call => {
   const {
@@ -257,14 +258,7 @@ export const parseRouteResponse = (
     route: { estimate, transactionRequest, params }
   } = response;
   const routeResponse = removeEmpty({
-    requestId:
-      headers && "x-request-id" in headers
-        ? (headers["x-request-id"] as string)
-        : undefined,
-    integratorId:
-      headers && "x-integrator-id" in headers
-        ? (headers["x-integrator-id"] as string)
-        : undefined,
+    ...getHeaderTracker(headers),
     route: {
       estimate: parseEstimate(estimate),
       transactionRequest: transactionRequest

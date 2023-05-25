@@ -6,6 +6,7 @@ import {
 } from "../../types";
 import { parseChainData } from "./chains";
 import { removeEmpty } from "./util";
+import { getHeaderTracker } from "utils";
 
 export const parseTransactionStatus = (data: any) => {
   if (!data) {
@@ -68,14 +69,7 @@ export const parseStatusResponse = (
     fromChain: parseTransactionStatus(fromChain),
     toChain: parseTransactionStatus(toChain),
     timeSpent: timeSpent,
-    requestId:
-      headers && "x-request-id" in headers
-        ? (headers["x-request-id"] as string)
-        : undefined,
-    integratorId:
-      headers && "x-integrator-id" in headers
-        ? (headers["x-integrator-id"] as string)
-        : undefined,
+    ...getHeaderTracker(headers),
     ...apiBasicResponse
   }) as StatusResponse;
 };
