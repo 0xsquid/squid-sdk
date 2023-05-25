@@ -296,7 +296,7 @@ export class Squid {
     if (_overrides.gasLimit) {
       _overrides = {
         ..._overrides,
-        gasLimit: Number(_overrides.gasLimit)
+        gasLimit: BigNumber.from(_overrides.gasLimit)
       };
     }
 
