@@ -17,7 +17,7 @@ import {
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
 import { AxiosResponseHeaders } from "axios";
-import { getHeaderTracker } from "utils";
+import { getHeaderTracker } from "../../utils";
 
 export const parseBridge = (data: any): Call => {
   const {

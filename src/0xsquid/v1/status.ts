@@ -6,7 +6,7 @@ import {
 } from "../../types";
 import { parseChainData } from "./chains";
 import { removeEmpty } from "./util";
-import { getHeaderTracker } from "utils";
+import { getHeaderTracker } from "../../utils";
 
 export const parseTransactionStatus = (data: any) => {
   if (!data) {
