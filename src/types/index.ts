@@ -158,6 +158,7 @@ export type Config = {
   };
   logging?: boolean;
   logLevel?: LogLevel;
+  integratorId?: string;
 };
 
 export enum SquidCallType {
@@ -293,6 +294,8 @@ export type SdkInfoResponse = {
 
 export type RouteResponse = {
   route: RouteData;
+  requestId?: string;
+  integratorId?: string;
 };
 
 export type ChainsResponse = {
@@ -372,6 +375,8 @@ export type ValidateBalanceAndApproval = {
 
 export type GetStatus = {
   transactionId: string;
+  requestId?: string;
+  integratorId?: string;
 };
 
 export type GasCost = {
@@ -423,4 +428,6 @@ export type StatusResponse = ApiBasicResponse & {
   fromChain?: TransactionStatus;
   toChain?: TransactionStatus;
   timeSpent?: Record<string, number>;
+  requestId?: string;
+  integratorId?: string;
 };
