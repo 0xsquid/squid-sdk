@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse, AxiosResponseHeaders } from "axios";
 import {
   ApiBasicResponse,
   StatusResponse,
@@ -6,6 +6,7 @@ import {
 } from "../../types";
 import { parseChainData } from "./chains";
 import { removeEmpty } from "./util";
+import { getHeaderTracker } from "../../utils";
 
 export const parseTransactionStatus = (data: any) => {
   if (!data) {
@@ -44,7 +45,10 @@ export const parseApiBasicResponse = (response: AxiosResponse) => {
   return apiBasicResponse as ApiBasicResponse;
 };
 
-export const parseStatusResponse = (response: AxiosResponse) => {
+export const parseStatusResponse = (
+  response: any,
+  headers: AxiosResponseHeaders
+) => {
   const apiBasicResponse = parseApiBasicResponse(response);
   const {
     id,
@@ -65,6 +69,7 @@ export const parseStatusResponse = (response: AxiosResponse) => {
     fromChain: parseTransactionStatus(fromChain),
     toChain: parseTransactionStatus(toChain),
     timeSpent: timeSpent,
+    ...getHeaderTracker(headers),
     ...apiBasicResponse
   }) as StatusResponse;
 };

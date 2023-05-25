@@ -16,6 +16,8 @@ import {
 } from "../../types";
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
+import { AxiosResponseHeaders } from "axios";
+import { getHeaderTracker } from "../../utils";
 
 export const parseBridge = (data: any): Call => {
   const {
@@ -248,11 +250,15 @@ export const parseParams = (data: any): RouteParams => {
   });
 };
 
-export const parseRouteResponse = (response: any): RouteResponse => {
+export const parseRouteResponse = (
+  response: any,
+  headers: AxiosResponseHeaders
+): RouteResponse => {
   const {
     route: { estimate, transactionRequest, params }
   } = response;
-  const routeResponse = {
+  const routeResponse = removeEmpty({
+    ...getHeaderTracker(headers),
     route: {
       estimate: parseEstimate(estimate),
       transactionRequest: transactionRequest
@@ -260,6 +266,6 @@ export const parseRouteResponse = (response: any): RouteResponse => {
         : undefined,
       params: parseParams(params)
     }
-  };
+  });
   return routeResponse;
 };

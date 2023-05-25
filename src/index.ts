@@ -48,6 +48,7 @@ export class Squid {
         baseURL: config?.baseUrl || baseUrl,
         headers: {
           // 'api-key': config.apiKey
+          "x-integrator-id": "squid-sdk"
         }
       }),
       config
@@ -228,6 +229,7 @@ export class Squid {
       baseURL: config.baseUrl || baseUrl,
       headers: {
         // 'api-key': config.apiKey
+        ...(config.integratorId && { "x-integrator-id": config.integratorId })
       }
     });
     this.config = config;
@@ -246,7 +248,10 @@ export class Squid {
       });
     }
 
-    const route: RouteResponse = parseRouteResponse(response.data);
+    const route: RouteResponse = parseRouteResponse(
+      response.data,
+      response.headers
+    );
     return route;
   }
 
@@ -527,9 +532,18 @@ export class Squid {
   }
 
   public async getStatus(params: GetStatus): Promise<StatusResponse> {
-    const response = await this.axiosInstance.get("/v1/status", { params });
+    const response = await this.axiosInstance.get("/v1/status", {
+      params,
+      headers: {
+        ...(params.requestId && { "x-request-id": params.requestId }),
+        ...(params.integratorId && { "x-integrator-id": params.integratorId })
+      }
+    });
 
-    const statusResponse: StatusResponse = parseStatusResponse(response);
+    const statusResponse: StatusResponse = parseStatusResponse(
+      response.data,
+      response.headers
+    );
     return statusResponse;
   }
 
