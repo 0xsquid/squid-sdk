@@ -1,5 +1,12 @@
 
 
+### [1.6.3](https://github.com/0xsquid/api-sdk/compare/v1.6.0...v1.6.3) (2023-05-29)
+
+
+### Bug Fixes
+
+* gasLimit parse and status empty validation ([#122](https://github.com/0xsquid/api-sdk/issues/122)) ([9fb9900](https://github.com/0xsquid/api-sdk/commit/9fb99002b11b3e2e5e603feb8c779acc7c11c00a))
+
 ### [1.6.2](https://github.com/0xsquid/api-sdk/compare/v1.6.0...v1.6.2) (2023-05-25)
 
 
