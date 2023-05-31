@@ -199,7 +199,7 @@ export type TransactionRequest = {
   routeType: string;
   targetAddress: string;
   data: string;
-  value: number;
+  value: string;
   gasLimit: string;
   gasPrice: string;
   maxFeePerGas: string;

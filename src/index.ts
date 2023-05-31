@@ -337,6 +337,43 @@ export class Squid {
     return await signer.sendTransaction(tx);
   }
 
+  public async getRawTxHex({
+    nonce,
+    route
+  }: {
+    route: RouteData;
+    nonce: number;
+  }): Promise<string> {
+    if (!route.transactionRequest) {
+      throw new SquidError({
+        message: `transactionRequest property is missing in route object`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+
+    const { gasLimit, gasPrice, targetAddress, data } =
+      route.transactionRequest;
+
+    const _gasLimit = parseInt(gasLimit).toString(16);
+    let _gasPrice = gasPrice;
+
+    if (!_gasPrice) {
+      const chain = this.chains.find(
+        chain => chain.chainId == route.params.fromChain
+      );
+      const provider = new ethers.providers.JsonRpcProvider(chain?.rpc);
+      _gasPrice = parseInt((await provider.getGasPrice()).toString()).toString(
+        16
+      );
+    }
+
+    const value = parseInt(route.transactionRequest.value).toString(16);
+
+    return `${nonce}${_gasPrice}${_gasLimit}${targetAddress}${value}${data}`;
+  }
+
   public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
     isApproved: boolean;
     message: string;
