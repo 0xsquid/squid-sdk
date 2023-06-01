@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 import axios, { AxiosInstance } from "axios";
 
 import {
@@ -29,7 +29,6 @@ import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseStatusResponse } from "./0xsquid/v1/status";
-import { createHash } from "crypto";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -338,13 +337,12 @@ export class Squid {
     return await signer.sendTransaction(tx);
   }
 
-  public async getRawTxHex({
+  public getRawTxHex({
     nonce,
-    route
-  }: {
-    route: RouteData;
-    nonce: number;
-  }): Promise<string> {
+    route,
+    overrides,
+    executionSettings
+  }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
     if (!route.transactionRequest) {
       throw new SquidError({
         message: `transactionRequest property is missing in route object`,
@@ -354,27 +352,43 @@ export class Squid {
       });
     }
 
-    const { gasLimit, gasPrice, targetAddress, data } =
-      route.transactionRequest;
+    const {
+      gasLimit,
+      gasPrice,
+      targetAddress,
+      data,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      value
+    } = route.transactionRequest;
 
-    const _gasLimit = parseInt(gasLimit).toString(16);
-    let _gasPrice = gasPrice;
+    let _gasParams = {
+      gasLimit: BigNumber.from(gasLimit)
+    } as any;
 
-    if (!_gasPrice) {
-      const chain = this.chains.find(
-        chain => chain.chainId == route.params.fromChain
-      );
-      const provider = new ethers.providers.JsonRpcProvider(chain?.rpc);
-      _gasPrice = parseInt((await provider.getGasPrice()).toString()).toString(
-        16
-      );
+    if (executionSettings?.setGasPrice) {
+      _gasParams = maxPriorityFeePerGas
+        ? {
+            ..._gasParams,
+            maxFeePerGas: BigNumber.from(maxFeePerGas),
+            maxPriorityFeePerGas: BigNumber.from(maxPriorityFeePerGas)
+          }
+        : { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
+    } else {
+      _gasParams = { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
     }
 
-    const value = parseInt(route.transactionRequest.value).toString(16);
+    const _overrides = overrides
+      ? { ..._gasParams, ...overrides }
+      : { ..._gasParams };
 
-    return createHash("sha256")
-      .update(`${nonce}${_gasPrice}${_gasLimit}${targetAddress}${value}${data}`)
-      .digest("hex");
+    return ethers.utils.serializeTransaction({
+      to: targetAddress,
+      data: data,
+      value: BigNumber.from(value),
+      nonce,
+      ..._overrides
+    } as UnsignedTransaction);
   }
 
   public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
