@@ -29,6 +29,7 @@ import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseStatusResponse } from "./0xsquid/v1/status";
+import { createHash } from "crypto";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -371,7 +372,9 @@ export class Squid {
 
     const value = parseInt(route.transactionRequest.value).toString(16);
 
-    return `${nonce}${_gasPrice}${_gasLimit}${targetAddress}${value}${data}`;
+    return createHash("sha256")
+      .update(`${nonce}${_gasPrice}${_gasLimit}${targetAddress}${value}${data}`)
+      .digest("hex");
   }
 
   public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
