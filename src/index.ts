@@ -383,6 +383,7 @@ export class Squid {
       : { ..._gasParams };
 
     return ethers.utils.serializeTransaction({
+      chainId: parseInt(route.params.fromChain as string),
       to: targetAddress,
       data: data,
       value: BigNumber.from(value),
