@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 import axios, { AxiosInstance } from "axios";
 
 import {
@@ -335,6 +335,61 @@ export class Squid {
     }
 
     return await signer.sendTransaction(tx);
+  }
+
+  public getRawTxHex({
+    nonce,
+    route,
+    overrides,
+    executionSettings
+  }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
+    if (!route.transactionRequest) {
+      throw new SquidError({
+        message: `transactionRequest property is missing in route object`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+
+    const {
+      gasLimit,
+      gasPrice,
+      targetAddress,
+      data,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      value
+    } = route.transactionRequest;
+
+    let _gasParams = {
+      gasLimit: BigNumber.from(gasLimit)
+    } as any;
+
+    if (executionSettings?.setGasPrice) {
+      _gasParams = maxPriorityFeePerGas
+        ? {
+            ..._gasParams,
+            maxFeePerGas: BigNumber.from(maxFeePerGas),
+            maxPriorityFeePerGas: BigNumber.from(maxPriorityFeePerGas)
+          }
+        : { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
+    } else {
+      _gasParams = { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
+    }
+
+    const _overrides = overrides
+      ? { ..._gasParams, ...overrides }
+      : { ..._gasParams };
+
+    return ethers.utils.serializeTransaction({
+      chainId: parseInt(route.params.fromChain as string),
+      to: targetAddress,
+      data: data,
+      value: BigNumber.from(value),
+      nonce,
+      ..._overrides
+    } as UnsignedTransaction);
   }
 
   public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
