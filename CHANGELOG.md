@@ -1,5 +1,17 @@
 
 
+### [1.4.2-delta.0](https://github.com/0xsquid/api-sdk/compare/v1.4.2-alpha.0...v1.4.2-delta.0) (2023-06-04)
+
+
+### Features
+
+* added cosmos route ([1025156](https://github.com/0xsquid/api-sdk/commit/102515617446fb53a2b19b0efffe2dfa84cd7ad8))
+
+
+### Bug Fixes
+
+* fix route object ([30addae](https://github.com/0xsquid/api-sdk/commit/30addae9acfeb58a538f392c3f2dee342bcb5f7f))
+
 ### [1.4.2-beta.1](https://github.com/0xsquid/api-sdk/compare/v1.4.2-alpha.0...v1.4.2-beta.1) (2023-06-04)
 
 
