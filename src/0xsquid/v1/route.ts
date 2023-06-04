@@ -87,7 +87,12 @@ export const parseCustom = (data: any): Call => {
 export const parseRoute = (data: any[]): Route => {
   const calls = data
     .filter((call: Call) =>
-      [CallType.BRIDGE, CallType.CUSTOM, CallType.SWAP].includes(call.type)
+      [
+        CallType.BRIDGE,
+        CallType.CUSTOM,
+        CallType.SWAP,
+        CallType.TRANSFER
+      ].includes(call.type)
     )
     .map((call: any) => {
       switch (call.type as CallType) {
@@ -96,6 +101,8 @@ export const parseRoute = (data: any[]): Route => {
         case CallType.SWAP:
           return parseSwap(call);
         case CallType.CUSTOM:
+          return parseCustom(call);
+        case CallType.TRANSFER:
           return parseCustom(call);
       }
     });
