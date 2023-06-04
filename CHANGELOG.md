@@ -1,5 +1,13 @@
 
 
+* chore: branch cut release for sdk v1.4.2-beta.1 (#126) (ba460f9)
+* feat: added cosmos route (1025156)
+* fix: fix route object (30addae)
+* chore: branch cut release for sdk v1.4.2-beta.0 (#117) (5838c43)
+* specific case for dydx only (bf6bd08)
+* set fee to be 0 for dydx chain (89e3690)
+* Merge pull request #114 from 0xsquid/release/v1.4.2-alpha.0 (c0ca678)
+
 ### [1.4.2-beta.1](https://github.com/0xsquid/api-sdk/compare/v1.4.2-alpha.0...v1.4.2-beta.1) (2023-06-04)
 
 
