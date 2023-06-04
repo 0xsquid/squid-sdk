@@ -41,6 +41,12 @@ export enum ChainName {
   UMEE = "UMEE"
 }
 
+export enum SummaryPathAction {
+  SWAP = "Swap",
+  TRANSFER = "Transfer",
+  BRIDGE = "Bridge"
+}
+
 export enum ChainType {
   EVM = "evm",
   Cosmos = "cosmos"
@@ -214,6 +220,25 @@ export type BaseCall = {
   type: CallType;
 };
 
+export type TransferAction = {
+  type: SummaryPathAction.TRANSFER;
+  fromChain: string;
+  toChain: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromChannel: string;
+  toChannel: string;
+};
+
+export type SwapActionCosmos = {
+  type: SummaryPathAction.SWAP;
+  chainId: string;
+  dex: string;
+  poolId: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+};
+
 export type Swap = BaseCall & {
   dex: {
     chainName: string;
@@ -246,7 +271,12 @@ export type Bridge = BaseCall & {
 
 export type CustomCall = BaseCall & ContractCall;
 
-export type Call = Swap | CustomCall | Bridge;
+export type Call =
+  | Swap
+  | CustomCall
+  | Bridge
+  | SwapActionCosmos
+  | TransferAction;
 
 export type Estimate = {
   fromAmount: string;
