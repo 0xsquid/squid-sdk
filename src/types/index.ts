@@ -213,7 +213,8 @@ export type Route = Call[];
 export enum CallType {
   SWAP = "SWAP",
   BRIDGE = "BRIDGE",
-  CUSTOM = "CUSTOM"
+  CUSTOM = "CUSTOM",
+  TRANSFER = "TRANSFER"
 }
 
 export type BaseCall = {
@@ -221,7 +222,7 @@ export type BaseCall = {
 };
 
 export type TransferAction = {
-  type: SummaryPathAction.TRANSFER;
+  type: CallType.TRANSFER;
   fromChain: string;
   toChain: string;
   fromToken: TokenData;
@@ -231,7 +232,7 @@ export type TransferAction = {
 };
 
 export type SwapActionCosmos = {
-  type: SummaryPathAction.SWAP;
+  type: CallType.SWAP;
   chainId: string;
   dex: string;
   poolId: string;
