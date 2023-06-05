@@ -1,5 +1,12 @@
 
 
+### [1.6.4-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.6.3...v1.6.4-beta.0) (2023-06-05)
+
+
+### Features
+
+* add getRawTxHex method given a route ([#125](https://github.com/0xsquid/api-sdk/issues/125)) ([9dd4b77](https://github.com/0xsquid/api-sdk/commit/9dd4b77371e1d14dd9d49155b390efca35dc8eb2))
+
 ### [1.6.3](https://github.com/0xsquid/api-sdk/compare/v1.6.0...v1.6.3) (2023-05-29)
 
 
