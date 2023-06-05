@@ -7,7 +7,8 @@ import {
   SigningStargateClient,
   calculateFee
 } from "@cosmjs/stargate";
-import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
+import { toUtf8 } from "@cosmjs/encoding";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 
 import {
   Allowance,
@@ -27,7 +28,10 @@ import {
   ChainData,
   RouteParams,
   TransactionRequest,
-  CosmosMsg
+  CosmosMsg,
+  IBC_TRANSFER_TYPE,
+  WASM_TYPE,
+  WasmHookMsg
 } from "./types";
 
 import erc20Abi from "./abi/erc20.json";
@@ -223,9 +227,6 @@ export class Squid {
       signerAddress,
       coin.denom
     );
-    console.log(
-      `VALIDATING BALANCE, CURRENT: ${JSON.stringify(signerCoinBalance)}`
-    );
 
     const currentBalance = ethers.BigNumber.from(signerCoinBalance.amount);
     const transferAmount = ethers.BigNumber.from(coin.amount);
@@ -301,7 +302,6 @@ export class Squid {
       signer instanceof SigningStargateClient ||
       signer.constructor.name === "SigningStargateClient"
     ) {
-      console.log("HERE");
       return await this.executeRouteCosmos(
         signer as SigningStargateClient,
         signerAddress!,
@@ -382,36 +382,54 @@ export class Squid {
     route: RouteData
   ): Promise<DeliverTxResponse> {
     const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
+    const msgs = [];
 
-    // validating that user has enough balance for the transfer
-    await this.validateCosmosBalance(
-      signer,
-      signerAddress,
-      cosmosMsg.msg.token!
-    );
+    switch (cosmosMsg.msgTypeUrl) {
+      case IBC_TRANSFER_TYPE: {
+        msgs.push({
+          typeUrl: cosmosMsg.msgTypeUrl,
+          value: cosmosMsg.msg
+        });
 
-    const broadcastMsg = [
-      {
-        typeUrl: cosmosMsg.msgTypeUrl,
-        value: cosmosMsg.msg
+        break;
       }
-    ];
+      case WASM_TYPE: {
+        // register execute wasm msg type for signer
+        signer.registry.register(WASM_TYPE, MsgExecuteContract);
 
-    // simulate tx to estimate gas cost
-    if (route.params.fromChain === "dydxprotocol-testnet") {
-      return await signer.signAndBroadcast(
-        signerAddress,
-        broadcastMsg,
-        0 // assuming that dydx has no fees, setting them to be 0
-      );
+        const wasmHook = cosmosMsg.msg as WasmHookMsg;
+        msgs.push({
+          typeUrl: cosmosMsg.msgTypeUrl,
+          value: {
+            sender: signerAddress,
+            contract: wasmHook.wasm.contract,
+            msg: toUtf8(JSON.stringify(wasmHook.wasm.msg)),
+            funds: [
+              {
+                denom: route.params.fromToken.address,
+                amount: route.params.fromAmount
+              }
+            ]
+          }
+        });
+
+        break;
+      }
     }
 
-    const estimatedGas = await signer.simulate(signerAddress, broadcastMsg, "");
+    // validating that user has enough balance for the transfer
+    await this.validateCosmosBalance(signer, signerAddress, {
+      denom: route.params.fromToken.address,
+      amount: route.params.fromAmount
+    });
+
+    // simulate tx to estimate gas cost
+    const estimatedGas = await signer.simulate(signerAddress, msgs, "");
     const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
     return await signer.signAndBroadcast(
       signerAddress,
-      broadcastMsg,
+      msgs,
       calculateFee(
         Math.trunc(estimatedGas * gasMultiplier),
         GasPrice.fromString(route.transactionRequest!.gasPrice)

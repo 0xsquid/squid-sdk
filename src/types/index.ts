@@ -207,7 +207,9 @@ export type Route = Call[];
 export enum CallType {
   SWAP = "SWAP",
   BRIDGE = "BRIDGE",
-  CUSTOM = "CUSTOM"
+  CUSTOM = "CUSTOM",
+  OSMOSIS_SWAP = "Swap",
+  COSMOS_TRANSFER = "Transfer"
 }
 
 export type BaseCall = {
@@ -246,7 +248,35 @@ export type Bridge = BaseCall & {
 
 export type CustomCall = BaseCall & ContractCall;
 
-export type Call = Swap | CustomCall | Bridge;
+export type CosmosTransferAction = BaseCall & {
+  fromChain: string;
+  toChain: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromChannel: string;
+  toChannel: string;
+};
+
+export type SwapActionCosmosEstimate = BaseCall & {
+  chainId: string;
+  dex: string;
+  poolId: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromAmount: string;
+  toAmount: string;
+  toAmountMin: string;
+  exchangeRate: string;
+  priceImpact: string;
+  dynamicSlippage?: number;
+};
+
+export type Call =
+  | Swap
+  | CustomCall
+  | Bridge
+  | CosmosTransferAction
+  | SwapActionCosmosEstimate;
 
 export type Estimate = {
   fromAmount: string;
@@ -420,5 +450,15 @@ export type StatusResponse = ApiBasicResponse & {
 
 export type CosmosMsg = {
   msgTypeUrl: string;
-  msg: MsgTransfer;
+  msg: object;
 };
+
+export type WasmHookMsg = {
+  wasm: {
+    contract: string;
+    msg: object;
+  };
+};
+
+export const IBC_TRANSFER_TYPE = "/ibc.applications.transfer.v1.MsgTransfer";
+export const WASM_TYPE = "/cosmwasm.wasm.v1.MsgExecuteContract";
