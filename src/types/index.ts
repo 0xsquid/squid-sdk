@@ -4,41 +4,49 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 
 export enum ChainName {
-  AGORIC = "Agoric",
-  AURA = "AURA",
-  AURORA = "aurora",
+  ACRECHAIN = "acre",
+  AGORIC = "agoric",
   ARBITRUM = "Arbitrum",
   ARBITRUM2 = "arbitrum",
-  ASSETMANTLE = "ASSETMANTLE",
+  ASSETMANTLE = "assetmantle",
+  AURA = "aura",
+  AURORA = "aurora",
   AVALANCHE = "Avalanche",
-  AXELARNET = "Axelarnet",
-  AXELAR = "AXELAR",
+  AXELARNET = "axelarnet",
+  BASE = "base",
   BINANCE = "binance",
-  CELO = "Celo",
-  CELO2 = "celo",
+  CARBON = "carbon",
+  CELO = "celo",
+  COMDEX = "comdex",
   COSMOS = "cosmoshub",
-  COMDEX = "COMDEX",
   CRESCENT = "crescent",
   EMONEY = "e-money",
   ETHEREUM = "Ethereum",
   ETHEREUM2 = "Ethereum-2",
-  EVMOS = "EVMOS",
+  EVMOS = "evmos",
   FANTOM = "Fantom",
   FETCH = "fetch",
-  MOONBEAM = "Moonbeam",
+  FILECOIN = "filecoin",
   INJECTIVE = "injective",
   JUNO = "juno",
-  KI = "KI",
+  KAVA = "kava",
+  KI = "ki",
   KUJIRA = "kujira",
+  MOONBEAM = "Moonbeam",
+  NEUTRON = "neutron",
+  OPTIMISM = "optimism",
   OSMOSIS = "osmosis",
-  OSMOSIS4 = "osmosis-4",
+  OSMOSIS5 = "osmosis-5",
   POLYGON = "Polygon",
-  REGEN = "REGEN",
-  SECRET = "secret",
+  REGEN = "regen",
   SEI = "sei",
-  STARGAZE = "STARGAZE",
+  SECRET = "secret",
+  SECRETSNIP = "secret-snip",
+  STARGAZE = "stargaze",
+  STRIDE = "stride",
   TERRA2 = "terra-2",
-  UMEE = "UMEE"
+  UMEE = "umee",
+  XPLA = "xpla"
 }
 
 export enum ChainType {
@@ -139,6 +147,9 @@ export type TokenData = {
   decimals: number;
   logoURI: string;
   coingeckoId: string;
+  commonKey?: string;
+  bridgeOnly?: boolean;
+  ibcDenom?: string;
 };
 
 export type Config = {
@@ -149,6 +160,7 @@ export type Config = {
   };
   logging?: boolean;
   logLevel?: LogLevel;
+  integratorId?: string;
 };
 
 export enum SquidCallType {
@@ -190,7 +202,7 @@ export type TransactionRequest = {
   routeType: string;
   targetAddress: string;
   data: string;
-  value: number;
+  value: string;
   gasLimit: string;
   gasPrice: string;
   maxFeePerGas: string;
@@ -315,6 +327,8 @@ export type SdkInfoResponse = {
 
 export type RouteResponse = {
   route: RouteData;
+  requestId?: string;
+  integratorId?: string;
 };
 
 export type ChainsResponse = {
@@ -395,6 +409,8 @@ export type ValidateBalanceAndApproval = {
 
 export type GetStatus = {
   transactionId: string;
+  requestId?: string;
+  integratorId?: string;
 };
 
 export type GasCost = {
@@ -446,6 +462,8 @@ export type StatusResponse = ApiBasicResponse & {
   fromChain?: TransactionStatus;
   toChain?: TransactionStatus;
   timeSpent?: Record<string, number>;
+  requestId?: string;
+  integratorId?: string;
 };
 
 export type CosmosMsg = {

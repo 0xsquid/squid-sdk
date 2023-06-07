@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import {
   Coin,
@@ -61,6 +61,7 @@ export class Squid {
         baseURL: config?.baseUrl || baseUrl,
         headers: {
           // 'api-key': config.apiKey
+          "x-integrator-id": "squid-sdk"
         }
       }),
       config
@@ -264,6 +265,7 @@ export class Squid {
       baseURL: config.baseUrl || baseUrl,
       headers: {
         // 'api-key': config.apiKey
+        ...(config.integratorId && { "x-integrator-id": config.integratorId })
       }
     });
     this.config = config;
@@ -282,7 +284,10 @@ export class Squid {
       });
     }
 
-    const route: RouteResponse = parseRouteResponse(response.data);
+    const route: RouteResponse = parseRouteResponse(
+      response.data,
+      response.headers
+    );
     return route;
   }
 
@@ -340,9 +345,16 @@ export class Squid {
       _gasParams = { gasLimit };
     }
 
-    const _overrides = overrides
+    let _overrides = overrides
       ? { ..._gasParams, ...overrides }
       : { ..._gasParams };
+
+    if (_overrides.gasLimit) {
+      _overrides = {
+        ..._overrides,
+        gasLimit: BigNumber.from(_overrides.gasLimit)
+      };
+    }
 
     if (!fromIsNative) {
       await this.validateBalanceAndApproval({
@@ -374,6 +386,61 @@ export class Squid {
     }
 
     return await signer.sendTransaction(tx);
+  }
+
+  public getRawTxHex({
+    nonce,
+    route,
+    overrides,
+    executionSettings
+  }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
+    if (!route.transactionRequest) {
+      throw new SquidError({
+        message: `transactionRequest property is missing in route object`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+
+    const {
+      gasLimit,
+      gasPrice,
+      targetAddress,
+      data,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      value
+    } = route.transactionRequest;
+
+    let _gasParams = {
+      gasLimit: BigNumber.from(gasLimit)
+    } as any;
+
+    if (executionSettings?.setGasPrice) {
+      _gasParams = maxPriorityFeePerGas
+        ? {
+            ..._gasParams,
+            maxFeePerGas: BigNumber.from(maxFeePerGas),
+            maxPriorityFeePerGas: BigNumber.from(maxPriorityFeePerGas)
+          }
+        : { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
+    } else {
+      _gasParams = { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
+    }
+
+    const _overrides = overrides
+      ? { ..._gasParams, ...overrides }
+      : { ..._gasParams };
+
+    return ethers.utils.serializeTransaction({
+      chainId: parseInt(route.params.fromChain as string),
+      to: targetAddress,
+      data: data,
+      value: BigNumber.from(value),
+      nonce,
+      ..._overrides
+    } as UnsignedTransaction);
   }
 
   private async executeRouteCosmos(
@@ -632,9 +699,18 @@ export class Squid {
   }
 
   public async getStatus(params: GetStatus): Promise<StatusResponse> {
-    const response = await this.axiosInstance.get("/v1/status", { params });
+    const response = await this.axiosInstance.get("/v1/status", {
+      params,
+      headers: {
+        ...(params.requestId && { "x-request-id": params.requestId }),
+        ...(params.integratorId && { "x-integrator-id": params.integratorId })
+      }
+    });
 
-    const statusResponse: StatusResponse = parseStatusResponse(response);
+    const statusResponse: StatusResponse = parseStatusResponse(
+      response.data,
+      response.headers
+    );
     return statusResponse;
   }
 
