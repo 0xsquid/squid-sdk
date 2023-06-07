@@ -1,6 +1,6 @@
 {
   "name": "@0xsquid/sdk",
-  "version": "1.6.3",
+  "version": "1.4.3-prealpha.0",
   "description": "🛠 An SDK for building applications on top of 0xsquid",
   "repository": {
     "type": "git",
@@ -42,9 +42,6 @@
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",
-    "@cosmjs/proto-signing": "^0.30.1",
-    "@cosmjs/stargate": "^0.30.1",
-    "cosmjs-types": "^0.6.0",
     "@tsconfig/node16": "^1.0.3",
     "@types/jest": "^28.1.6",
     "@types/node": "^18.0.6",
