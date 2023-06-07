@@ -297,6 +297,15 @@ export class Squid {
   > {
     this.validateInit();
 
+    if (!route.transactionRequest) {
+      throw new SquidError({
+        message: `transactionRequest property is missing in route object`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+
     // handle cosmos case
     if (
       signer instanceof SigningStargateClient ||
@@ -307,15 +316,6 @@ export class Squid {
         signerAddress!,
         route
       );
-    }
-
-    if (!route.transactionRequest) {
-      throw new SquidError({
-        message: `transactionRequest property is missing in route object`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
     }
 
     const { transactionRequest, params } = route;
