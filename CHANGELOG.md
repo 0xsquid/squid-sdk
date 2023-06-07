@@ -1,5 +1,13 @@
 
 
+### [1.4.3-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.6.3...v1.4.3-beta.0) (2023-06-07)
+
+
+### Features
+
+* add cosmos message handler support ([35311fd](https://github.com/0xsquid/api-sdk/commit/35311fd578c2fdc802d7eee10950dff18fbe491d)), closes [#117](https://github.com/0xsquid/api-sdk/issues/117) [#130](https://github.com/0xsquid/api-sdk/issues/130)
+* add getRawTxHex method given a route ([#125](https://github.com/0xsquid/api-sdk/issues/125)) ([9dd4b77](https://github.com/0xsquid/api-sdk/commit/9dd4b77371e1d14dd9d49155b390efca35dc8eb2))
+
 ### [1.6.3](https://github.com/0xsquid/api-sdk/compare/v1.6.0...v1.6.3) (2023-05-29)
 
 
