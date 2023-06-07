@@ -12,7 +12,9 @@ import {
   GasCost,
   CustomCall,
   ContractCall,
-  OptimalRoute
+  OptimalRoute,
+  CosmosTransferAction,
+  SwapActionCosmosEstimate
 } from "../../types";
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
@@ -86,10 +88,70 @@ export const parseCustom = (data: any): Call => {
   } as CustomCall);
 };
 
+export const parseOsmosisSwap = (data: any): Call => {
+  const {
+    type,
+    chainId,
+    dex,
+    poolId,
+    fromToken,
+    toToken,
+    fromAmount,
+    toAmount,
+    toAmountMin,
+    exchangeRate,
+    priceImpact,
+    dynamicSlippage
+  } = data;
+
+  return removeEmpty({
+    type,
+    chainId,
+    dex,
+    poolId,
+    fromToken,
+    toToken,
+    fromAmount,
+    toAmount,
+    toAmountMin,
+    exchangeRate,
+    priceImpact,
+    dynamicSlippage
+  } as SwapActionCosmosEstimate);
+};
+
+export const parseCosmosTransfer = (data: any): Call => {
+  const {
+    type,
+    fromChain,
+    toChain,
+    fromToken,
+    toToken,
+    fromChannel,
+    toChannel
+  } = data;
+
+  return removeEmpty({
+    type,
+    fromChain,
+    toChain,
+    fromToken,
+    toToken,
+    fromChannel,
+    toChannel
+  } as CosmosTransferAction);
+};
+
 export const parseRoute = (data: any[]): Route => {
   const calls = data
     .filter((call: Call) =>
-      [CallType.BRIDGE, CallType.CUSTOM, CallType.SWAP].includes(call.type)
+      [
+        CallType.BRIDGE,
+        CallType.CUSTOM,
+        CallType.SWAP,
+        CallType.OSMOSIS_SWAP,
+        CallType.COSMOS_TRANSFER
+      ].includes(call.type)
     )
     .map((call: any) => {
       switch (call.type as CallType) {
@@ -99,6 +161,10 @@ export const parseRoute = (data: any[]): Route => {
           return parseSwap(call);
         case CallType.CUSTOM:
           return parseCustom(call);
+        case CallType.OSMOSIS_SWAP:
+          return parseOsmosisSwap(call);
+        case CallType.COSMOS_TRANSFER:
+          return parseCosmosTransfer(call);
       }
     });
   return calls;

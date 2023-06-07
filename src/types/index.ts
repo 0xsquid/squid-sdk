@@ -1,5 +1,7 @@
 import { ethers } from "ethers";
 import { LogLevel } from "../error";
+import { SigningStargateClient } from "@cosmjs/stargate";
+import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 
 export enum ChainName {
   ACRECHAIN = "acre",
@@ -185,6 +187,7 @@ export type GetRoute = {
   toChain: number | string;
   fromToken: string;
   toToken: string;
+  cosmosSignerAddress?: string;
   fromAmount: string;
   toAddress: string;
   slippage: number;
@@ -216,7 +219,9 @@ export type Route = Call[];
 export enum CallType {
   SWAP = "SWAP",
   BRIDGE = "BRIDGE",
-  CUSTOM = "CUSTOM"
+  CUSTOM = "CUSTOM",
+  OSMOSIS_SWAP = "Swap",
+  COSMOS_TRANSFER = "Transfer"
 }
 
 export type BaseCall = {
@@ -255,7 +260,35 @@ export type Bridge = BaseCall & {
 
 export type CustomCall = BaseCall & ContractCall;
 
-export type Call = Swap | CustomCall | Bridge;
+export type CosmosTransferAction = BaseCall & {
+  fromChain: string;
+  toChain: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromChannel: string;
+  toChannel: string;
+};
+
+export type SwapActionCosmosEstimate = BaseCall & {
+  chainId: string;
+  dex: string;
+  poolId: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromAmount: string;
+  toAmount: string;
+  toAmountMin: string;
+  exchangeRate: string;
+  priceImpact: string;
+  dynamicSlippage?: number;
+};
+
+export type Call =
+  | Swap
+  | CustomCall
+  | Bridge
+  | CosmosTransferAction
+  | SwapActionCosmosEstimate;
 
 export type Estimate = {
   fromAmount: string;
@@ -312,7 +345,8 @@ export type OverrideParams = Omit<
 >;
 
 export type ExecuteRoute = {
-  signer: ethers.Wallet | ethers.Signer;
+  signer: ethers.Wallet | ethers.Signer | SigningStargateClient;
+  signerAddress?: string;
   route: RouteData;
   executionSettings?: {
     infiniteApproval?: boolean;
@@ -431,3 +465,18 @@ export type StatusResponse = ApiBasicResponse & {
   requestId?: string;
   integratorId?: string;
 };
+
+export type CosmosMsg = {
+  msgTypeUrl: string;
+  msg: object;
+};
+
+export type WasmHookMsg = {
+  wasm: {
+    contract: string;
+    msg: object;
+  };
+};
+
+export const IBC_TRANSFER_TYPE = "/ibc.applications.transfer.v1.MsgTransfer";
+export const WASM_TYPE = "/cosmwasm.wasm.v1.MsgExecuteContract";
