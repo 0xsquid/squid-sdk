@@ -237,7 +237,14 @@ export class Squid {
 
   public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
-    const response = await this.axiosInstance.get("/v1/route", { params });
+    const response = await this.axiosInstance.get("/v1/route", {
+      params,
+      headers: {
+        ...(this.config.integratorId && {
+          "x-integrator-id": this.config.integratorId
+        })
+      }
+    });
     if (response.status != 200) {
       response.data.error;
       throw new SquidError({
