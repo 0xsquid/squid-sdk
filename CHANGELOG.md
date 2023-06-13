@@ -1,7 +1,5 @@
 
-
 ### [1.4.3-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.6.3...v1.4.3-beta.0) (2023-06-07)
-
 
 ### Features
 
@@ -10,13 +8,11 @@
 
 ### [1.6.3](https://github.com/0xsquid/api-sdk/compare/v1.6.0...v1.6.3) (2023-05-29)
 
-
 ### Bug Fixes
 
 * gasLimit parse and status empty validation ([#122](https://github.com/0xsquid/api-sdk/issues/122)) ([9fb9900](https://github.com/0xsquid/api-sdk/commit/9fb99002b11b3e2e5e603feb8c779acc7c11c00a))
 
 ### [1.6.2](https://github.com/0xsquid/api-sdk/compare/v1.6.0...v1.6.2) (2023-05-25)
-
 
 ### Bug Fixes
 
@@ -26,13 +22,11 @@
 
 ## [1.6.0](https://github.com/0xsquid/api-sdk/compare/v1.5.1...v1.6.0) (2023-05-03)
 
-
 ### Reverts
 
 * Revert "feat: implement Safe Contract sdk execution (#111)" (#115) ([05b2853](https://github.com/0xsquid/api-sdk/commit/05b2853cc3c91a6afc221b9fa4d6e7d16ca09023)), closes [#111](https://github.com/0xsquid/api-sdk/issues/111) [#115](https://github.com/0xsquid/api-sdk/issues/115)
 
 ### [1.5.1](https://github.com/0xsquid/api-sdk/compare/v1.5.0...v1.5.1) (2023-04-26)
-
 
 ### Features
 
@@ -40,11 +34,9 @@
 
 ## [1.5.0](https://github.com/0xsquid/api-sdk/compare/v1.4.1...v1.5.0) (2023-04-25)
 
-
 ### Features
 
 * add filecoin chain ([#105](https://github.com/0xsquid/api-sdk/issues/105)) ([b99c885](https://github.com/0xsquid/api-sdk/commit/b99c885a0fcba9abb3b945af8f6bc1188b60c311))
-
 
 ### Bug Fixes
 
@@ -52,18 +44,15 @@
 
 ### [1.4.3](https://github.com/0xsquid/api-sdk/compare/v1.4.1...v1.4.3) (2023-04-20)
 
-
 ### Features
 
 * add filecoin chain ([#105](https://github.com/0xsquid/api-sdk/issues/105)) ([b99c885](https://github.com/0xsquid/api-sdk/commit/b99c885a0fcba9abb3b945af8f6bc1188b60c311))
-
 
 ### Bug Fixes
 
 * add bridgeOnly property ([#107](https://github.com/0xsquid/api-sdk/issues/107)) ([42ed8dc](https://github.com/0xsquid/api-sdk/commit/42ed8dc9476854f472b5c3fd7acacadb67c4a95d))
 
 ### [1.4.2](https://github.com/0xsquid/api-sdk/compare/v1.4.1...v1.4.2) (2023-04-20)
-
 
 ### Features
 
@@ -77,7 +66,6 @@
 
 ### [1.4.1](https://github.com/0xsquid/api-sdk/compare/v1.4.0...v1.4.1) (2023-04-05)
 
-
 ### Features
 
 * add estimatedExpressRouteDuration property to chain ([#103](https://github.com/0xsquid/api-sdk/issues/103)) ([b03ec36](https://github.com/0xsquid/api-sdk/commit/b03ec36987b4c379093b1c40f6522ad464d3fd50))
@@ -86,18 +74,15 @@
 
 ### [1.3.11](https://github.com/0xsquid/api-sdk/compare/v1.3.10...v1.3.11) (2023-03-15)
 
-
 ### Bug Fixes
 
 * targetAddress variable deconstruction ([#99](https://github.com/0xsquid/api-sdk/issues/99)) ([c64952b](https://github.com/0xsquid/api-sdk/commit/c64952b4709f1e05a4fc68185b6689fbae35043c))
 
 ### [1.3.10](https://github.com/0xsquid/api-sdk/compare/v1.3.8...v1.3.10) (2023-03-15)
 
-
 ### Features
 
 * add maintenance flag to sdkinfo route ([#95](https://github.com/0xsquid/api-sdk/issues/95)) ([a08cd15](https://github.com/0xsquid/api-sdk/commit/a08cd150d9839b25db87c90a2eebda37dec4f64b))
-
 
 ### Bug Fixes
 
@@ -107,7 +92,6 @@
 
 ### [1.3.9](https://github.com/0xsquid/api-sdk/compare/v1.3.8...v1.3.9) (2023-02-01)
 
-
 ### Bug Fixes
 
 * gasLimit issues ([#91](https://github.com/0xsquid/api-sdk/issues/91)) ([3d67599](https://github.com/0xsquid/api-sdk/commit/3d6759945b56eedf34ae0d3635424da1c5040a09))
@@ -115,7 +99,6 @@
 ### [1.3.8](https://github.com/0xsquid/api-sdk/compare/v1.3.7...v1.3.8) (2023-01-31)
 
 ### [1.3.7](https://github.com/0xsquid/api-sdk/compare/v1.3.5...v1.3.7) (2023-01-30)
-
 
 ### Features
 
@@ -125,11 +108,9 @@
 
 ### [1.3.6-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.5...v1.3.6-beta.0) (2023-01-30)
 
-
 ### Features
 
 * add receiveGasOnDestination param to getRoute ([#84](https://github.com/0xsquid/api-sdk/issues/84)) ([a16afb1](https://github.com/0xsquid/api-sdk/commit/a16afb117bd9242c5734655516eb64954dbb8745))
-
 
 ### Bug Fixes
 
@@ -137,13 +118,11 @@
 
 ### [1.3.5](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.5) (2023-01-12)
 
-
 ### Features
 
 * add override param to approval action ([#73](https://github.com/0xsquid/api-sdk/issues/73)) ([a111768](https://github.com/0xsquid/api-sdk/commit/a1117686d7bb206ad5bed5ee9ee80e8e06b21860))
 * add prefer param ([#82](https://github.com/0xsquid/api-sdk/issues/82)) ([4535965](https://github.com/0xsquid/api-sdk/commit/4535965df424f951bd01c3492077e0f5005fb1c9))
 * prioritise-eip1559-transactions ([#75](https://github.com/0xsquid/api-sdk/issues/75)) ([babcdb3](https://github.com/0xsquid/api-sdk/commit/babcdb38677537f2c2838d1f6d8bf4df221715a5))
-
 
 ### Bug Fixes
 
@@ -152,19 +131,16 @@
 
 ### [1.3.5-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.5-beta.0) (2022-12-23)
 
-
 ### Features
 
 * add override param to approval action ([#73](https://github.com/0xsquid/api-sdk/issues/73)) ([a111768](https://github.com/0xsquid/api-sdk/commit/a1117686d7bb206ad5bed5ee9ee80e8e06b21860))
 * prioritise-eip1559-transactions ([#75](https://github.com/0xsquid/api-sdk/issues/75)) ([babcdb3](https://github.com/0xsquid/api-sdk/commit/babcdb38677537f2c2838d1f6d8bf4df221715a5))
-
 
 ### Bug Fixes
 
 * set default value for overrides param ([08829ea](https://github.com/0xsquid/api-sdk/commit/08829eaeb6b10132f2dc952b07717a9f7559edfd))
 
 ### [1.3.4](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.4) (2022-12-21)
-
 
 ### Features
 
@@ -173,13 +149,11 @@
 
 ### [1.3.4-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.3-beta.0...v1.3.4-beta.0) (2022-12-20)
 
-
 ### Features
 
 * add override param to approval action ([#73](https://github.com/0xsquid/api-sdk/issues/73)) ([a111768](https://github.com/0xsquid/api-sdk/commit/a1117686d7bb206ad5bed5ee9ee80e8e06b21860))
 
 ### [1.3.3-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.3.2...v1.3.3-beta.0) (2022-12-19)
-
 
 ### Features
 
@@ -189,13 +163,11 @@
 
 ### [1.3.1](https://github.com/0xsquid/api-sdk/compare/v1.2.0...v1.3.1) (2022-12-13)
 
-
 ### Features
 
 * add new route api params for usdc value ([#61](https://github.com/0xsquid/api-sdk/issues/61)) ([300b538](https://github.com/0xsquid/api-sdk/commit/300b538a298879fcc5bc32f3749e3bd88b6737a5))
 * add timeSpent param in status response ([#63](https://github.com/0xsquid/api-sdk/issues/63)) ([c979277](https://github.com/0xsquid/api-sdk/commit/c979277ab339e20faaf2713864b41d0fd959d41c))
 * sort and add new chainNames ([#66](https://github.com/0xsquid/api-sdk/issues/66)) ([41c465f](https://github.com/0xsquid/api-sdk/commit/41c465f0ac5a5f6f22c00a76028ef7257ad9b7cb))
-
 
 ### Bug Fixes
 
@@ -203,11 +175,9 @@
 
 ## [1.3.0](https://github.com/0xsquid/api-sdk/compare/v1.2.0...v1.3.0) (2022-12-08)
 
-
 ### Features
 
 * add new route api params for usdc value ([#61](https://github.com/0xsquid/api-sdk/issues/61)) ([300b538](https://github.com/0xsquid/api-sdk/commit/300b538a298879fcc5bc32f3749e3bd88b6737a5))
-
 
 ### Bug Fixes
 
@@ -215,16 +185,13 @@
 
 ## [1.2.0](https://github.com/0xsquid/api-sdk/compare/v1.1.0-beta.12...v1.2.0) (2022-11-21)
 
-
 ### Features
 
 * add custom contract calls type ([#53](https://github.com/0xsquid/api-sdk/issues/53)) ([80dc35b](https://github.com/0xsquid/api-sdk/commit/80dc35b7dbd7b3d410e82bf8a5a3094b9dfe691c))
 
-
 ### Bug Fixes
 
 * update api docs endpoint in readme ([#54](https://github.com/0xsquid/api-sdk/issues/54)) ([be60dcc](https://github.com/0xsquid/api-sdk/commit/be60dcc877dc59cb330e85bdb8f05ed5162a2762))
-
 
 ### Reverts
 
@@ -234,12 +201,10 @@
 
 ## [1.1.0-beta.12](https://github.com/0xsquid/api-sdk/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2022-11-01)
 
-
 ### Features
 
 * add axelarscan url param to sdk-info api ([#48](https://github.com/0xsquid/api-sdk/issues/48)) ([a0ebca2](https://github.com/0xsquid/api-sdk/commit/a0ebca23994ef54c9d6a21de22628845de86f4a4))
 * improve error handling ([#43](https://github.com/0xsquid/api-sdk/issues/43)) ([1b2ef73](https://github.com/0xsquid/api-sdk/commit/1b2ef7392784421cf950e9a481a2495c71be1e8f))
-
 
 ### Bug Fixes
 
@@ -248,13 +213,14 @@
 
 ## 1.1.0-beta.11 (2022-10-28)
 
-
 ### Features
 
 * setup release branch cut github action ([#45](https://github.com/0xsquid/api-sdk/issues/45)) ([5c7838e](https://github.com/0xsquid/api-sdk/commit/5c7838e4d613dc1e692e72c4c38c5a7463cf3e9a))
+
 ## 1.1.0-beta.10 (2022-10-27)
 
 ### BugFix
+
 * task: remove crosschain and commonKey from tokenData ([8a70e4f](https://github.com/0xsquid/squid-sdk/commit/10874d913247e7a0b1aba952d48dda8208a70e4f))
 
 ## 1.1.0-beta.9 (2022-10-21)
