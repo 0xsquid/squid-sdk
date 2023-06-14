@@ -1,4 +1,3 @@
-import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 import axios, { AxiosInstance } from "axios";
 import {
   Coin,
@@ -9,39 +8,40 @@ import {
 } from "@cosmjs/stargate";
 import { toUtf8 } from "@cosmjs/encoding";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 
 import {
   Allowance,
   Approve,
   ApproveRoute,
+  ChainData,
   Config,
   ExecuteRoute,
   GetRoute,
   GetStatus,
-  StatusResponse,
-  RouteResponse,
-  TokenData,
   IsRouteApproved,
   RouteData,
-  RouteParamsData,
-  ValidateBalanceAndApproval,
-  ChainData,
   RouteParams,
   TransactionRequest,
   CosmosMsg,
   IBC_TRANSFER_TYPE,
   WASM_TYPE,
-  WasmHookMsg
+  WasmHookMsg,
+  RouteParamsData,
+  RouteResponse,
+  StatusResponse,
+  TokenData,
+  ValidateBalanceAndApproval
 } from "./types";
 
+import { parseRouteResponse } from "./0xsquid/v1/route";
+import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
+import { parseStatusResponse } from "./0xsquid/v1/status";
 import erc20Abi from "./abi/erc20.json";
-import { getChainData, getTokenData } from "./utils";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
+import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
-import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
-import { parseRouteResponse } from "./0xsquid/v1/route";
-import { parseStatusResponse } from "./0xsquid/v1/status";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -54,6 +54,7 @@ export class Squid {
   public chains: ChainData[] = [] as ChainData[];
   public axelarscanURL: string | undefined;
   public isInMaintenanceMode = false;
+  public maintenanceMessage: string | undefined;
 
   constructor(config = {} as Config) {
     this.axiosInstance = setAxiosInterceptors(
@@ -257,6 +258,7 @@ export class Squid {
     this.chains = typeResponse.chains;
     this.axelarscanURL = typeResponse.axelarscanURL;
     this.isInMaintenanceMode = typeResponse.isInMaintenanceMode;
+    this.maintenanceMessage = typeResponse.maintenanceMessage;
     this.initialized = true;
   }
 
