@@ -1,5 +1,12 @@
 
 
+### [1.6.5](https://github.com/0xsquid/api-sdk/compare/v1.6.4...v1.6.5) (2023-06-14)
+
+
+### Bug Fixes
+
+* get status param bug ([#135](https://github.com/0xsquid/api-sdk/issues/135)) ([71f5468](https://github.com/0xsquid/api-sdk/commit/71f54686651f0ae09f613ad3a0cfdb167787450d))
+
 ### [1.6.4](https://github.com/0xsquid/api-sdk/compare/v1.6.3...v1.6.4) (2023-06-13)
 
 
