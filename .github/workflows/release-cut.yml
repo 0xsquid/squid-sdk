@@ -23,6 +23,15 @@ on:
         description: Runs NPM publish with the --dry-run flag to prevent publication, defaults to false
         required: false
         default: false
+      tag:
+        type: choice
+        description: The tag to publish to in NPM. e.g. latest or beta
+        default: "latest"
+        required: true
+        options:
+          - latest
+          - alpha
+          - beta
 
 jobs:
   cut-release:
@@ -115,6 +124,7 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           dry-run: ${{ github.event.inputs.dry-run }}
+          tag: ${{github.event.inputs.tag}}
 
       - if: ${{ github.event.inputs.npm-release == 'true' && steps.publish.outputs.type != 'none' && github.event.inputs.dry-run == 'false'}}
         run: |
