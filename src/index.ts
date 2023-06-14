@@ -590,13 +590,15 @@ export class Squid {
     const response = await this.axiosInstance.get("/v1/status", {
       params,
       headers: {
+        ...(this.axiosInstance.defaults.headers.common &&
+          this.axiosInstance.defaults.headers.common),
         ...(params.requestId && { "x-request-id": params.requestId }),
         ...(params.integratorId && { "x-integrator-id": params.integratorId })
       }
     });
 
     const statusResponse: StatusResponse = parseStatusResponse(
-      response.data,
+      response,
       response.headers
     );
     return statusResponse;
