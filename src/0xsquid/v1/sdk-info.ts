@@ -1,6 +1,6 @@
 import { SdkInfoResponse } from "../../types";
-import { parseTokenDataList } from "./tokens";
 import { parseChainData } from "./chains";
+import { parseTokenDataList } from "./tokens";
 
 export const parseSdkInfoResponse = (response: any): SdkInfoResponse => {
   const {
@@ -8,6 +8,7 @@ export const parseSdkInfoResponse = (response: any): SdkInfoResponse => {
     tokens,
     axelarscanURL,
     isInMaintenanceMode,
+    maintenanceMessage,
     expressDefaultDisabled
   } = response;
   return {
@@ -15,6 +16,7 @@ export const parseSdkInfoResponse = (response: any): SdkInfoResponse => {
     tokens: parseTokenDataList(tokens),
     axelarscanURL,
     isInMaintenanceMode,
+    maintenanceMessage,
     expressDefaultDisabled
   };
 };
