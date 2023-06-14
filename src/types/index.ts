@@ -322,6 +322,7 @@ export type SdkInfoResponse = {
   tokens: TokenData[];
   axelarscanURL: string;
   isInMaintenanceMode: boolean;
+  maintenanceMessage?: string;
   expressDefaultDisabled: ChainName[];
 };
 
