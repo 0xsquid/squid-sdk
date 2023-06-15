@@ -256,16 +256,18 @@ export const parseRouteResponse = (
 ): RouteResponse => {
   const { route, status, message } = response;
 
-const routeResponse = {
- ...getHeaderTracker(headers),
-  route: route && {
-    estimate: parseEstimate(route.estimate),
-    transactionRequest: route.transactionRequest && parseTransactionRequest(route.transactionRequest),
-    params: parseParams(route.params)
-  },
-  status,
-  message
-};
+  const routeResponse = {
+    ...getHeaderTracker(headers),
+    route: route && {
+      estimate: parseEstimate(route.estimate),
+      transactionRequest:
+        route.transactionRequest &&
+        parseTransactionRequest(route.transactionRequest),
+      params: parseParams(route.params)
+    },
+    status,
+    message
+  };
 
-return removeEmpty(routeResponse);
+  return removeEmpty(routeResponse);
 };
