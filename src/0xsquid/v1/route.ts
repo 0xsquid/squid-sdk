@@ -254,18 +254,20 @@ export const parseRouteResponse = (
   response: any,
   headers: AxiosResponseHeaders
 ): RouteResponse => {
-  const {
-    route: { estimate, transactionRequest, params }
-  } = response;
-  const routeResponse = removeEmpty({
+  const { route, status, message } = response;
+
+  const routeResponse = {
     ...getHeaderTracker(headers),
-    route: {
-      estimate: parseEstimate(estimate),
-      transactionRequest: transactionRequest
-        ? parseTransactionRequest(transactionRequest)
-        : undefined,
-      params: parseParams(params)
-    }
-  });
-  return routeResponse;
+    route: route && {
+      estimate: parseEstimate(route.estimate),
+      transactionRequest:
+        route.transactionRequest &&
+        parseTransactionRequest(route.transactionRequest),
+      params: parseParams(route.params)
+    },
+    status,
+    message
+  };
+
+  return removeEmpty(routeResponse);
 };
