@@ -297,6 +297,8 @@ export type RouteResponse = {
   route: RouteData;
   requestId?: string;
   integratorId?: string;
+  status?: string;
+  message?: string;
 };
 
 export type ChainsResponse = {
