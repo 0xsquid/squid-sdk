@@ -467,6 +467,7 @@ export type StatusResponse = ApiBasicResponse & {
   timeSpent?: Record<string, number>;
   requestId?: string;
   integratorId?: string;
+  routeStatus?: any; //TODO add type
 };
 
 export type CosmosMsg = {
