@@ -1,5 +1,12 @@
 
 
+### [1.4.4-beta.1](https://github.com/0xsquid/api-sdk/compare/v1.4.4-beta.0...v1.4.4-beta.1) (2023-06-16)
+
+
+### Features
+
+* added route response ([03acba0](https://github.com/0xsquid/api-sdk/commit/03acba0ee9caeb997d888e5d59c72f6e1da77cef))
+
 ### [1.4.4-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.6.3...v1.4.4-beta.0) (2023-06-15)
 
 
