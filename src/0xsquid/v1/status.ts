@@ -58,7 +58,8 @@ export const parseStatusResponse = (
     axelarTransactionUrl,
     fromChain,
     toChain,
-    timeSpent
+    timeSpent,
+    routeStatus
   } = response.data;
   return removeEmpty({
     id,
@@ -69,6 +70,7 @@ export const parseStatusResponse = (
     fromChain: parseTransactionStatus(fromChain),
     toChain: parseTransactionStatus(toChain),
     timeSpent: timeSpent,
+    routeStatus: routeStatus,
     ...getHeaderTracker(headers),
     ...apiBasicResponse
   }) as StatusResponse;
