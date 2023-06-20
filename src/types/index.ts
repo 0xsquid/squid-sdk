@@ -414,6 +414,8 @@ export type GetStatus = {
   transactionId: string;
   requestId?: string;
   integratorId?: string;
+  fromChainId?: string | number;
+  toChainId?: string | number;
 };
 
 export type GasCost = {
