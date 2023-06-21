@@ -25,7 +25,7 @@ export const parseTransactionStatus = (data: any) => {
     blockNumber,
     callEventStatus,
     callEventLog,
-    chainData: parseChainData([chainData]).pop(),
+    chainData: chainData ? parseChainData([chainData]).pop() : undefined,
     transactionUrl
   }) as TransactionStatus;
 };
