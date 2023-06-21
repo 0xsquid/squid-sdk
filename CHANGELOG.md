@@ -1,5 +1,12 @@
 
 
+## [1.5.0-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.4.5-beta.0...v1.5.0-beta.0) (2023-06-21)
+
+
+### Bug Fixes
+
+* handle undefined chaindata in parse status ([5ff0efe](https://github.com/0xsquid/api-sdk/commit/5ff0efe34ff1f37a19f18d9293fa1f25fffe6519))
+
 ### [1.4.5-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.4.4-beta.0...v1.4.5-beta.0) (2023-06-20)
 
 
