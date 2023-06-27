@@ -433,4 +433,5 @@ export type StatusResponse = ApiBasicResponse & {
   timeSpent?: Record<string, number>;
   requestId?: string;
   integratorId?: string;
+  squidTransactionStatus?: string;
 };
