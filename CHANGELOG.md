@@ -1,5 +1,12 @@
 
 
+### [1.7.3](https://github.com/0xsquid/api-sdk/compare/v1.7.2...v1.7.3) (2023-06-27)
+
+
+### Features
+
+* add squidTransactionStatus param ([#154](https://github.com/0xsquid/api-sdk/issues/154)) ([41d5d84](https://github.com/0xsquid/api-sdk/commit/41d5d843fb12bdd91e34c8a4964682045c8ab2e5))
+
 ### [1.7.2](https://github.com/0xsquid/api-sdk/compare/v1.7.1...v1.7.2) (2023-06-21)
 
 
