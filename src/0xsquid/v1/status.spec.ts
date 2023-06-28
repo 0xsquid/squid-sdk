@@ -99,7 +99,12 @@ describe("status", () => {
         transactionUrl:
           "https://moonbase.moonscan.io/tx/0x4b39d5597cf6d5191217bde7ed435bdf26f9ec4591b958713296c16b01bd9af5"
       },
-      errors: {}
+      timeSpent: {
+        call_express_executed: 13,
+        total: 47
+      },
+      errors: {},
+      squidTransactionStatus: "received"
     }
   };
   describe("parseTransactionStatus", () => {
@@ -178,6 +183,12 @@ describe("status", () => {
       });
       it("should contain toChain", () => {
         expect(result).toHaveProperty("toChain");
+      });
+      it("should contain timeSpent", () => {
+        expect(result).toHaveProperty("timeSpent");
+      });
+      it("should contain squidTransactionStatus", () => {
+        expect(result).toHaveProperty("squidTransactionStatus");
       });
     });
   });
