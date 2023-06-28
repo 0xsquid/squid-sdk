@@ -33,8 +33,8 @@
     "release:dry": "release-it --dry-run"
   },
   "dependencies": {
-    "@cosmjs/encoding": "^0.30.1",
-    "@cosmjs/stargate": "^0.30.1",
+    "@cosmjs/encoding": "^0.31.0",
+    "@cosmjs/stargate": "^0.31.0",
     "@release-it/conventional-changelog": "release-it/conventional-changelog",
     "axios": "^0.27.2",
     "cosmjs-types": "^0.8.0",
