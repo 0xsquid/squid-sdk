@@ -470,6 +470,7 @@ export type StatusResponse = ApiBasicResponse & {
   requestId?: string;
   integratorId?: string;
   routeStatus?: any; //TODO add type
+  squidTransactionStatus?: string;
 };
 
 export type CosmosMsg = {
