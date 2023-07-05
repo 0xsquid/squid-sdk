@@ -1,7 +1,6 @@
+import { SigningStargateClient } from "@cosmjs/stargate";
 import { ethers } from "ethers";
 import { LogLevel } from "../error";
-import { SigningStargateClient } from "@cosmjs/stargate";
-import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 
 export enum ChainName {
   ACRECHAIN = "acre",
@@ -188,6 +187,7 @@ export type GetRoute = {
   fromToken: string;
   toToken: string;
   cosmosSignerAddress?: string;
+  evmFallbackAddress?: string;
   fromAmount: string;
   toAddress: string;
   slippage: number;
