@@ -14,8 +14,8 @@
   ],
   "scripts": {
     "clean": "rimraf dist tsconfig.tsbuildinfo",
-    "lint": "eslint --ext .js,.ts,.json .",
-    "lint:fix": "eslint --ext .js,.ts,.json . --fix",
+    "lint": "eslint --ext .js,.ts,.json,.yml .",
+    "lint:fix": "eslint --ext .js,.ts,.json,.yml . --fix",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "prepare": "husky install",
     "test": "jest ./*/*.spec.ts --verbose",
