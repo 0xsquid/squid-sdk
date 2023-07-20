@@ -21,11 +21,8 @@ describe("status", () => {
         callEventStatus: "",
         callEventLog: [],
         chainData: {
-          chainName: "Ethereum-2",
           chainType: "evm",
           rpc: "https://goerli.infura.io/v3/e558ada833174869b035ae269bf2d107",
-          internalRpc:
-            "https://goerli.infura.io/v3/e558ada833174869b035ae269bf2d107",
           networkName: "ETH Goerli Testnet",
           chainId: 5,
           nativeCurrency: {
@@ -36,12 +33,6 @@ describe("status", () => {
           },
           chainIconURI: "https://axelarscan.io/logos/chains/ethereum.svg",
           blockExplorerUrls: ["https://goerli.etherscan.io/"],
-          chainNativeContracts: {
-            wrappedNativeToken: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-            ensRegistry: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
-            multicall: "0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e",
-            usdcToken: "0x254d06f33bDc5b8ee05b2ea472107E300226659A"
-          },
           axelarContracts: {
             gateway: "0xBC6fcce7c5487d43830a219CA6E7B83238B41e71",
             forecallable: ""
@@ -52,7 +43,13 @@ describe("status", () => {
               "0x254d06f33bDc5b8ee05b2ea472107E300226659A",
             squidMulticall: "0x7555094bFFbBd7245163C3d16105031d923B1194"
           },
-          estimatedRouteDuration: 900
+          estimatedRouteDuration: 900,
+          chainNativeContracts: {
+            wrappedNativeToken: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+            ensRegistry: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+            multicall: "0x77dCa2C955b15e9dE4dbBCf1246B4B85b651e50e",
+            usdcToken: "0x254d06f33bDc5b8ee05b2ea472107E300226659A"
+          }
         },
         transactionUrl:
           "https://goerli.etherscan.io/tx/0x340f90f07ae08285cc5bab5d9eba0802a9e3e8f96551ff4afcbc75fbee68d3fd"

@@ -30,5 +30,6 @@ Squid {
   "initialized": false,
   "isInMaintenanceMode": false,
   "tokens": Array [],
+  "version": "v2",
 }
 `;
