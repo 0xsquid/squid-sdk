@@ -1,4 +1,10 @@
 import {
+  ChainName,
+  ChainType,
+  CosmosChain,
+  NetworkIdentifier
+} from "@0xsquid/squid-types";
+import {
   parseEvmChain,
   parseBaseChain,
   parseChainData,
@@ -6,26 +12,26 @@ import {
   parseSquidContracts,
   parseAxelarContracts
 } from "./chains";
-import { ChainType, CosmosChain } from "../../types";
 
 describe("chains", () => {
   const data = {
     chains: [
       {
-        chainName: "Ethereum",
-        chainType: "evm",
+        axelarChainName: ChainName.ETHEREUM,
+        networkIdentifier: NetworkIdentifier.ETHEREUM,
+        chainType: ChainType.EVM,
         rpc: "https://eth-rpc.gateway.pokt.network",
-        internalRpc:
-          "https://mainnet.infura.io/v3/273aad656cd94f9aa022e4899b87dd6c",
-        networkName: "Mainnet",
-        chainId: 1,
+        networkName: "Ethereum",
+        chainId: "1",
         nativeCurrency: {
           name: "Ethereum",
           symbol: "ETH",
           decimals: 18,
-          icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880"
+          icon: "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png"
         },
-        chainIconURI: "https://axelarscan.io/logos/chains/ethereum.svg",
+        swapAmountForGas: "2000000",
+        chainIconURI:
+          "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png",
         blockExplorerUrls: ["https://etherscan.io/"],
         chainNativeContracts: {
           wrappedNativeToken: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
@@ -40,74 +46,88 @@ describe("chains", () => {
         squidContracts: {
           squidRouter: "0xce16F69375520ab01377ce7B88f5BA8C48F8D666",
           defaultCrosschainToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-          squidMulticall: "0x28D04fD16B2D7b8c0FDAdb821E381b72fe3CC11e"
+          squidMulticall: "0x4fd39C9E151e50580779bd04B1f7eCc310079fd3"
         },
-        estimatedRouteDuration: 900
+        estimatedRouteDuration: 960,
+        estimatedExpressRouteDuration: 20
       },
       {
-        chainName: "crescent",
-        chainType: "cosmos",
-        rpc: "https://mainnet.crescent.network:26657",
-        internalRpc: "https://mainnet.crescent.network:26657",
-        rest: "https://mainnet.crescent.network:1317",
-        networkName: "Crescent",
-        chainId: "crescent-1",
+        axelarChainName: ChainName.EVMOS,
+        networkIdentifier: NetworkIdentifier.EVMOS,
+        chainType: ChainType.COSMOS,
+        rpc: "/chain/evmos",
+        rest: "https://rest.bd.evmos.org:1317",
         nativeCurrency: {
-          name: "Crescent",
-          symbol: "CRE",
+          name: "Evmos",
+          symbol: "EVMOS",
           decimals: 6,
-          icon: "https://assets.coingecko.com/coins/images/25061/small/logo_200x200.png?1649943220"
+          icon: "https://raw.githubusercontent.com/cosmos/chain-registry/master/evmos/images/evmos.png"
         },
-        chainIconURI: "https://axelarscan.io/logos/chains/crescent.svg",
-        blockExplorerUrls: ["https://www.mintscan.io/crescent"],
+        swapAmountForGas: "2000000",
+        chainIconURI: "https://axelarscan.io/logos/chains/evmos.svg",
+        networkName: "Evmos",
+        chainId: "evmos_9001-2",
+        blockExplorerUrls: [
+          "https://ezstaking.tools/evmos",
+          "https://www.mintscan.io/evmos",
+          "https://evmos.bigdipper.live",
+          "https://evm.evmos.org",
+          "https://ping.pub/evmos",
+          "https://evmos.explorers.guru",
+          "https://atomscan.com/evmos",
+          "https://evmos.tcnetwork.io"
+        ],
+        stakeCurrency: {
+          coinDenom: "EVMOS",
+          coinMinimalDenom: "aevmos",
+          coinDecimals: 18,
+          coingeckoId: "evmos"
+        },
+        walletUrl: "https://wallet.keplr.app/chains/evmos",
+        walletUrlForStaking: "https://wallet.keplr.app/chains/evmos",
         bip44: {
-          coinType: 118
+          coinType: 60
         },
         bech32Config: {
-          bech32PrefixAccAddr: "cre",
-          bech32PrefixAccPub: "crepub",
-          bech32PrefixValAddr: "crevaloper",
-          bech32PrefixValPub: "crevaloperpub",
-          bech32PrefixConsAddr: "crevalcons",
-          bech32PrefixConsPub: "crevalconspub"
+          bech32PrefixAccAddr: "evmos",
+          bech32PrefixAccPub: "evmospub",
+          bech32PrefixValAddr: "evmosvaloper",
+          bech32PrefixValPub: "evmosvaloperpub",
+          bech32PrefixConsAddr: "evmosvalcons",
+          bech32PrefixConsPub: "evmosvalconspub"
         },
         currencies: [
           {
-            coinDenom: "CRE",
-            coinMinimalDenom: "ucre",
-            coinDecimals: 6,
-            coingeckoId: "crescent"
+            coinDenom: "EVMOS",
+            coinMinimalDenom: "aevmos",
+            coinDecimals: 18,
+            coingeckoId: "evmos"
           }
         ],
         feeCurrencies: [
           {
-            coinDenom: "CRE",
-            coinMinimalDenom: "ucre",
-            coinDecimals: 6,
-            coingeckoId: "crescent"
+            coinDenom: "EVMOS",
+            coinMinimalDenom: "aevmos",
+            coinDecimals: 18,
+            coingeckoId: "evmos"
           }
         ],
-        stakeCurrency: {
-          coinDenom: "CRE",
-          coinMinimalDenom: "ucre",
-          coinDecimals: 6,
-          coingeckoId: "crescent"
-        },
-        coinType: 118,
         gasPriceStep: {
-          low: 1,
-          average: 1,
-          high: 1
+          low: 25000000000,
+          average: 25000000000,
+          high: 40000000000
         },
-        features: ["stargate", "ibc-transfer", "no-legacy-stdTx"],
-        estimatedRouteDuration: 180,
+        coinType: 60,
+        features: ["ibc-transfer", "ibc-go", "eth-address-gen", "eth-key-sign"],
         squidContracts: {
           defaultCrosschainToken: "uusdc"
         },
         axelarContracts: {
           gateway: ""
         },
-        chainToAxelarChannelId: "channel-4"
+        chainToAxelarChannelId: "channel-21",
+        estimatedRouteDuration: 180,
+        estimatedExpressRouteDuration: 20
       }
     ]
   };
@@ -175,17 +195,14 @@ describe("chains", () => {
       it("should have Bridge type", () => {
         expect(expected.chainType).toBe(ChainType.EVM);
       });
-      it("should contain chainName", () => {
-        expect(expected).toHaveProperty("chainName");
+      it("should contain axelarChainName", () => {
+        expect(expected).toHaveProperty("axelarChainName");
       });
       it("should contain rpc", () => {
         expect(expected).toHaveProperty("rpc");
       });
-      it("should contain internalRpc", () => {
-        expect(expected).toHaveProperty("internalRpc");
-      });
       it("should contain networkName", () => {
-        expect(expected).toHaveProperty("networkName");
+        expect(expected).toHaveProperty("networkIdentifier");
       });
       it("should contain chainId", () => {
         expect(expected).toHaveProperty("chainId");
@@ -220,17 +237,14 @@ describe("chains", () => {
       it("should have Bridge type", () => {
         expect(expected.chainType).toBe(ChainType.EVM);
       });
-      it("should contain chainName", () => {
-        expect(expected).toHaveProperty("chainName");
+      it("should contain axelarChainName", () => {
+        expect(expected).toHaveProperty("axelarChainName");
       });
       it("should contain rpc", () => {
         expect(expected).toHaveProperty("rpc");
       });
-      it("should contain internalRpc", () => {
-        expect(expected).toHaveProperty("internalRpc");
-      });
       it("should contain networkName", () => {
-        expect(expected).toHaveProperty("networkName");
+        expect(expected).toHaveProperty("networkIdentifier");
       });
       it("should contain chainId", () => {
         expect(expected).toHaveProperty("chainId");
@@ -269,19 +283,16 @@ describe("chains", () => {
         expect(expected).toEqual(selected);
       });
       it("should have Bridge type", () => {
-        expect(expected.chainType).toBe(ChainType.Cosmos);
+        expect(expected.chainType).toBe(ChainType.COSMOS);
       });
-      it("should contain chainName", () => {
-        expect(expected).toHaveProperty("chainName");
+      it("should contain axelarChainName", () => {
+        expect(expected).toHaveProperty("axelarChainName");
       });
       it("should contain rpc", () => {
         expect(expected).toHaveProperty("rpc");
       });
-      it("should contain internalRpc", () => {
-        expect(expected).toHaveProperty("internalRpc");
-      });
       it("should contain networkName", () => {
-        expect(expected).toHaveProperty("networkName");
+        expect(expected).toHaveProperty("networkIdentifier");
       });
       it("should contain chainId", () => {
         expect(expected).toHaveProperty("chainId");
@@ -312,7 +323,7 @@ describe("chains", () => {
         expect(expected).toEqual(selected);
       });
       it("should have ChainType.Cosmos", () => {
-        expect(expected.chainType).toBe(ChainType.Cosmos);
+        expect(expected.chainType).toBe(ChainType.COSMOS);
       });
       it("should contain optional chainId", () => {
         expect(expected).toHaveProperty("chainId");

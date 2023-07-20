@@ -18,7 +18,7 @@ describe("SquidSdk approve method", () => {
     },
     status: 200
   });
-  const mockedAxios = (axios.create as jest.Mock).mockReturnValue({
+  (axios.create as jest.Mock).mockReturnValue({
     get: getMocked,
     interceptors: {
       response: {
@@ -31,9 +31,7 @@ describe("SquidSdk approve method", () => {
   const mockedContract = jest.fn().mockReturnValue({
     approve: mockedApprove
   });
-  const mockedEthers = (
-    ethers.Contract as unknown as jest.Mock
-  ).mockImplementation(mockedContract);
+  (ethers.Contract as unknown as jest.Mock).mockImplementation(mockedContract);
 
   it("should call the approve method with infinite amount", async () => {
     const squidSdk = new Squid();
@@ -44,7 +42,7 @@ describe("SquidSdk approve method", () => {
       signer: {} as ethers.Wallet,
       spender: "0x6972A415e0572bd2E5E3c7DF307d0AFe32D30955",
       tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      chainId: 1
+      chainId: "1"
     });
 
     expect(mockedApprove).toHaveBeenCalledWith(
@@ -64,7 +62,7 @@ describe("SquidSdk approve method", () => {
       signer: {} as ethers.Wallet,
       spender: "0x6972A415e0572bd2E5E3c7DF307d0AFe32D30955",
       tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      chainId: 1,
+      chainId: "1",
       amount: "100"
     });
 

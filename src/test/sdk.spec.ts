@@ -15,7 +15,7 @@ describe("Squid", () => {
       },
       status: 200
     });
-    const mockedAxios = (axios.create as jest.Mock).mockReturnValue({
+    (axios.create as jest.Mock).mockReturnValue({
       get: getMocked,
       interceptors: {
         response: {
@@ -58,7 +58,7 @@ describe("Squid", () => {
         },
         status: 200
       });
-      const mockedAxios = (axios.create as jest.Mock).mockReturnValue({
+      (axios.create as jest.Mock).mockReturnValue({
         get: getMocked,
         interceptors: {
           response: {

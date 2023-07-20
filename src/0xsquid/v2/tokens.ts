@@ -1,6 +1,7 @@
-import { TokenData, TokensResponse } from "../../types";
-import { removeEmpty } from "./util";
-export const parseTokenData = (data: any): TokenData => {
+import { Token } from "@0xsquid/squid-types";
+import { removeEmpty } from "../util";
+import { TokensResponse } from "types";
+export const parseTokenData = (data: any): Token => {
   const {
     chainId,
     address,
@@ -11,7 +12,9 @@ export const parseTokenData = (data: any): TokenData => {
     coingeckoId,
     commonKey,
     bridgeOnly,
-    ibcDenom
+    ibcDenom,
+    type,
+    usdPrice
   } = data;
   return removeEmpty({
     chainId,
@@ -23,11 +26,13 @@ export const parseTokenData = (data: any): TokenData => {
     coingeckoId,
     commonKey,
     bridgeOnly,
+    type,
+    usdPrice,
     ibcDenom
   });
 };
 
-export const parseTokenDataList = (data: any[]): TokenData[] => {
+export const parseTokenDataList = (data: any[]): Token[] => {
   const tokenDataList = data.map((token: any) => {
     return parseTokenData(token);
   });

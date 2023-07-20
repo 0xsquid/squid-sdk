@@ -1,11 +1,11 @@
+import { ChainData, Token } from "@0xsquid/squid-types";
 import { AxiosRequestHeaders } from "axios";
-import { ChainData, TokenData } from "../types";
 
 export const getTokenData = (
-  tokens: TokenData[],
+  tokens: Token[],
   address: string,
-  chainId: number | string
-): TokenData | undefined =>
+  chainId: string
+): Token | undefined =>
   tokens.find(
     e =>
       e.address.toLowerCase() === address?.toLowerCase() && e.chainId == chainId
@@ -13,7 +13,7 @@ export const getTokenData = (
 
 export const getChainData = (
   chains: ChainData[],
-  chainId: number | string
+  chainId: string
 ): ChainData | undefined => chains.find(chain => chain.chainId == chainId);
 
 export const getHeaderTracker = (headers: AxiosRequestHeaders) => {

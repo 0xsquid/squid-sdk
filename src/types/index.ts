@@ -1,154 +1,18 @@
 import { ethers } from "ethers";
 import { LogLevel } from "../error";
-
-export enum ChainName {
-  ACRECHAIN = "acre",
-  AGORIC = "agoric",
-  ARBITRUM = "Arbitrum",
-  ARBITRUM2 = "arbitrum",
-  ASSETMANTLE = "assetmantle",
-  AURA = "aura",
-  AURORA = "aurora",
-  AVALANCHE = "Avalanche",
-  AXELARNET = "axelarnet",
-  BASE = "base",
-  BINANCE = "binance",
-  CARBON = "carbon",
-  CELO = "celo",
-  COMDEX = "comdex",
-  COSMOS = "cosmoshub",
-  CRESCENT = "crescent",
-  EMONEY = "e-money",
-  ETHEREUM = "Ethereum",
-  ETHEREUM2 = "Ethereum-2",
-  EVMOS = "evmos",
-  FANTOM = "Fantom",
-  FETCH = "fetch",
-  FILECOIN = "filecoin",
-  INJECTIVE = "injective",
-  JUNO = "juno",
-  KAVA = "kava",
-  KI = "ki",
-  KUJIRA = "kujira",
-  MOONBEAM = "Moonbeam",
-  NEUTRON = "neutron",
-  OPTIMISM = "optimism",
-  OSMOSIS = "osmosis",
-  OSMOSIS5 = "osmosis-5",
-  POLYGON = "Polygon",
-  REGEN = "regen",
-  SEI = "sei",
-  SECRET = "secret",
-  SECRETSNIP = "secret-snip",
-  STARGAZE = "stargaze",
-  STRIDE = "stride",
-  TERRA2 = "terra-2",
-  UMEE = "umee",
-  XPLA = "xpla"
-}
-
-export enum ChainType {
-  EVM = "evm",
-  Cosmos = "cosmos"
-}
-
-export type BaseChain = {
-  chainId: number | string;
-  chainType: ChainType;
-  chainName: ChainName;
-  networkName: string;
-  rpc: string;
-  internalRpc: string;
-  chainIconURI: string;
-  blockExplorerUrls: string[];
-  estimatedRouteDuration: number;
-  estimatedExpressRouteDuration: number;
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    icon: string;
-  };
-  squidContracts: {
-    defaultCrosschainToken: string;
-    squidRouter?: string;
-    squidMulticall?: string;
-  };
-  axelarContracts: {
-    gateway: string;
-    forecallable?: string;
-  };
-};
-
-export type EvmChain = BaseChain & {
-  chainNativeContracts: {
-    wrappedNativeToken: string;
-    ensRegistry: string;
-    multicall: string;
-    usdcToken: string;
-  };
-};
-
-export type CosmosCurrency = {
-  coinDenom: string;
-  coinMinimalDenom: string;
-  coinDecimals: number;
-  coingeckoId?: string;
-};
-
-export type BIP44 = {
-  coinType: number;
-};
-
-export type Bech32Config = {
-  bech32PrefixAccAddr: string;
-  bech32PrefixAccPub: string;
-  bech32PrefixValAddr: string;
-  bech32PrefixValPub: string;
-  bech32PrefixConsAddr: string;
-  bech32PrefixConsPub: string;
-};
-
-export type CosmosGasType = {
-  low: number;
-  average: number;
-  high: number;
-};
-
-export type CosmosChain = BaseChain & {
-  rest: string;
-  stakeCurrency: CosmosCurrency;
-  walletUrl?: string;
-  walletUrlForStaking?: string;
-  bip44: BIP44;
-  alternativeBIP44s?: BIP44[];
-  bech32Config: Bech32Config;
-  currencies: CosmosCurrency[];
-  feeCurrencies: CosmosCurrency[];
-  coinType?: number;
-  features?: string[];
-  gasPriceStep?: CosmosGasType;
-  chainToAxelarChannelId: string;
-};
-
-export type ChainData = EvmChain | CosmosChain;
+import {
+  ChainName,
+  RouteResponse as RouteData,
+  ChainData,
+  Token,
+  SquidData
+} from "@0xsquid/squid-types";
 
 export type MapChainIdName = {
   [key: string | number]: ChainName;
 };
 
-export type TokenData = {
-  chainId: number | string;
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  logoURI: string;
-  coingeckoId: string;
-  commonKey?: string;
-  bridgeOnly?: boolean;
-  ibcDenom?: string;
-};
+export type TransactionRequest = SquidData;
 
 export type Config = {
   apiKey?: string;
@@ -161,132 +25,11 @@ export type Config = {
   integratorId?: string;
 };
 
-export enum SquidCallType {
-  DEFAULT = 0,
-  FULL_TOKEN_BALANCE = 1,
-  FULL_NATIVE_BALANCE = 2,
-  COLLECT_TOKEN_BALANCE = 3
-}
-
-export type ContractCall = {
-  callType: SquidCallType;
-  target: string;
-  value?: string;
-  callData: string;
-  payload?: {
-    tokenAddress: string;
-    inputPos: number;
-  };
-  estimatedGas: string;
-};
-
-export type GetRoute = {
-  fromChain: number | string;
-  toChain: number | string;
-  fromToken: string;
-  toToken: string;
-  fromAmount: string;
-  toAddress: string;
-  slippage: number;
-  quoteOnly?: boolean;
-  enableExpress?: boolean;
-  customContractCalls?: ContractCall[];
-  prefer?: string[];
-  receiveGasOnDestination?: boolean;
-};
-
-export type TransactionRequest = {
-  routeType: string;
-  targetAddress: string;
-  data: string;
-  value: string;
-  gasLimit: string;
-  gasPrice: string;
-  maxFeePerGas: string;
-  maxPriorityFeePerGas: string;
-};
-
-export type OptimalRoute = {
-  fromChain: Route;
-  toChain: Route;
-};
-
-export type Route = Call[];
-
-export enum CallType {
-  SWAP = "SWAP",
-  BRIDGE = "BRIDGE",
-  CUSTOM = "CUSTOM"
-}
-
-export type BaseCall = {
-  type: CallType;
-};
-
-export type Swap = BaseCall & {
-  dex: {
-    chainName: string;
-    dexName: string;
-    factory: string;
-    isStable: boolean;
-    swapRouter: string;
-  };
-  squidCallType: SquidCallType;
-  path: string[];
-  fromToken: TokenData;
-  toToken: TokenData;
-  fromAmount: string;
-  toAmount: string;
-  toAmountMin: string;
-  exchangeRate: string;
-  priceImpact: string;
-  dynamicSlippage?: number;
-};
-
-export type Bridge = BaseCall & {
-  fromToken: TokenData;
-  toToken: TokenData;
-  fromAmount: string;
-  toAmount: string;
-  toAmountMin: string;
-  exchangeRate: string;
-  priceImpact: string;
-};
-
-export type CustomCall = BaseCall & ContractCall;
-
-export type Call = Swap | CustomCall | Bridge;
-
-export type Estimate = {
-  fromAmount: string;
-  fromAmountUSD: string;
-  sendAmount: string;
-  toAmount: string;
-  toAmountMin: string;
-  toAmountUSD: string;
-  route: OptimalRoute;
-  exchangeRate?: string;
-  estimatedRouteDuration: number;
-  aggregatePriceImpact: string;
-  feeCosts: FeeCost[];
-  gasCosts: GasCost[];
-  isExpressSupported: boolean;
-};
-
-export type RouteParams = GetRoute & {
-  fromToken: TokenData;
-  toToken: TokenData;
-};
-
-export type RouteData = {
-  estimate: Estimate;
-  transactionRequest?: TransactionRequest;
-  params: GetRoute & { fromToken: TokenData; toToken: TokenData };
-};
+export type GetRoute = RouteData;
 
 export type SdkInfoResponse = {
   chains: ChainData[];
-  tokens: TokenData[];
+  tokens: Token[];
   axelarscanURL: string;
   isInMaintenanceMode: boolean;
   maintenanceMessage?: string;
@@ -306,7 +49,7 @@ export type ChainsResponse = {
 };
 
 export type TokensResponse = {
-  tokens: TokenData[];
+  tokens: Token[];
 };
 
 export type OverrideParams = Omit<
@@ -328,7 +71,7 @@ export type Allowance = {
   owner: string;
   spender: string;
   tokenAddress: string;
-  chainId: number | string;
+  chainId: string;
 };
 
 export type Approve = {
@@ -336,7 +79,7 @@ export type Approve = {
   spender: string;
   tokenAddress: string;
   amount?: string;
-  chainId: number | string;
+  chainId: string;
   overrides?: OverrideParams;
 };
 
@@ -357,8 +100,8 @@ export type ApproveRoute = {
 export type RouteParamsData = {
   fromChain: ChainData;
   toChain: ChainData;
-  fromToken: TokenData | undefined;
-  toToken: TokenData | undefined;
+  fromToken: Token | undefined;
+  toToken: Token | undefined;
   fromTokenContract: ethers.Contract | undefined;
   fromProvider: ethers.providers.JsonRpcProvider;
   fromIsNative: boolean;
@@ -380,27 +123,6 @@ export type GetStatus = {
   transactionId: string;
   requestId?: string;
   integratorId?: string;
-};
-
-export type GasCost = {
-  type: string;
-  token: TokenData;
-  amount: string;
-  amountUSD: string;
-  gasPrice: string;
-  maxFeePerGas: string;
-  maxPriorityFeePerGas: string;
-  estimate: string;
-  limit: string;
-};
-
-export type FeeCost = {
-  name: string;
-  description: string;
-  percentage: string;
-  token: TokenData;
-  amount: string;
-  amountUSD: string;
 };
 
 export type TransactionStatus = {

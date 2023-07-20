@@ -1,12 +1,12 @@
-import { removeEmpty } from "./util";
+import { removeEmpty } from "../util";
 import {
   BaseChain,
   ChainData,
-  ChainsResponse,
   ChainType,
   CosmosChain,
   EvmChain
-} from "../../types";
+} from "@0xsquid/squid-types";
+import { ChainsResponse } from "types";
 
 export const parseChainNativeContracts = (
   data: any
@@ -43,10 +43,10 @@ export const parseSquidContracts = (
 
 export const parseBaseChain = (data: any): BaseChain => {
   const {
-    chainName,
     chainType,
+    axelarChainName,
+    networkIdentifier,
     rpc,
-    internalRpc,
     networkName,
     chainId,
     nativeCurrency,
@@ -55,13 +55,14 @@ export const parseBaseChain = (data: any): BaseChain => {
     axelarContracts,
     squidContracts,
     estimatedRouteDuration,
-    estimatedExpressRouteDuration
+    estimatedExpressRouteDuration,
+    swapAmountForGas
   } = data;
   return {
-    chainName,
+    networkIdentifier,
+    axelarChainName,
     chainType,
     rpc,
-    internalRpc,
     networkName,
     chainId,
     nativeCurrency,
@@ -69,6 +70,7 @@ export const parseBaseChain = (data: any): BaseChain => {
     blockExplorerUrls,
     axelarContracts: parseAxelarContracts(axelarContracts),
     squidContracts: parseSquidContracts(squidContracts),
+    swapAmountForGas,
     estimatedRouteDuration,
     estimatedExpressRouteDuration
   } as BaseChain;
@@ -122,13 +124,13 @@ export const parseCosmosChain = (data: any): CosmosChain => {
 export const parseChainData = (data: any[]): ChainData[] => {
   const chains = data
     .filter((chain: BaseChain) =>
-      [ChainType.EVM, ChainType.Cosmos].includes(chain.chainType)
+      [ChainType.EVM, ChainType.COSMOS].includes(chain.chainType)
     )
     .map((chain: any) => {
       switch (chain.chainType as ChainType) {
         case ChainType.EVM:
           return parseEvmChain(chain);
-        case ChainType.Cosmos:
+        case ChainType.COSMOS:
           return parseCosmosChain(chain);
       }
     });

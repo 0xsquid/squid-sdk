@@ -5,39 +5,40 @@ import {
   Allowance,
   Approve,
   ApproveRoute,
-  ChainData,
   Config,
   ExecuteRoute,
   GetRoute,
   GetStatus,
   IsRouteApproved,
-  RouteData,
-  RouteParams,
   RouteParamsData,
   RouteResponse,
   StatusResponse,
-  TokenData,
-  TransactionRequest,
   ValidateBalanceAndApproval
 } from "./types";
 
-import { parseRouteResponse } from "./0xsquid/v1/route";
-import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
-import { parseStatusResponse } from "./0xsquid/v1/status";
 import erc20Abi from "./abi/erc20.json";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
 import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 
+import {
+  ChainData,
+  RouteRequest,
+  SquidData,
+  Token
+} from "@0xsquid/squid-types";
+import { parseSdkInfoResponse, parseRouteResponse } from "./0xsquid";
+
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
 export class Squid {
   private axiosInstance: AxiosInstance;
 
+  private version = "v2";
   public initialized = false;
   public config: Config;
-  public tokens: TokenData[] = [] as TokenData[];
+  public tokens: Token[] = [] as Token[];
   public chains: ChainData[] = [] as ChainData[];
   public axelarscanURL: string | undefined;
   public isInMaintenanceMode = false;
@@ -143,7 +144,7 @@ export class Squid {
     }
   }
 
-  private validateRouteParams(params: RouteParams): RouteParamsData {
+  private validateRouteParams(params: RouteRequest): RouteParamsData {
     const { fromChain, toChain, fromToken, toToken } = params;
 
     const _fromChain = getChainData(
@@ -194,8 +195,8 @@ export class Squid {
   }
 
   private validateTransactionRequest(
-    transactionRequest?: TransactionRequest
-  ): TransactionRequest {
+    transactionRequest?: SquidData
+  ): SquidData {
     if (!transactionRequest) {
       throw new SquidError({
         message: `transactionRequest param not found in route object`,
@@ -208,7 +209,7 @@ export class Squid {
   }
 
   public async init() {
-    const response = await this.axiosInstance.get("/v1/sdk-info");
+    const response = await this.axiosInstance.get("v2/sdk-info");
     if (response.status != 200) {
       throw new SquidError({
         message: `SDK initialization failed`,
@@ -239,7 +240,9 @@ export class Squid {
 
   public async getRoute(params: GetRoute): Promise<RouteResponse> {
     this.validateInit();
-    const response = await this.axiosInstance.get("/v1/route", { params });
+    const response = await this.axiosInstance.get(`${this.version}/route`, {
+      params
+    });
     if (response.status != 200) {
       response.data.error;
       throw new SquidError({
@@ -357,7 +360,7 @@ export class Squid {
     const {
       gasLimit,
       gasPrice,
-      targetAddress,
+      target,
       data,
       maxPriorityFeePerGas,
       maxFeePerGas,
@@ -386,7 +389,7 @@ export class Squid {
 
     return ethers.utils.serializeTransaction({
       chainId: parseInt(route.params.fromChain as string),
-      to: targetAddress,
+      to: target,
       data: data,
       value: BigNumber.from(value),
       nonce,
@@ -402,7 +405,7 @@ export class Squid {
 
     const { fromIsNative, fromChain, fromProvider, fromTokenContract } =
       this.validateRouteParams(route.params);
-    const { targetAddress } = this.validateTransactionRequest(
+    const { target } = this.validateTransactionRequest(
       route.transactionRequest
     );
 
@@ -511,11 +514,7 @@ export class Squid {
   }: Allowance): Promise<BigNumber> {
     this.validateInit();
 
-    const token = getTokenData(
-      this.tokens as TokenData[],
-      tokenAddress,
-      chainId
-    );
+    const token = getTokenData(this.tokens as Token[], tokenAddress, chainId);
     if (!token) {
       throw new SquidError({
         message: `Token not found for ${tokenAddress}`,
@@ -525,10 +524,7 @@ export class Squid {
       });
     }
 
-    const chain = getChainData(
-      this.chains as ChainData[],
-      token.chainId as number
-    );
+    const chain = getChainData(this.chains as ChainData[], token.chainId);
     if (!chain) {
       throw new SquidError({
         message: `Chain not found for ${token.chainId}`,
@@ -554,7 +550,7 @@ export class Squid {
     this.validateInit();
 
     const token = getTokenData(
-      this.tokens as TokenData[],
+      this.tokens as Token[],
       tokenAddress,
       chainId as number | string
     );
