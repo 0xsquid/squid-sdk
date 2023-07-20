@@ -1,6 +1,6 @@
 import { ChainData, Token } from "@0xsquid/squid-types";
 import { AxiosRequestHeaders } from "axios";
-import { ErrorType, SquidError } from "error";
+import { ErrorType, SquidError } from "../error";
 import { Config } from "types";
 
 export const getTokenData = (
