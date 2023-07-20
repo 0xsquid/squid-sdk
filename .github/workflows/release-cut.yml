@@ -58,7 +58,7 @@ jobs:
           ref: main
           node-version: 16.x
           fetch-depth: 0
-      
+
       - name: Authenticate with private NPM package
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
