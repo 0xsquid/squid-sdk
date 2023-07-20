@@ -5,7 +5,8 @@ import {
   RouteResponse as RouteData,
   ChainData,
   Token,
-  SquidData
+  SquidData,
+  RouteRequest
 } from "@0xsquid/squid-types";
 
 export type MapChainIdName = {
@@ -25,7 +26,7 @@ export type Config = {
   integratorId?: string;
 };
 
-export type GetRoute = RouteData;
+export type GetRoute = RouteRequest;
 
 export type SdkInfoResponse = {
   chains: ChainData[];
@@ -100,8 +101,8 @@ export type ApproveRoute = {
 export type RouteParamsData = {
   fromChain: ChainData;
   toChain: ChainData;
-  fromToken: Token | undefined;
-  toToken: Token | undefined;
+  fromToken: Token;
+  toToken: Token;
   fromTokenContract: ethers.Contract | undefined;
   fromProvider: ethers.providers.JsonRpcProvider;
   fromIsNative: boolean;

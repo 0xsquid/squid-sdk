@@ -15,7 +15,7 @@ import {
   StatusResponse,
   ValidateBalanceAndApproval
 } from "./types";
-
+import { RouteResponse as RouteData } from "@0xsquid/squid-types";
 import erc20Abi from "./abi/erc20.json";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
@@ -28,7 +28,11 @@ import {
   SquidData,
   Token
 } from "@0xsquid/squid-types";
-import { parseSdkInfoResponse, parseRouteResponse } from "./0xsquid";
+import {
+  parseSdkInfoResponse,
+  parseRouteResponse,
+  parseStatusResponse
+} from "./0xsquid";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -149,35 +153,33 @@ export class Squid {
 
     const _fromChain = getChainData(
       this.chains as ChainData[],
-      params.fromChain
+      fromChain,
+      this.config
     );
-    if (!_fromChain) {
-      throw new SquidError({
-        message: `fromChain not found for ${fromChain}`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
 
-    const _toChain = getChainData(this.chains as ChainData[], toChain);
-    if (!_toChain) {
-      throw new SquidError({
-        message: `toChain not found for ${fromChain}`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
+    const _toChain = getChainData(
+      this.chains as ChainData[],
+      toChain,
+      this.config
+    );
+
+    const _fromToken = getTokenData(
+      this.tokens,
+      fromToken,
+      fromChain,
+      this.config
+    );
+
+    const _toToken = getTokenData(this.tokens, toToken, toChain, this.config);
 
     const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
 
-    const fromIsNative = fromToken.address === nativeTokenConstant;
+    const fromIsNative = _fromToken.address === nativeTokenConstant;
     let fromTokenContract;
 
     if (!fromIsNative) {
       fromTokenContract = new ethers.Contract(
-        fromToken.address,
+        _fromToken.address,
         erc20Abi,
         fromProvider
       );
@@ -186,8 +188,8 @@ export class Squid {
     return {
       fromChain: _fromChain,
       toChain: _toChain,
-      fromToken,
-      toToken,
+      fromToken: _fromToken,
+      toToken: _toToken,
       fromTokenContract,
       fromProvider,
       fromIsNative
@@ -431,12 +433,12 @@ export class Squid {
 
       const allowance = await (fromTokenContract as ethers.Contract).allowance(
         sender,
-        targetAddress
+        target
       );
 
       if (amount.gt(allowance)) {
         throw new SquidError({
-          message: `Insufficient allowance for contract: ${targetAddress} on chain ${fromChain.chainId}`,
+          message: `Insufficient allowance for contract: ${target} on chain ${fromChain.chainId}`,
           errorType: ErrorType.ValidationError,
           logging: this.config.logging,
           logLevel: this.config.logLevel
@@ -480,7 +482,7 @@ export class Squid {
       route.params
     );
 
-    const { targetAddress } = this.validateTransactionRequest(
+    const { target } = this.validateTransactionRequest(
       route.transactionRequest
     );
 
@@ -500,7 +502,7 @@ export class Squid {
 
     const approveTx = await (fromTokenContract as ethers.Contract)
       .connect(signer)
-      .approve(targetAddress, amountToApprove, overrides);
+      .approve(target, amountToApprove, overrides);
     await approveTx.wait();
 
     return true;
@@ -514,25 +516,17 @@ export class Squid {
   }: Allowance): Promise<BigNumber> {
     this.validateInit();
 
-    const token = getTokenData(this.tokens as Token[], tokenAddress, chainId);
-    if (!token) {
-      throw new SquidError({
-        message: `Token not found for ${tokenAddress}`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-
-    const chain = getChainData(this.chains as ChainData[], token.chainId);
-    if (!chain) {
-      throw new SquidError({
-        message: `Chain not found for ${token.chainId}`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
+    const token = getTokenData(
+      this.tokens as Token[],
+      tokenAddress,
+      chainId,
+      this.config
+    );
+    const chain = getChainData(
+      this.chains as ChainData[],
+      token.chainId,
+      this.config
+    );
 
     const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
     const contract = new ethers.Contract(token.address, erc20Abi, provider);
@@ -552,29 +546,9 @@ export class Squid {
     const token = getTokenData(
       this.tokens as Token[],
       tokenAddress,
-      chainId as number | string
+      chainId,
+      this.config
     );
-    if (!token) {
-      throw new SquidError({
-        message: `Token not found for ${tokenAddress}`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-
-    const chain = getChainData(
-      this.chains as ChainData[],
-      token.chainId as number | string
-    );
-    if (!chain) {
-      throw new SquidError({
-        message: `Chain not found for ${token.chainId}`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
 
     const contract = new ethers.Contract(token.address, erc20Abi, signer);
     return await contract.approve(
