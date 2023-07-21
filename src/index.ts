@@ -255,10 +255,7 @@ export class Squid {
       });
     }
 
-    const route: RouteResponse = parseRouteResponse(
-      response.data,
-      response.headers
-    );
+    const route: RouteResponse = parseRouteResponse(response, response.headers);
     return route;
   }
 
@@ -284,13 +281,8 @@ export class Squid {
     const { fromIsNative, fromChain, fromTokenContract, fromProvider } =
       this.validateRouteParams(route.params);
 
-    const {
-      targetAddress,
-      maxFeePerGas,
-      maxPriorityFeePerGas,
-      gasPrice,
-      gasLimit
-    } = route.transactionRequest;
+    const { target, maxFeePerGas, maxPriorityFeePerGas, gasPrice, gasLimit } =
+      route.transactionRequest;
 
     let _gasParams = {};
     if (executionSettings?.setGasPrice) {
@@ -315,7 +307,7 @@ export class Squid {
     if (!fromIsNative) {
       await this.validateBalanceAndApproval({
         fromTokenContract: fromTokenContract as ethers.Contract,
-        targetAddress,
+        targetAddress: target,
         fromProvider,
         fromIsNative,
         fromAmount: params.fromAmount,
@@ -329,7 +321,7 @@ export class Squid {
     const value = ethers.BigNumber.from(route.transactionRequest.value);
 
     let tx = {
-      to: targetAddress,
+      to: target,
       data: transactionRequest.data,
       ..._overrides
     } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;

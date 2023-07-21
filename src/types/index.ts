@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { LogLevel } from "../error";
 import {
   ChainName,
-  RouteResponse as RouteData,
+  RouteResponse as RouteApiResponse,
   ChainData,
   Token,
   SquidData,
@@ -14,6 +14,8 @@ export type MapChainIdName = {
 };
 
 export type TransactionRequest = SquidData;
+
+export type RouteData = RouteApiResponse;
 
 export type Config = {
   apiKey?: string;
