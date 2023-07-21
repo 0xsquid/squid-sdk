@@ -27,7 +27,7 @@
     "release:dry": "release-it --dry-run"
   },
   "dependencies": {
-    "@0xsquid/squid-types": "^0.1.7",
+    "@0xsquid/squid-types": "^0.1.8",
     "axios": "^0.27.2",
     "ethers": "^5.7.1"
   },
