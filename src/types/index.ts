@@ -2,11 +2,11 @@ import { ethers } from "ethers";
 import { LogLevel } from "../error";
 import {
   ChainName,
-  RouteResponse as RouteApiResponse,
   ChainData,
   Token,
   SquidData,
-  RouteRequest
+  RouteRequest,
+  Estimate
 } from "@0xsquid/squid-types";
 
 export type MapChainIdName = {
@@ -15,7 +15,11 @@ export type MapChainIdName = {
 
 export type TransactionRequest = SquidData;
 
-export type RouteData = RouteApiResponse;
+export type RouteData = {
+  estimate: Estimate;
+  transactionRequest: TransactionRequest;
+  params: RouteRequest;
+};
 
 export type Config = {
   apiKey?: string;

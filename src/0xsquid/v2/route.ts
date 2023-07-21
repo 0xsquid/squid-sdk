@@ -14,14 +14,16 @@ import { RouteData, RouteResponse } from "types";
 
 export const parseFeeCost = (data: any[]): FeeCost[] =>
   data.map((item: any) => {
-    return {
+    return removeEmpty({
       name: item.name,
       description: item.description,
       percentage: item.percentage,
       token: parseTokenData(item.token),
+      gasLimit: item.gasLimit,
+      gasMultiplier: item.gasMultiplier,
       amount: item.amount,
       amountUSD: item.amountUSD
-    };
+    }) as FeeCost;
   });
 
 export const parseGasCost = (data: any): GasCost[] =>

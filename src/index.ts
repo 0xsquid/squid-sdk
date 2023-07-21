@@ -320,18 +320,12 @@ export class Squid {
 
     const value = ethers.BigNumber.from(route.transactionRequest.value);
 
-    let tx = {
+    const tx = {
       to: target,
       data: transactionRequest.data,
+      value,
       ..._overrides
     } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
-
-    if (transactionRequest.routeType !== "SEND") {
-      tx = {
-        ...tx,
-        value
-      };
-    }
 
     return await signer.sendTransaction(tx);
   }
@@ -478,9 +472,7 @@ export class Squid {
       route.transactionRequest
     );
 
-    const {
-      params: { fromAmount }
-    } = route as RouteData;
+    const { fromAmount } = route.params;
 
     if (fromIsNative) {
       return true;
