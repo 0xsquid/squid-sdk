@@ -33,6 +33,7 @@ async function main() {
   };
 
   const routeResponse = await squidSdk.getRoute(params as GetRoute);
+  console.log("routeResponse: ", routeResponse.route.estimate.feeCosts);
   // const Tx = await squidSdk.executeRoute({
   //   signer,
   //   route: routeResponse.route
