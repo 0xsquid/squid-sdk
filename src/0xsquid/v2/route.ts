@@ -137,17 +137,18 @@ export const parseRouteResponse = (
   response: any,
   headers: AxiosResponseHeaders
 ): RouteResponse => {
-  const { data, status, message } = response;
+  const { route, status, message } = response.data;
+  console.log("parseRouteResponse", route);
   const routeResponse = {
     ...getHeaderTracker(headers),
     route:
-      data &&
+      route &&
       ({
-        estimate: parseEstimate(data.estimate),
+        estimate: parseEstimate(route.estimate),
         transactionRequest:
-          data.transactionRequest &&
-          parseTransactionRequest(data.transactionRequest),
-        params: parseParams(data.params)
+          route.transactionRequest &&
+          parseTransactionRequest(route.transactionRequest),
+        params: parseParams(route.params)
       } as RouteData),
     status,
     message

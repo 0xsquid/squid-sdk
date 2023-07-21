@@ -383,10 +383,10 @@ describe("route", () => {
   });
   describe("parseRouteResponse", () => {
     describe("exact match", () => {
-      const selected = fullResponse;
+      const selected = { data: fullResponse };
       const result = parseRouteResponse(selected, {});
       it("should match provided data", () => {
-        expect(result).toEqual(selected);
+        expect(result).toEqual(fullResponse);
       });
     });
   });
