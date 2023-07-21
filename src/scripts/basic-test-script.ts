@@ -1,35 +1,43 @@
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
-import { Squid } from "../../src";
-import { getTestCases } from "./basic-test-config";
+import { GetRoute, Squid } from "../../src";
 
 dotenv.config();
-const privateKey = process.env.privateKey as string;
-const rpcEndPoint = process.env.ethereumRpcEndPoint as string; // be sure that rpc corresponds to env
-const provider = new ethers.providers.JsonRpcProvider(rpcEndPoint);
+const privateKey = process.env.testerPk as string;
 
 async function main() {
-  const signer = new ethers.Wallet(privateKey, provider);
   const squidSdk = new Squid({
-    baseUrl: "update this" // "http://localhost:3000" | "http://testnet.api.0xsquid.com"
+    baseUrl: "http://localhost:3000" // "http://localhost:3000" | "http://testnet.api.0xsquid.com"
   });
 
   await squidSdk.init();
-  const testCases = await getTestCases(squidSdk, signer.address); //configure test in test cases
-  for (let i = 0; i < testCases.length; i++) {
-    console.log(`\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>`);
-    const config = testCases[i];
-    console.log(`> test case index: ${i}`);
-    console.log("> params: ", config);
+  const ethereum = squidSdk.chains.find(c => c.chainId === "5");
+  const polygon = squidSdk.chains.find(c => c.chainId === "80001");
+  const fromToken = squidSdk.tokens.find(
+    t => t.symbol === "aUSDC" && t.chainId === "5"
+  )?.address as string;
+  const toToken = squidSdk.tokens.find(
+    t => t.symbol === "aUSDC" && t.chainId === "80001"
+  )?.address as string;
+  const provider = new ethers.providers.JsonRpcProvider(ethereum?.rpc);
+  const signer = new ethers.Wallet(privateKey, provider);
+  console.log("signer: ", signer.address);
+  const params = {
+    toAddress: signer.address,
+    fromChain: ethereum?.chainId,
+    fromToken,
+    fromAmount: ethers.utils.parseUnits("0.1", 6).toString(),
+    toChain: polygon?.chainId,
+    toToken,
+    slippage: 1
+  };
 
-    const { route } = await squidSdk.getRoute(config.params);
-    const tx = await squidSdk.executeRoute({
-      signer,
-      route
-    });
-    const txReceipt = await tx.wait(1);
-    console.log("> txReceipt: ", txReceipt.transactionHash);
-  }
+  const routeResponse = await squidSdk.getRoute(params as GetRoute);
+  // const Tx = await squidSdk.executeRoute({
+  //   signer,
+  //   route: routeResponse.route
+  // });
+  // console.log("Tx: ", Tx);
 }
 
 main()

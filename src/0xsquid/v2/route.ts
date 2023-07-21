@@ -10,7 +10,7 @@ import {
   SquidData
 } from "@0xsquid/squid-types";
 import { parseTokenData } from "./tokens";
-import { RouteResponse } from "types";
+import { RouteData, RouteResponse } from "types";
 
 export const parseFeeCost = (data: any[]): FeeCost[] =>
   data.map((item: any) => {
@@ -137,17 +137,18 @@ export const parseRouteResponse = (
   response: any,
   headers: AxiosResponseHeaders
 ): RouteResponse => {
-  const { route, status, message } = response;
-
+  const { data, status, message } = response;
   const routeResponse = {
     ...getHeaderTracker(headers),
-    route: route && {
-      estimate: parseEstimate(route.estimate),
-      transactionRequest:
-        route.transactionRequest &&
-        parseTransactionRequest(route.transactionRequest),
-      params: parseParams(route.params)
-    },
+    route:
+      data &&
+      ({
+        estimate: parseEstimate(data.estimate),
+        transactionRequest:
+          data.transactionRequest &&
+          parseTransactionRequest(data.transactionRequest),
+        params: parseParams(data.params)
+      } as RouteData),
     status,
     message
   };
