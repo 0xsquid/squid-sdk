@@ -1,5 +1,4 @@
 import { ChainData, Token } from "@0xsquid/squid-types";
-import { ErrorType, SquidError } from "./error";
 
 export class TokensChains {
   public tokens: Token[] = [];
@@ -13,10 +12,9 @@ export class TokensChains {
     );
 
     if (!token) {
-      throw new SquidError({
-        message: `Could not find token with address ${address} on chain ${chainId}`,
-        errorType: ErrorType.ValidationError
-      });
+      throw new Error(
+        `Could not find token with address ${address} on chain ${chainId}`
+      );
     }
 
     return token;
@@ -26,10 +24,7 @@ export class TokensChains {
     const chain = this.chains.find(chain => chain.chainId == chainId);
 
     if (!chain) {
-      throw new SquidError({
-        message: `Could not find chain with ${chainId}`,
-        errorType: ErrorType.ValidationError
-      });
+      throw new Error(`Could not find chain with ${chainId}`);
     }
 
     return chain;

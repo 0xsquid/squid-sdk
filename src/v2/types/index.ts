@@ -6,7 +6,8 @@ import {
   Estimate
 } from "@0xsquid/squid-types";
 import { ethers } from "ethers";
-import { LogLevel } from "../error";
+
+export type LogLevel = "info" | "error" | "debug";
 
 export type Config = {
   apiKey?: string;
@@ -30,15 +31,6 @@ export type OverrideParams = Omit<
   "to" | "data" | "value" | "from"
 >;
 
-export type ApproveRoute = {
-  route: RouteData;
-  signer: ethers.Wallet | ethers.Signer;
-  executionSettings?: {
-    infiniteApproval?: boolean;
-  };
-  overrides?: OverrideParams;
-};
-
 export type ExecutionSettings = {
   infiniteApproval?: boolean;
 };
@@ -56,11 +48,6 @@ export type GetStatus = {
   integratorId?: string;
 };
 
-export type IsRouteApproved = {
-  route: RouteData;
-  sender: string;
-};
-
 export type RouteParamsPopulated = Omit<
   RouteRequest,
   "fromChain" | "toChain" | "fromToken" | "toToken"
@@ -72,25 +59,4 @@ export type RouteParamsPopulated = Omit<
   fromTokenContract: ethers.Contract | undefined;
   fromProvider: ethers.providers.JsonRpcProvider;
   fromIsNative: boolean;
-};
-
-export type RouteResponse = {
-  route: RouteData;
-  requestId?: string;
-  integratorId?: string;
-  status?: string;
-  message?: string;
-};
-
-export type ValidateBalanceAndApproval = {
-  route: RouteData;
-  fromTokenContract: ethers.Contract;
-  fromProvider: ethers.providers.JsonRpcProvider;
-  fromIsNative: boolean;
-  fromAmount: string;
-  targetAddress: string;
-  signer: ethers.Wallet | ethers.Signer;
-  fromChain: ChainData;
-  infiniteApproval?: boolean;
-  overrides?: OverrideParams;
 };

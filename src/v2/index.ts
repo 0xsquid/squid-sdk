@@ -1,25 +1,27 @@
-import { RouteRequest } from "@0xsquid/squid-types";
+import { ChainType, RouteRequest } from "@0xsquid/squid-types";
 import { ethers } from "ethers";
 
 import HttpAdapter from "./adapter/HttpAdapter";
-import { uint256MaxValue } from "./constants";
-import { ErrorType, SquidError } from "./error";
+import { nativeTokenConstant } from "./constants";
 import {
   Config,
   RouteData,
-  ApproveRoute,
   GetStatus,
   ExecuteRoute,
-  RouteResponse,
-  ValidateBalanceAndApproval
+  RouteParamsPopulated
 } from "./types";
 
-import { Utils } from "./utils";
+import erc20Abi from "./abi/erc20.json";
+import { TokensChains } from "./TokensChains";
+import { EvmHandler } from "./handlers";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
-export class Squid extends Utils {
+export class Squid extends TokensChains {
   private httpInstance: HttpAdapter;
+  private handlers = {
+    evm: new EvmHandler()
+  };
 
   public initialized = false;
   public config: Config;
@@ -60,12 +62,7 @@ export class Squid extends Utils {
     const response = await this.httpInstance.get("v2/sdk-info");
 
     if (response.status != 200) {
-      throw new SquidError({
-        message: `SDK initialization failed`,
-        errorType: ErrorType.InitError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
+      throw new Error("SDK initialization failed");
     }
 
     this.tokens = response.data.tokens;
@@ -75,154 +72,7 @@ export class Squid extends Utils {
     this.initialized = true;
   }
 
-  private validateInit() {
-    if (!this.initialized) {
-      throw new SquidError({
-        message:
-          "SquidSdk must be initialized! Please call the SquidSdk.init method",
-        errorType: ErrorType.InitError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-  }
-
-  async getRoute(params: RouteRequest): Promise<RouteResponse> {
-    this.validateInit();
-
-    const response = await this.httpInstance.get("v2/route", {
-      params
-    });
-
-    if (response.status != 200) {
-      response.data.error;
-      throw new SquidError({
-        message: response.data.error,
-        errorType: ErrorType.RouteResponseError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-
-    return response.data;
-  }
-
-  async executeRoute({
-    signer,
-    route,
-    executionSettings,
-    overrides
-  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
-    this.validateInit();
-    this.validateTransactionRequest(route);
-
-    const { fromIsNative, fromChain, fromTokenContract, fromProvider } =
-      this.populateRouteParams(route.params);
-
-    const { transactionRequest, params } = route;
-    const { target, value } = route.transactionRequest;
-
-    const gasData = this.getGasData({
-      transactionRequest: route.transactionRequest,
-      overrides
-    });
-
-    await this.validateBalanceAndApproval({
-      route,
-      fromTokenContract: fromTokenContract as ethers.Contract,
-      targetAddress: target,
-      fromProvider,
-      fromIsNative,
-      fromAmount: params.fromAmount,
-      fromChain,
-      infiniteApproval: executionSettings?.infiniteApproval,
-      signer,
-      overrides: gasData
-    });
-
-    const tx = {
-      to: target,
-      data: transactionRequest.data,
-      value,
-      ...gasData
-    } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
-
-    return await signer.sendTransaction(tx);
-  }
-
-  async isRouteApproved({
-    route,
-    sender
-  }: {
-    route: RouteData;
-    sender: string;
-  }): Promise<{
-    isApproved: boolean;
-    message: string;
-  }> {
-    this.validateInit();
-    this.validateTransactionRequest(route);
-
-    const {
-      fromIsNative,
-      fromChain,
-      fromProvider,
-      fromTokenContract,
-      fromAmount
-    } = this.populateRouteParams(route.params);
-
-    const sourceAmount = BigInt(fromAmount);
-
-    if (fromIsNative) {
-      return await this.validateNativeBalance({
-        fromProvider,
-        sender,
-        amount: sourceAmount,
-        fromChain
-      });
-    } else {
-      return await this.validateTokenBalance({
-        amount: sourceAmount,
-        fromTokenContract: fromTokenContract as ethers.Contract,
-        fromChain,
-        sender
-      });
-    }
-  }
-
-  async approveRoute({
-    route,
-    signer,
-    executionSettings,
-    overrides = {}
-  }: ApproveRoute): Promise<boolean> {
-    this.validateInit();
-    this.validateTransactionRequest(route);
-
-    const { target } = route.transactionRequest;
-    const { fromAmount } = route.params;
-
-    const { fromIsNative, fromTokenContract } = this.populateRouteParams(
-      route.params
-    );
-
-    if (fromIsNative) {
-      return true;
-    }
-
-    let amountToApprove = BigInt(uint256MaxValue);
-
-    if (executionSettings?.infiniteApproval === false) {
-      amountToApprove = BigInt(fromAmount);
-    }
-
-    const approveTx = await (fromTokenContract as ethers.Contract)
-      .connect(signer)
-      .approve(target, amountToApprove, overrides);
-    await approveTx.wait();
-
-    return true;
-  }
+  // PUBLIC METHODS
 
   // TODO: ADD STATUS TYPE
   async getStatus(params: GetStatus): Promise<any> {
@@ -239,50 +89,131 @@ export class Squid extends Utils {
     return response.data;
   }
 
-  async validateBalanceAndApproval({
-    route,
-    fromTokenContract,
-    fromAmount,
-    fromIsNative,
-    targetAddress,
-    signer,
-    infiniteApproval,
-    overrides
-  }: ValidateBalanceAndApproval) {
-    const sourceAmount = BigInt(fromAmount);
-    let address: string;
+  async getRoute(params: RouteRequest): Promise<RouteData> {
+    this.validateInit();
 
-    // get address from differents ethers instances
-    if (signer && ethers.Signer.isSigner(signer)) {
-      address = await (signer as ethers.Signer).getAddress();
-    } else {
-      address = (signer as ethers.Wallet).address;
+    const response = await this.httpInstance.get("v2/route", {
+      params
+    });
+
+    if (response.status != 200) {
+      throw new Error(response.data.error);
     }
 
-    // validate balance
-    await this.isRouteApproved({ route, sender: address });
+    return response.data;
+  }
 
-    // approve token spent if necessary
-    if (!fromIsNative) {
-      const allowance = BigInt(
-        (await fromTokenContract.allowance(address, targetAddress)).toString()
+  async executeRoute(
+    data: ExecuteRoute
+  ): Promise<ethers.providers.TransactionResponse> {
+    this.validateInit();
+    this.validateTransactionRequest(data.route);
+
+    const params = await this.populateRouteParams(data.route.params);
+
+    switch (params.fromChain.chainType) {
+      case ChainType.EVM:
+        return this.handlers.evm.executeRoute({ data, params });
+
+      case ChainType.COSMOS:
+        throw new Error("not implemented");
+
+      default:
+        throw new Error("not supported");
+    }
+  }
+
+  async isRouteApproved({
+    route,
+    sender
+  }: {
+    route: RouteData;
+    sender: string;
+  }): Promise<{
+    isApproved: boolean;
+    message: string;
+  }> {
+    this.validateInit();
+    this.validateTransactionRequest(route);
+
+    const params = await this.populateRouteParams(route.params);
+
+    switch (params.fromChain.chainType) {
+      case ChainType.EVM:
+        return this.handlers.evm.isRouteApproved({ sender, params });
+
+      case ChainType.COSMOS:
+        throw new Error("not implemented");
+
+      default:
+        throw new Error("not supported");
+    }
+  }
+
+  async approveRoute(data: ExecuteRoute): Promise<boolean> {
+    this.validateInit();
+    this.validateTransactionRequest(data.route);
+
+    const params = await this.populateRouteParams(data.route.params);
+
+    switch (params.fromChain.chainType) {
+      case ChainType.EVM:
+        return this.handlers.evm.approveRoute({ data, params });
+
+      case ChainType.COSMOS:
+        throw new Error("not implemented");
+
+      default:
+        throw new Error("not supported");
+    }
+  }
+
+  // INTERNAL PRIVATES METHODS
+
+  private validateInit() {
+    if (!this.initialized) {
+      throw new Error(
+        "SquidSdk must be initialized! Please call the SquidSdk.init method"
       );
+    }
+  }
 
-      if (sourceAmount > allowance) {
-        let amountToApprove = BigInt(uint256MaxValue);
+  private populateRouteParams(params: RouteRequest): RouteParamsPopulated {
+    const { fromChain, toChain, fromToken, toToken } = params;
 
-        if (
-          this.config?.executionSettings?.infiniteApproval === false &&
-          !infiniteApproval === false
-        ) {
-          amountToApprove = sourceAmount;
-        }
+    const _fromChain = this.getChainData(fromChain);
+    const _toChain = this.getChainData(toChain);
+    const _fromToken = this.getTokenData(fromToken, fromChain);
+    const _toToken = this.getTokenData(toToken, toChain);
 
-        const approveTx = await fromTokenContract
-          .connect(signer)
-          .approve(targetAddress, amountToApprove, overrides);
-        await approveTx.wait();
-      }
+    const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
+
+    const fromIsNative = _fromToken.address === nativeTokenConstant;
+    let fromTokenContract;
+
+    if (!fromIsNative) {
+      fromTokenContract = new ethers.Contract(
+        _fromToken.address,
+        erc20Abi,
+        fromProvider
+      );
+    }
+
+    return {
+      ...params,
+      fromChain: _fromChain,
+      toChain: _toChain,
+      fromToken: _fromToken,
+      toToken: _toToken,
+      fromTokenContract,
+      fromProvider,
+      fromIsNative
+    };
+  }
+
+  private validateTransactionRequest(route: RouteData) {
+    if (!route.transactionRequest) {
+      throw new Error("transactionRequest param not found in route object");
     }
   }
 }
