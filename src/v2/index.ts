@@ -1,12 +1,6 @@
-import {
-  ChainData,
-  RouteRequest,
-  Token,
-  SquidData
-} from "@0xsquid/squid-types";
+import { RouteRequest, SquidData } from "@0xsquid/squid-types";
 import { ethers, UnsignedTransaction } from "ethers";
 
-import { getChainData, getTokenData } from "./utils";
 import HttpAdapter from "./adapter/httpAdapter";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
@@ -17,25 +11,25 @@ import {
   GetStatus,
   ExecuteRoute,
   RouteResponse,
-  RouteParamsData,
+  RouteParamsPopulated,
   ValidateBalanceAndApproval,
   OverrideParams
 } from "./types";
 import erc20Abi from "./abi/erc20.json";
+import { TokensChains } from "./tokensChains";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
-export class Squid {
+export class Squid extends TokensChains {
   private httpInstance: HttpAdapter;
 
   public initialized = false;
   public config: Config;
-  public tokens: Token[] = [] as Token[];
-  public chains: ChainData[] = [] as ChainData[];
   public isInMaintenanceMode = false;
   public maintenanceMessage: string | undefined;
 
   constructor(config = {} as Config) {
+    super();
     this.httpInstance = new HttpAdapter({
       baseUrl: config?.baseUrl || baseUrl,
       config,
@@ -125,7 +119,7 @@ export class Squid {
     this.validateTransactionRequest(route);
 
     const { fromIsNative, fromChain, fromTokenContract, fromProvider } =
-      this.validateRouteParams(route.params);
+      this.populateRouteParams(route.params);
 
     const { transactionRequest, params } = route;
     const { target, value } = route.transactionRequest;
@@ -205,7 +199,7 @@ export class Squid {
     this.validateTransactionRequest(route);
 
     const { fromIsNative, fromChain, fromProvider, fromTokenContract } =
-      this.validateRouteParams(route.params);
+      this.populateRouteParams(route.params);
 
     const {
       params: { fromAmount }
@@ -268,7 +262,7 @@ export class Squid {
     const { target } = route.transactionRequest;
     const { fromAmount } = route.params;
 
-    const { fromIsNative, fromTokenContract } = this.validateRouteParams(
+    const { fromIsNative, fromTokenContract } = this.populateRouteParams(
       route.params
     );
 
@@ -324,77 +318,13 @@ export class Squid {
     return overrides ? { ...gasParams, ...overrides } : gasParams;
   };
 
-  // validation helpers
-  private async validateBalanceAndApproval({
-    route,
-    fromTokenContract,
-    fromAmount,
-    fromIsNative,
-    targetAddress,
-    signer,
-    infiniteApproval,
-    overrides
-  }: ValidateBalanceAndApproval) {
-    const sourceAmount = BigInt(fromAmount);
-    let address: string;
-
-    // get address from differents ethers instances
-    if (signer && ethers.Signer.isSigner(signer)) {
-      address = await (signer as ethers.Signer).getAddress();
-    } else {
-      address = (signer as ethers.Wallet).address;
-    }
-
-    // validate balance
-    this.isRouteApproved({ route, sender: address });
-
-    // approve token spent if necessary
-    if (!fromIsNative) {
-      const allowance = BigInt(
-        (await fromTokenContract.allowance(address, targetAddress)).toString()
-      );
-
-      if (sourceAmount > allowance) {
-        let amountToApprove = BigInt(uint256MaxValue);
-
-        if (
-          this.config?.executionSettings?.infiniteApproval === false &&
-          !infiniteApproval === false
-        ) {
-          amountToApprove = sourceAmount;
-        }
-
-        const approveTx = await fromTokenContract
-          .connect(signer)
-          .approve(targetAddress, amountToApprove, overrides);
-        await approveTx.wait();
-      }
-    }
-  }
-
-  private validateRouteParams(params: RouteRequest): RouteParamsData {
+  private populateRouteParams(params: RouteRequest): RouteParamsPopulated {
     const { fromChain, toChain, fromToken, toToken } = params;
 
-    const _fromChain = getChainData(
-      this.chains as ChainData[],
-      fromChain,
-      this.config
-    );
-
-    const _toChain = getChainData(
-      this.chains as ChainData[],
-      toChain,
-      this.config
-    );
-
-    const _fromToken = getTokenData(
-      this.tokens,
-      fromToken,
-      fromChain,
-      this.config
-    );
-
-    const _toToken = getTokenData(this.tokens, toToken, toChain, this.config);
+    const _fromChain = this.getChainData(fromChain);
+    const _toChain = this.getChainData(toChain);
+    const _fromToken = this.getTokenData(fromToken, fromChain);
+    const _toToken = this.getTokenData(toToken, toChain);
 
     const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
 
@@ -418,6 +348,53 @@ export class Squid {
       fromProvider,
       fromIsNative
     };
+  }
+
+  private async validateBalanceAndApproval({
+    route,
+    fromTokenContract,
+    fromAmount,
+    fromIsNative,
+    targetAddress,
+    signer,
+    infiniteApproval,
+    overrides
+  }: ValidateBalanceAndApproval) {
+    const sourceAmount = BigInt(fromAmount);
+    let address: string;
+
+    // get address from differents ethers instances
+    if (signer && ethers.Signer.isSigner(signer)) {
+      address = await (signer as ethers.Signer).getAddress();
+    } else {
+      address = (signer as ethers.Wallet).address;
+    }
+
+    // validate balance
+    await this.isRouteApproved({ route, sender: address });
+
+    // approve token spent if necessary
+    if (!fromIsNative) {
+      const allowance = BigInt(
+        (await fromTokenContract.allowance(address, targetAddress)).toString()
+      );
+
+      if (sourceAmount > allowance) {
+        let amountToApprove = BigInt(uint256MaxValue);
+
+        if (
+          this.config?.executionSettings?.infiniteApproval === false &&
+          !infiniteApproval === false
+        ) {
+          amountToApprove = sourceAmount;
+        }
+
+        const approveTx = await fromTokenContract
+          .connect(signer)
+          .approve(targetAddress, amountToApprove, overrides);
+        await approveTx.wait();
+      }
+    }
   }
 
   private validateTransactionRequest(route: RouteData) {

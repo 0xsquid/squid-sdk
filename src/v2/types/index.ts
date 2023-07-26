@@ -61,7 +61,7 @@ export type IsRouteApproved = {
   sender: string;
 };
 
-export type RouteParamsData = {
+export type RouteParamsPopulated = {
   fromChain: ChainData;
   toChain: ChainData;
   fromToken: Token;
