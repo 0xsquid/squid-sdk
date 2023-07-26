@@ -27,7 +27,6 @@
     "release:dry": "release-it --dry-run"
   },
   "dependencies": {
-    "@0xsquid/squid-types": "^0.1.8",
     "axios": "^0.27.2",
     "ethers": "^5.7.1",
     "lodash": "^4.17.21"
@@ -36,6 +35,7 @@
     "semver": "^7.5.4"
   },
   "devDependencies": {
+    "@0xsquid/squid-types": "^0.1.10",
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",

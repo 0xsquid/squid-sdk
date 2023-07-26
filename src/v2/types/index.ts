@@ -61,7 +61,10 @@ export type IsRouteApproved = {
   sender: string;
 };
 
-export type RouteParamsPopulated = {
+export type RouteParamsPopulated = Omit<
+  RouteRequest,
+  "fromChain" | "toChain" | "fromToken" | "toToken"
+> & {
   fromChain: ChainData;
   toChain: ChainData;
   fromToken: Token;
