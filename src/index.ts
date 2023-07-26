@@ -1,64 +1,42 @@
-import axios, { AxiosInstance } from "axios";
-import { BigNumber, ethers, UnsignedTransaction } from "ethers";
+import { ChainType, RouteRequest } from "@0xsquid/squid-types";
+import { ethers } from "ethers";
 
+import HttpAdapter from "./adapter/HttpAdapter";
+import { nativeTokenConstant } from "./constants";
 import {
-  Allowance,
-  Approve,
-  ApproveRoute,
   Config,
-  ExecuteRoute,
-  GetRoute,
+  RouteData,
   GetStatus,
-  IsRouteApproved,
-  RouteParamsData,
-  RouteResponse,
-  StatusResponse,
-  ValidateBalanceAndApproval
+  ExecuteRoute,
+  RouteParamsPopulated
 } from "./types";
-import { RouteResponse as RouteData } from "@0xsquid/squid-types";
-import erc20Abi from "./abi/erc20.json";
-import { nativeTokenConstant, uint256MaxValue } from "./constants";
-import { ErrorType, SquidError } from "./error";
-import { getChainData, getTokenData } from "./utils";
-import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 
-import {
-  ChainData,
-  RouteRequest,
-  SquidData,
-  Token
-} from "@0xsquid/squid-types";
-import {
-  parseSdkInfoResponse,
-  parseRouteResponse,
-  parseStatusResponse
-} from "./0xsquid";
+import erc20Abi from "./abi/erc20.json";
+import { TokensChains } from "./TokensChains";
+import { EvmHandler } from "./handlers";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
-export class Squid {
-  private axiosInstance: AxiosInstance;
+export class Squid extends TokensChains {
+  private httpInstance: HttpAdapter;
+  private handlers = {
+    evm: new EvmHandler()
+  };
 
-  private version = "v2";
   public initialized = false;
   public config: Config;
-  public tokens: Token[] = [] as Token[];
-  public chains: ChainData[] = [] as ChainData[];
-  public axelarscanURL: string | undefined;
   public isInMaintenanceMode = false;
   public maintenanceMessage: string | undefined;
 
   constructor(config = {} as Config) {
-    this.axiosInstance = setAxiosInterceptors(
-      axios.create({
-        baseURL: config?.baseUrl || baseUrl,
-        headers: {
-          // 'api-key': config.apiKey
-          "x-integrator-id": "squid-sdk"
-        }
-      }),
-      config
-    );
+    super();
+    this.httpInstance = new HttpAdapter({
+      baseUrl: config?.baseUrl || baseUrl,
+      config,
+      headers: {
+        "x-integrator-id": config.integratorId || "squid-sdk"
+      }
+    });
 
     this.config = {
       baseUrl: config?.baseUrl || baseUrl,
@@ -66,111 +44,147 @@ export class Squid {
     };
   }
 
+  setConfig(config: Config) {
+    this.httpInstance = new HttpAdapter({
+      baseUrl: config?.baseUrl || baseUrl,
+      config,
+      headers: {
+        "x-integrator-id": config.integratorId || "squid-sdk"
+      }
+    });
+    this.config = {
+      baseUrl: config?.baseUrl || baseUrl,
+      ...config
+    };
+  }
+
+  async init() {
+    const response = await this.httpInstance.get("v2/sdk-info");
+
+    if (response.status != 200) {
+      throw new Error("SDK initialization failed");
+    }
+
+    this.tokens = response.data.tokens;
+    this.chains = response.data.chains;
+    this.isInMaintenanceMode = response.data.isInMaintenanceMode;
+    this.maintenanceMessage = response.data.maintenanceMessage;
+    this.initialized = true;
+  }
+
+  // PUBLIC METHODS
+
+  // TODO: ADD STATUS TYPE
+  async getStatus(params: GetStatus): Promise<any> {
+    const response = await this.httpInstance.axios.get("/v1/status", {
+      params,
+      headers: {
+        ...(this.httpInstance.axios.defaults.headers.common &&
+          this.httpInstance.axios.defaults.headers.common),
+        ...(params.requestId && { "x-request-id": params.requestId }),
+        ...(params.integratorId && { "x-integrator-id": params.integratorId })
+      }
+    });
+
+    return response.data;
+  }
+
+  async getRoute(params: RouteRequest): Promise<{ route: RouteData }> {
+    this.validateInit();
+
+    const response = await this.httpInstance.get("v2/route", {
+      params
+    });
+
+    if (response.status != 200) {
+      throw new Error(response.data.error);
+    }
+
+    return response.data;
+  }
+
+  async executeRoute(
+    data: ExecuteRoute
+  ): Promise<ethers.providers.TransactionResponse> {
+    this.validateInit();
+    this.validateTransactionRequest(data.route);
+
+    const params = await this.populateRouteParams(data.route.params);
+
+    switch (params.fromChain.chainType) {
+      case ChainType.EVM:
+        return this.handlers.evm.executeRoute({ data, params });
+
+      case ChainType.COSMOS:
+        throw new Error("not implemented");
+
+      default:
+        throw new Error("not supported");
+    }
+  }
+
+  async isRouteApproved({
+    route,
+    sender
+  }: {
+    route: RouteData;
+    sender: string;
+  }): Promise<{
+    isApproved: boolean;
+    message: string;
+  }> {
+    this.validateInit();
+    this.validateTransactionRequest(route);
+
+    const params = await this.populateRouteParams(route.params);
+
+    switch (params.fromChain.chainType) {
+      case ChainType.EVM:
+        return this.handlers.evm.isRouteApproved({ sender, params });
+
+      case ChainType.COSMOS:
+        throw new Error("not implemented");
+
+      default:
+        throw new Error("not supported");
+    }
+  }
+
+  async approveRoute(data: ExecuteRoute): Promise<boolean> {
+    this.validateInit();
+    this.validateTransactionRequest(data.route);
+
+    const params = await this.populateRouteParams(data.route.params);
+
+    switch (params.fromChain.chainType) {
+      case ChainType.EVM:
+        return this.handlers.evm.approveRoute({ data, params });
+
+      case ChainType.COSMOS:
+        throw new Error("not implemented");
+
+      default:
+        throw new Error("not supported");
+    }
+  }
+
+  // INTERNAL PRIVATES METHODS
+
   private validateInit() {
     if (!this.initialized) {
-      throw new SquidError({
-        message:
-          "SquidSdk must be initialized! Please call the SquidSdk.init method",
-        errorType: ErrorType.InitError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-  }
-
-  private async validateBalanceAndApproval({
-    fromTokenContract,
-    fromAmount,
-    fromIsNative,
-    targetAddress,
-    fromProvider,
-    fromChain,
-    signer,
-    infiniteApproval,
-    overrides
-  }: ValidateBalanceAndApproval) {
-    const _sourceAmount = ethers.BigNumber.from(fromAmount);
-    let address;
-
-    if (signer && ethers.Signer.isSigner(signer)) {
-      address = await (signer as ethers.Signer).getAddress();
-    } else {
-      address = (signer as ethers.Wallet).address;
-    }
-
-    if (!fromIsNative) {
-      const balance = await fromTokenContract.balanceOf(address);
-
-      if (_sourceAmount.gt(balance)) {
-        throw new SquidError({
-          message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
-          errorType: ErrorType.ValidationError,
-          logging: this.config.logging,
-          logLevel: this.config.logLevel
-        });
-      }
-
-      const allowance = await fromTokenContract.allowance(
-        address,
-        targetAddress
+      throw new Error(
+        "SquidSdk must be initialized! Please call the SquidSdk.init method"
       );
-
-      if (_sourceAmount.gt(allowance)) {
-        let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
-
-        if (infiniteApproval === false) {
-          amountToApprove = _sourceAmount;
-        }
-
-        if (
-          this.config?.executionSettings?.infiniteApproval === false &&
-          !infiniteApproval
-        ) {
-          amountToApprove = ethers.BigNumber.from(uint256MaxValue);
-        }
-
-        const approveTx = await fromTokenContract
-          .connect(signer)
-          .approve(targetAddress, amountToApprove, overrides);
-        await approveTx.wait();
-      }
-    } else {
-      const balance = await fromProvider.getBalance(address);
-
-      if (_sourceAmount.gt(balance)) {
-        throw new SquidError({
-          message: `Insufficient funds for account: ${address} on chain ${fromChain.chainId}`,
-          errorType: ErrorType.ValidationError,
-          logging: this.config.logging,
-          logLevel: this.config.logLevel
-        });
-      }
     }
   }
 
-  private validateRouteParams(params: RouteRequest): RouteParamsData {
+  private populateRouteParams(params: RouteRequest): RouteParamsPopulated {
     const { fromChain, toChain, fromToken, toToken } = params;
 
-    const _fromChain = getChainData(
-      this.chains as ChainData[],
-      fromChain,
-      this.config
-    );
-
-    const _toChain = getChainData(
-      this.chains as ChainData[],
-      toChain,
-      this.config
-    );
-
-    const _fromToken = getTokenData(
-      this.tokens,
-      fromToken,
-      fromChain,
-      this.config
-    );
-
-    const _toToken = getTokenData(this.tokens, toToken, toChain, this.config);
+    const _fromChain = this.getChainData(fromChain);
+    const _toChain = this.getChainData(toChain);
+    const _fromToken = this.getTokenData(fromToken, fromChain);
+    const _toToken = this.getTokenData(toToken, toChain);
 
     const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
 
@@ -186,6 +200,7 @@ export class Squid {
     }
 
     return {
+      ...params,
       fromChain: _fromChain,
       toChain: _toChain,
       fromToken: _fromToken,
@@ -196,383 +211,9 @@ export class Squid {
     };
   }
 
-  private validateTransactionRequest(
-    transactionRequest?: SquidData
-  ): SquidData {
-    if (!transactionRequest) {
-      throw new SquidError({
-        message: `transactionRequest param not found in route object`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-    return transactionRequest;
-  }
-
-  public async init() {
-    const response = await this.axiosInstance.get("v2/sdk-info");
-    if (response.status != 200) {
-      throw new SquidError({
-        message: `SDK initialization failed`,
-        errorType: ErrorType.InitError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-    const typeResponse = parseSdkInfoResponse(response.data);
-    this.tokens = typeResponse.tokens;
-    this.chains = typeResponse.chains;
-    this.axelarscanURL = typeResponse.axelarscanURL;
-    this.isInMaintenanceMode = typeResponse.isInMaintenanceMode;
-    this.maintenanceMessage = typeResponse.maintenanceMessage;
-    this.initialized = true;
-  }
-
-  public setConfig(config: Config) {
-    this.axiosInstance = axios.create({
-      baseURL: config.baseUrl || baseUrl,
-      headers: {
-        // 'api-key': config.apiKey
-        ...(config.integratorId && { "x-integrator-id": config.integratorId })
-      }
-    });
-    this.config = config;
-  }
-
-  public async getRoute(params: GetRoute): Promise<RouteResponse> {
-    this.validateInit();
-    const response = await this.axiosInstance.get(`${this.version}/route`, {
-      params
-    });
-    if (response.status != 200) {
-      response.data.error;
-      throw new SquidError({
-        message: response.data.error,
-        errorType: ErrorType.RouteResponseError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-
-    const route: RouteResponse = parseRouteResponse(response, response.headers);
-    return route;
-  }
-
-  public async executeRoute({
-    signer,
-    route,
-    executionSettings,
-    overrides
-  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
-    this.validateInit();
-
+  private validateTransactionRequest(route: RouteData) {
     if (!route.transactionRequest) {
-      throw new SquidError({
-        message: `transactionRequest property is missing in route object`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
+      throw new Error("transactionRequest param not found in route object");
     }
-
-    const { transactionRequest, params } = route;
-
-    const { fromIsNative, fromChain, fromTokenContract, fromProvider } =
-      this.validateRouteParams(route.params);
-
-    const { target, maxFeePerGas, maxPriorityFeePerGas, gasPrice, gasLimit } =
-      route.transactionRequest;
-
-    let _gasParams = {};
-    if (executionSettings?.setGasPrice) {
-      _gasParams = maxPriorityFeePerGas
-        ? { maxFeePerGas, maxPriorityFeePerGas, gasLimit }
-        : { gasPrice, gasLimit };
-    } else {
-      _gasParams = { gasLimit };
-    }
-
-    let _overrides = overrides
-      ? { ..._gasParams, ...overrides }
-      : { ..._gasParams };
-
-    if (_overrides.gasLimit) {
-      _overrides = {
-        ..._overrides,
-        gasLimit: BigNumber.from(_overrides.gasLimit)
-      };
-    }
-
-    if (!fromIsNative) {
-      await this.validateBalanceAndApproval({
-        fromTokenContract: fromTokenContract as ethers.Contract,
-        targetAddress: target,
-        fromProvider,
-        fromIsNative,
-        fromAmount: params.fromAmount,
-        fromChain,
-        infiniteApproval: executionSettings?.infiniteApproval,
-        signer,
-        overrides: _overrides
-      });
-    }
-
-    const value = ethers.BigNumber.from(route.transactionRequest.value);
-
-    const tx = {
-      to: target,
-      data: transactionRequest.data,
-      value,
-      ..._overrides
-    } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
-
-    return await signer.sendTransaction(tx);
-  }
-
-  public getRawTxHex({
-    nonce,
-    route,
-    overrides,
-    executionSettings
-  }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
-    if (!route.transactionRequest) {
-      throw new SquidError({
-        message: `transactionRequest property is missing in route object`,
-        errorType: ErrorType.ValidationError,
-        logging: this.config.logging,
-        logLevel: this.config.logLevel
-      });
-    }
-
-    const {
-      gasLimit,
-      gasPrice,
-      target,
-      data,
-      maxPriorityFeePerGas,
-      maxFeePerGas,
-      value
-    } = route.transactionRequest;
-
-    let _gasParams = {
-      gasLimit: BigNumber.from(gasLimit)
-    } as any;
-
-    if (executionSettings?.setGasPrice) {
-      _gasParams = maxPriorityFeePerGas
-        ? {
-            ..._gasParams,
-            maxFeePerGas: BigNumber.from(maxFeePerGas),
-            maxPriorityFeePerGas: BigNumber.from(maxPriorityFeePerGas)
-          }
-        : { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
-    } else {
-      _gasParams = { ..._gasParams, gasPrice: BigNumber.from(gasPrice) };
-    }
-
-    const _overrides = overrides
-      ? { ..._gasParams, ...overrides }
-      : { ..._gasParams };
-
-    return ethers.utils.serializeTransaction({
-      chainId: parseInt(route.params.fromChain as string),
-      to: target,
-      data: data,
-      value: BigNumber.from(value),
-      nonce,
-      ..._overrides
-    } as UnsignedTransaction);
-  }
-
-  public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
-    isApproved: boolean;
-    message: string;
-  }> {
-    this.validateInit();
-
-    const { fromIsNative, fromChain, fromProvider, fromTokenContract } =
-      this.validateRouteParams(route.params);
-    const { target } = this.validateTransactionRequest(
-      route.transactionRequest
-    );
-
-    const {
-      params: { fromAmount }
-    } = route;
-
-    const amount = ethers.BigNumber.from(fromAmount);
-
-    if (!fromIsNative) {
-      const balance = await (fromTokenContract as ethers.Contract).balanceOf(
-        sender
-      );
-
-      if (amount.gt(balance)) {
-        throw new SquidError({
-          message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
-          errorType: ErrorType.ValidationError,
-          logging: this.config.logging,
-          logLevel: this.config.logLevel
-        });
-      }
-
-      const allowance = await (fromTokenContract as ethers.Contract).allowance(
-        sender,
-        target
-      );
-
-      if (amount.gt(allowance)) {
-        throw new SquidError({
-          message: `Insufficient allowance for contract: ${target} on chain ${fromChain.chainId}`,
-          errorType: ErrorType.ValidationError,
-          logging: this.config.logging,
-          logLevel: this.config.logLevel
-        });
-      }
-
-      return {
-        isApproved: true,
-        message: `User has approved Squid to use ${fromAmount} of ${await (
-          fromTokenContract as ethers.Contract
-        ).symbol()}`
-      };
-    } else {
-      const balance = await fromProvider.getBalance(sender);
-
-      if (amount.gt(balance)) {
-        throw new SquidError({
-          message: `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
-          errorType: ErrorType.ValidationError,
-          logging: this.config.logging,
-          logLevel: this.config.logLevel
-        });
-      }
-
-      return {
-        isApproved: true,
-        message: `User has the expected balance ${fromAmount} of ${fromChain.nativeCurrency.symbol}`
-      };
-    }
-  }
-
-  public async approveRoute({
-    route,
-    signer,
-    executionSettings,
-    overrides = {}
-  }: ApproveRoute): Promise<boolean> {
-    this.validateInit();
-
-    const { fromIsNative, fromTokenContract } = this.validateRouteParams(
-      route.params
-    );
-
-    const { target } = this.validateTransactionRequest(
-      route.transactionRequest
-    );
-
-    const { fromAmount } = route.params;
-
-    if (fromIsNative) {
-      return true;
-    }
-
-    let amountToApprove: BigNumber = ethers.BigNumber.from(uint256MaxValue);
-
-    if (executionSettings?.infiniteApproval === false) {
-      amountToApprove = ethers.BigNumber.from(fromAmount);
-    }
-
-    const approveTx = await (fromTokenContract as ethers.Contract)
-      .connect(signer)
-      .approve(target, amountToApprove, overrides);
-    await approveTx.wait();
-
-    return true;
-  }
-
-  public async allowance({
-    owner,
-    spender,
-    tokenAddress,
-    chainId
-  }: Allowance): Promise<BigNumber> {
-    this.validateInit();
-
-    const token = getTokenData(
-      this.tokens as Token[],
-      tokenAddress,
-      chainId,
-      this.config
-    );
-    const chain = getChainData(
-      this.chains as ChainData[],
-      token.chainId,
-      this.config
-    );
-
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
-    const contract = new ethers.Contract(token.address, erc20Abi, provider);
-    return await contract.allowance(owner, spender);
-  }
-
-  public async approve({
-    signer,
-    spender,
-    tokenAddress,
-    amount,
-    chainId,
-    overrides
-  }: Approve): Promise<ethers.providers.TransactionResponse> {
-    this.validateInit();
-
-    const token = getTokenData(
-      this.tokens as Token[],
-      tokenAddress,
-      chainId,
-      this.config
-    );
-
-    const contract = new ethers.Contract(token.address, erc20Abi, signer);
-    return await contract.approve(
-      spender,
-      amount || uint256MaxValue,
-      overrides
-    );
-  }
-
-  public async getStatus(params: GetStatus): Promise<StatusResponse> {
-    const response = await this.axiosInstance.get("/v1/status", {
-      params,
-      headers: {
-        ...(this.axiosInstance.defaults.headers.common &&
-          this.axiosInstance.defaults.headers.common),
-        ...(params.requestId && { "x-request-id": params.requestId }),
-        ...(params.integratorId && { "x-integrator-id": params.integratorId })
-      }
-    });
-
-    const statusResponse: StatusResponse = parseStatusResponse(
-      response,
-      response.headers
-    );
-    return statusResponse;
-  }
-
-  public async getTokenPrice({
-    tokenAddress,
-    chainId
-  }: {
-    tokenAddress: string;
-    chainId: string | number;
-  }) {
-    const response = await this.axiosInstance.get("/v1/token-price", {
-      params: { tokenAddress, chainId }
-    });
-
-    return response.data.price;
   }
 }
-
-export * from "./types";
