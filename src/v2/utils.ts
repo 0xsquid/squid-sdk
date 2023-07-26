@@ -110,12 +110,16 @@ export class Utils extends TokensChains {
     const { gasLimit, gasPrice, maxPriorityFeePerGas, maxFeePerGas } =
       transactionRequest;
 
-    const gasParams = {
-      gasLimit,
-      gasPrice,
-      maxPriorityFeePerGas,
-      maxFeePerGas
-    };
+    const gasParams = maxPriorityFeePerGas
+      ? {
+          gasLimit,
+          maxPriorityFeePerGas,
+          maxFeePerGas
+        }
+      : {
+          gasLimit,
+          gasPrice
+        };
 
     return overrides ? { ...gasParams, ...overrides } : gasParams;
   };

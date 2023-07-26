@@ -15,6 +15,7 @@ export type ErrorConstructor = {
   logLevel?: LogLevel;
 };
 
+// TODO: USE ERROR FROM TYPE PACKAGE
 export class SquidError extends Error {
   errorType: string;
   errors: any;

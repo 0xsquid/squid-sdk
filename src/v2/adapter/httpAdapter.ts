@@ -1,7 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { omit } from "lodash";
 
-import { ErrorType, SquidError } from "../error";
 import { HttpResponse, RequestConfig } from "../types/http";
 
 export default class HttpAdapter {
@@ -12,33 +11,6 @@ export default class HttpAdapter {
       ...omit(config, ["config"]),
       baseURL: config?.baseUrl
     });
-
-    this.axios.interceptors.response.use(
-      response => response,
-      error => {
-        if (error.response) {
-          return Promise.reject(
-            new SquidError({
-              message: error.response.statusText,
-              errorType: error.response.data.errors[0].errorType,
-              errors: error.response.data.errors,
-              logging: config.config?.logging,
-              logLevel: config.config?.logLevel
-            })
-          );
-        }
-
-        return Promise.reject(
-          new SquidError({
-            message: "There was an error while trying to fetch Squid Api",
-            errorType: ErrorType.UnknownError,
-            errors: [error],
-            logging: config.config?.logging,
-            logLevel: config.config?.logLevel
-          })
-        );
-      }
-    );
 
     if (config) {
       this.setConfig(config);
