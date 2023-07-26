@@ -168,6 +168,16 @@ export class Squid extends TokensChains {
     }
   }
 
+  // EVM ONLY METHOD ?
+  public getRawTxHex(
+    data: Omit<ExecuteRoute, "signer"> & { nonce: number }
+  ): string {
+    this.validateInit();
+    this.validateTransactionRequest(data.route);
+
+    return this.handlers.evm.getRawTxHex({ ...data });
+  }
+
   // INTERNAL PRIVATES METHODS
 
   private validateInit() {
