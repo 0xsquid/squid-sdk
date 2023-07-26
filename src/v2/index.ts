@@ -1,7 +1,7 @@
 import { RouteRequest } from "@0xsquid/squid-types";
 import { ethers } from "ethers";
 
-import HttpAdapter from "./adapter/httpAdapter";
+import HttpAdapter from "./adapter/HttpAdapter";
 import { uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
 import {
@@ -224,6 +224,7 @@ export class Squid extends Utils {
     return true;
   }
 
+  // TODO: ADD STATUS TYPE
   async getStatus(params: GetStatus): Promise<any> {
     const response = await this.httpInstance.axios.get("/v1/status", {
       params,
