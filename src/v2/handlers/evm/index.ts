@@ -90,10 +90,12 @@ export class EvmHandler extends Utils {
       },
       signer,
       overrides,
-      executionSettings: { infiniteApproval }
+      executionSettings
     } = data;
 
-    const { fromAmount, fromIsNative, fromTokenContract } = params;
+    const infiniteApproval = !!executionSettings?.infiniteApproval;
+    const fromTokenContract = params.fromTokenContract as ethers.Contract;
+    const { fromAmount, fromIsNative } = params;
 
     const sourceAmount = BigInt(fromAmount);
     let address: string;
