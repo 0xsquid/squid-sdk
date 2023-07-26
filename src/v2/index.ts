@@ -183,7 +183,7 @@ export class Squid extends Utils {
     } else {
       return await this.validateTokenBalance({
         amount: sourceAmount,
-        fromTokenContract,
+        fromTokenContract: fromTokenContract as ethers.Contract,
         fromChain,
         sender
       });
