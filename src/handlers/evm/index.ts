@@ -26,7 +26,10 @@ export class EvmHandler extends Utils {
     });
 
     await this.validateBalanceAndApproval({
-      data,
+      data: {
+        ...data,
+        overrides: gasData
+      },
       params
     });
 
@@ -84,20 +87,8 @@ export class EvmHandler extends Utils {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
   }) {
-    const {
-      route: {
-        transactionRequest: { target }
-      },
-      signer,
-      overrides,
-      executionSettings
-    } = data;
+    const { signer } = data;
 
-    const infiniteApproval = !!executionSettings?.infiniteApproval;
-    const fromTokenContract = params.fromTokenContract as ethers.Contract;
-    const { fromAmount, fromIsNative } = params;
-
-    const sourceAmount = BigInt(fromAmount);
     let address: string;
 
     // get address from differents ethers instances
@@ -111,24 +102,7 @@ export class EvmHandler extends Utils {
     await this.isRouteApproved({ sender: address, params });
 
     // approve token spent if necessary
-    if (!fromIsNative) {
-      const allowance = BigInt(
-        (await fromTokenContract.allowance(address, target)).toString()
-      );
-
-      if (sourceAmount > allowance) {
-        let amountToApprove = BigInt(uint256MaxValue);
-
-        if (infiniteApproval === false) {
-          amountToApprove = sourceAmount;
-        }
-
-        const approveTx = await fromTokenContract
-          .connect(signer)
-          .approve(target, amountToApprove, overrides);
-        await approveTx.wait();
-      }
-    }
+    await this.approveRoute({ data, params });
   }
 
   async approveRoute({
