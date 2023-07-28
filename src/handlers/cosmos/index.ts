@@ -13,7 +13,7 @@ import {
   IBC_TRANSFER_TYPE,
   WasmHookMsg,
   WASM_TYPE
-} from "types/cosmos";
+} from "../../types/cosmos";
 
 export class CosmosHandler {
   async validateBalance({
