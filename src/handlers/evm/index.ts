@@ -1,5 +1,5 @@
 import { ethers, UnsignedTransaction } from "ethers";
-import { ExecuteRoute, RouteParamsPopulated } from "../../types";
+import { EvmSigner, ExecuteRoute, RouteParamsPopulated } from "../../types";
 import { uint256MaxValue } from "../../constants";
 import { Utils } from "./utils";
 
@@ -10,15 +10,15 @@ export class EvmHandler extends Utils {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
-  }) {
+  }): Promise<ethers.providers.TransactionResponse> {
     const {
       route: {
         transactionRequest: { target, value, data: _data }
       },
       route,
-      signer,
       overrides
     } = data;
+    const signer = data.signer as EvmSigner;
 
     const gasData = this.getGasData({
       transactionRequest: route.transactionRequest,
@@ -86,8 +86,8 @@ export class EvmHandler extends Utils {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
-  }) {
-    const { signer } = data;
+  }): Promise<boolean> {
+    const signer = data.signer as EvmSigner;
 
     let address: string;
 
@@ -103,6 +103,8 @@ export class EvmHandler extends Utils {
 
     // approve token spent if necessary
     await this.approveRoute({ data, params });
+
+    return true;
   }
 
   async approveRoute({
@@ -117,9 +119,9 @@ export class EvmHandler extends Utils {
         transactionRequest: { target }
       },
       executionSettings,
-      signer,
       overrides
     } = data;
+    const signer = data.signer as EvmSigner;
     const { fromIsNative, fromAmount, fromTokenContract } = params;
 
     if (fromIsNative) {

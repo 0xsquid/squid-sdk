@@ -6,6 +6,7 @@ import {
   Estimate
 } from "@0xsquid/squid-types";
 import { ethers } from "ethers";
+import { DeliverTxResponse, SigningStargateClient } from "@cosmjs/stargate";
 
 export type LogLevel = "info" | "error" | "debug";
 
@@ -35,12 +36,20 @@ export type ExecutionSettings = {
   infiniteApproval?: boolean;
 };
 
+export type EvmSigner = ethers.Wallet | ethers.Signer;
+export type CosmosSigner = SigningStargateClient;
+
 export type ExecuteRoute = {
-  signer: ethers.Wallet | ethers.Signer;
+  signer: EvmSigner | CosmosSigner;
   route: RouteData;
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
+  signerAddress?: string; // cosmos specific
 };
+
+export type TransactionResponse =
+  | ethers.providers.TransactionResponse
+  | DeliverTxResponse;
 
 export type GetStatus = {
   transactionId: string;

@@ -8,19 +8,22 @@ import {
   RouteData,
   GetStatus,
   ExecuteRoute,
-  RouteParamsPopulated
+  RouteParamsPopulated,
+  TransactionResponse
 } from "./types";
 
-import erc20Abi from "./abi/erc20.json";
 import { TokensChains } from "./TokensChains";
-import { EvmHandler } from "./handlers";
+import { EvmHandler, CosmosHandler } from "./handlers";
+
+import erc20Abi from "./abi/erc20.json";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
 export class Squid extends TokensChains {
   private httpInstance: HttpAdapter;
   private handlers = {
-    evm: new EvmHandler()
+    evm: new EvmHandler(),
+    cosmos: new CosmosHandler()
   };
 
   public initialized = false;
@@ -103,9 +106,7 @@ export class Squid extends TokensChains {
     return response.data;
   }
 
-  async executeRoute(
-    data: ExecuteRoute
-  ): Promise<ethers.providers.TransactionResponse> {
+  async executeRoute(data: ExecuteRoute): Promise<TransactionResponse> {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
@@ -116,10 +117,12 @@ export class Squid extends TokensChains {
         return this.handlers.evm.executeRoute({ data, params });
 
       case ChainType.COSMOS:
-        throw new Error("not implemented");
+        return this.handlers.cosmos.executeRoute({ data, params });
 
       default:
-        throw new Error("not supported");
+        throw new Error(
+          `Method not supported given chain type ${params.fromChain.chainType}`
+        );
     }
   }
 
@@ -142,11 +145,10 @@ export class Squid extends TokensChains {
       case ChainType.EVM:
         return this.handlers.evm.isRouteApproved({ sender, params });
 
-      case ChainType.COSMOS:
-        throw new Error("not implemented");
-
       default:
-        throw new Error("not supported");
+        throw new Error(
+          `Method not supported given chain type ${params.fromChain.chainType}`
+        );
     }
   }
 
@@ -160,15 +162,14 @@ export class Squid extends TokensChains {
       case ChainType.EVM:
         return this.handlers.evm.approveRoute({ data, params });
 
-      case ChainType.COSMOS:
-        throw new Error("not implemented");
-
       default:
-        throw new Error("not supported");
+        throw new Error(
+          `Method not supported given chain type ${params.fromChain.chainType}`
+        );
     }
   }
 
-  // EVM ONLY METHOD ?
+  // TODO: IS THIS METHOD GONNA BE EVM ONLY ?
   public getRawTxHex(
     data: Omit<ExecuteRoute, "signer"> & { nonce: number }
   ): string {
