@@ -1,25 +1,14 @@
-import { ethers } from "ethers";
-import { LogLevel } from "../error";
 import {
-  ChainName,
   ChainData,
   Token,
   SquidData,
   RouteRequest,
   Estimate
 } from "@0xsquid/squid-types";
+import { ethers } from "ethers";
+import { DeliverTxResponse, SigningStargateClient } from "@cosmjs/stargate";
 
-export type MapChainIdName = {
-  [key: string | number]: ChainName;
-};
-
-export type TransactionRequest = SquidData;
-
-export type RouteData = {
-  estimate: Estimate;
-  transactionRequest: TransactionRequest;
-  params: RouteRequest;
-};
+export type LogLevel = "info" | "error" | "debug";
 
 export type Config = {
   apiKey?: string;
@@ -32,31 +21,10 @@ export type Config = {
   integratorId?: string;
 };
 
-export type GetRoute = RouteRequest;
-
-export type SdkInfoResponse = {
-  chains: ChainData[];
-  tokens: Token[];
-  axelarscanURL: string;
-  isInMaintenanceMode: boolean;
-  maintenanceMessage?: string;
-  expressDefaultDisabled: ChainName[];
-};
-
-export type RouteResponse = {
-  route: RouteData;
-  requestId?: string;
-  integratorId?: string;
-  status?: string;
-  message?: string;
-};
-
-export type ChainsResponse = {
-  chains: ChainData[];
-};
-
-export type TokensResponse = {
-  tokens: Token[];
+export type RouteData = {
+  estimate: Estimate;
+  transactionRequest: SquidData;
+  params: RouteRequest;
 };
 
 export type OverrideParams = Omit<
@@ -64,67 +32,24 @@ export type OverrideParams = Omit<
   "to" | "data" | "value" | "from"
 >;
 
-export type ExecuteRoute = {
-  signer: ethers.Wallet | ethers.Signer;
-  route: RouteData;
-  executionSettings?: {
-    infiniteApproval?: boolean;
-    setGasPrice?: boolean;
-  };
-  overrides?: OverrideParams;
-};
-
-export type Allowance = {
-  owner: string;
-  spender: string;
-  tokenAddress: string;
-  chainId: string;
-};
-
-export type Approve = {
-  signer: ethers.Wallet | ethers.Signer;
-  spender: string;
-  tokenAddress: string;
-  amount?: string;
-  chainId: string;
-  overrides?: OverrideParams;
-};
-
-export type IsRouteApproved = {
-  route: RouteData;
-  sender: string;
-};
-
-export type ApproveRoute = {
-  route: RouteData;
-  signer: ethers.Wallet | ethers.Signer;
-  executionSettings?: {
-    infiniteApproval?: boolean;
-  };
-  overrides?: OverrideParams;
-};
-
-export type RouteParamsData = {
-  fromChain: ChainData;
-  toChain: ChainData;
-  fromToken: Token;
-  toToken: Token;
-  fromTokenContract: ethers.Contract | undefined;
-  fromProvider: ethers.providers.JsonRpcProvider;
-  fromIsNative: boolean;
-};
-
-export type ValidateBalanceAndApproval = {
-  fromTokenContract: ethers.Contract;
-  fromProvider: ethers.providers.JsonRpcProvider;
-  fromIsNative: boolean;
-  fromAmount: string;
-  targetAddress: string;
-  signer: ethers.Wallet | ethers.Signer;
-  fromChain: ChainData;
+export type ExecutionSettings = {
   infiniteApproval?: boolean;
-  overrides?: OverrideParams;
 };
+
+export type EvmSigner = ethers.Wallet | ethers.Signer;
+export type CosmosSigner = SigningStargateClient;
+
+export type ExecuteRoute = {
+  signer: EvmSigner | CosmosSigner;
+  route: RouteData;
+  executionSettings?: ExecutionSettings;
+  overrides?: OverrideParams;
+  signerAddress?: string; // cosmos specific
+};
+
+export type TransactionResponse =
+  | ethers.providers.TransactionResponse
+  | DeliverTxResponse;
 
 export type GetStatus = {
   transactionId: string;
@@ -132,35 +57,15 @@ export type GetStatus = {
   integratorId?: string;
 };
 
-export type TransactionStatus = {
-  transactionId: string;
-  blockNumber: string;
-  callEventStatus: string;
-  callEventLog: Array<any>;
-  chainData: ChainData;
-  transactionUrl: string;
-};
-
-export type YupError = {
-  path: string;
-  message: string;
-};
-
-export type ApiBasicResponse = {
-  error?: string | YupError[] | any;
-  errorType?: string;
-};
-
-export type StatusResponse = ApiBasicResponse & {
-  id?: string;
-  status?: string;
-  gasStatus?: string;
-  isGMPTransaction?: boolean;
-  axelarTransactionUrl?: string;
-  fromChain?: TransactionStatus;
-  toChain?: TransactionStatus;
-  timeSpent?: Record<string, number>;
-  requestId?: string;
-  integratorId?: string;
-  squidTransactionStatus?: string;
+export type RouteParamsPopulated = Omit<
+  RouteRequest,
+  "fromChain" | "toChain" | "fromToken" | "toToken"
+> & {
+  fromChain: ChainData;
+  toChain: ChainData;
+  fromToken: Token;
+  toToken: Token;
+  fromTokenContract: ethers.Contract | undefined;
+  fromProvider: ethers.providers.JsonRpcProvider;
+  fromIsNative: boolean;
 };
