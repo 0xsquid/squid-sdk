@@ -28,13 +28,12 @@ export class EvmHandler extends Utils {
       route: {
         transactionRequest: { target, value, data: _data }
       },
-      route,
       overrides
     } = data;
     const signer = data.signer as EvmSigner;
 
     const gasData = this.getGasData({
-      transactionRequest: route.transactionRequest,
+      transactionRequest: data.route.transactionRequest,
       overrides
     });
 
@@ -56,7 +55,7 @@ export class EvmHandler extends Utils {
     return await signer.sendTransaction(tx);
   }
 
-  async isRouteApproved({
+  async validateBalance({
     sender,
     params
   }: {
@@ -112,13 +111,24 @@ export class EvmHandler extends Utils {
     }
 
     // validate balance
-    const { isApproved } = await this.isRouteApproved({
+    await this.validateBalance({
       sender: address,
       params
     });
 
+    if (params.fromIsNative) {
+      return true;
+    }
+
+    const hasAllowance = this.validateAllowance({
+      fromTokenContract: params.fromTokenContract,
+      sender: address,
+      router: data.route.transactionRequest.target,
+      amount: BigInt(params.fromAmount)
+    });
+
     // approve token spent if necessary
-    if (!isApproved) {
+    if (!hasAllowance) {
       await this.approveRoute({ data, params });
     }
 
@@ -158,6 +168,34 @@ export class EvmHandler extends Utils {
     await approveTx.wait();
 
     return true;
+  }
+
+  async isRouteApproved({
+    sender,
+    target,
+    params
+  }: {
+    sender: string;
+    target: string;
+    params: RouteParamsPopulated;
+  }) {
+    const result = await this.validateBalance({ sender, params });
+
+    const hasAllowance = await this.validateAllowance({
+      fromTokenContract: params.fromTokenContract,
+      sender,
+      router: target,
+      amount: BigInt(params.fromAmount)
+    });
+
+    if (!hasAllowance) {
+      return {
+        isApproved: false,
+        message: "Not enough allowance"
+      };
+    }
+
+    return result;
   }
 
   getRawTxHex({

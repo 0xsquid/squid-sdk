@@ -145,7 +145,11 @@ export class Squid extends TokensChains {
 
     switch (params.fromChain.chainType) {
       case ChainType.EVM:
-        return this.handlers.evm.isRouteApproved({ sender, params });
+        return await this.handlers.evm.isRouteApproved({
+          sender,
+          params,
+          target: route.transactionRequest.target
+        });
 
       default:
         throw new Error(
