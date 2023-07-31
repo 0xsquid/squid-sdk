@@ -1,7 +1,20 @@
-import { ethers, UnsignedTransaction } from "ethers";
-import { EvmSigner, ExecuteRoute, RouteParamsPopulated } from "../../types";
+import { EthersAdapter } from "../../adapter/EthersAdapter";
+
+import { ExecuteRoute, RouteParamsPopulated } from "../../types";
+import {
+  Contract,
+  EvmSigner,
+  Signer,
+  TransactionRequest,
+  TransactionResponse,
+  UnsignedTransaction,
+  Wallet
+} from "../../types/ethers";
+
 import { uint256MaxValue } from "../../constants";
 import { Utils } from "./utils";
+
+const ethersAdapter = new EthersAdapter();
 
 export class EvmHandler extends Utils {
   async executeRoute({
@@ -10,7 +23,7 @@ export class EvmHandler extends Utils {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
-  }): Promise<ethers.providers.TransactionResponse> {
+  }): Promise<TransactionResponse> {
     const {
       route: {
         transactionRequest: { target, value, data: _data }
@@ -38,7 +51,7 @@ export class EvmHandler extends Utils {
       data: _data,
       value,
       ...gasData
-    } as ethers.utils.Deferrable<ethers.providers.TransactionRequest>;
+    } as TransactionRequest;
 
     return await signer.sendTransaction(tx);
   }
@@ -73,7 +86,7 @@ export class EvmHandler extends Utils {
     } else {
       return await this.validateTokenBalance({
         amount,
-        fromTokenContract: fromTokenContract as ethers.Contract,
+        fromTokenContract: fromTokenContract as Contract,
         fromChain,
         sender
       });
@@ -92,10 +105,10 @@ export class EvmHandler extends Utils {
     let address: string;
 
     // get address from differents ethers instances
-    if (signer && ethers.Signer.isSigner(signer)) {
-      address = await (signer as ethers.Signer).getAddress();
+    if (signer && ethersAdapter.isSigner(signer)) {
+      address = await (signer as Signer).getAddress();
     } else {
-      address = (signer as ethers.Wallet).address;
+      address = (signer as Wallet).address;
     }
 
     // validate balance
@@ -134,7 +147,7 @@ export class EvmHandler extends Utils {
       amountToApprove = BigInt(fromAmount);
     }
 
-    const approveTx = await (fromTokenContract as ethers.Contract)
+    const approveTx = await (fromTokenContract as Contract)
       .connect(signer)
       .approve(target, amountToApprove, overrides);
     await approveTx.wait();
@@ -154,7 +167,7 @@ export class EvmHandler extends Utils {
       overrides
     });
 
-    return ethers.utils.serializeTransaction({
+    return ethersAdapter.serializeTransaction({
       chainId: parseInt(route.params.fromChain as string),
       to: target,
       data: data,

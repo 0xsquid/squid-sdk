@@ -7,7 +7,7 @@ import {
 } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 
-import { CosmosSigner, ExecuteRoute, RouteParamsPopulated } from "types";
+import { CosmosSigner, ExecuteRoute, RouteParamsPopulated } from "../../types";
 import {
   CosmosMsg,
   IBC_TRANSFER_TYPE,

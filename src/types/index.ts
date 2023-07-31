@@ -5,8 +5,15 @@ import {
   RouteRequest,
   Estimate
 } from "@0xsquid/squid-types";
-import { ethers } from "ethers";
 import { DeliverTxResponse, SigningStargateClient } from "@cosmjs/stargate";
+
+import {
+  EvmSigner,
+  TransactionRequest,
+  TransactionResponse,
+  RpcProvider,
+  Contract
+} from "./ethers";
 
 export type LogLevel = "info" | "error" | "debug";
 
@@ -28,7 +35,7 @@ export type RouteData = {
 };
 
 export type OverrideParams = Omit<
-  ethers.providers.TransactionRequest,
+  TransactionRequest,
   "to" | "data" | "value" | "from"
 >;
 
@@ -36,7 +43,6 @@ export type ExecutionSettings = {
   infiniteApproval?: boolean;
 };
 
-export type EvmSigner = ethers.Wallet | ethers.Signer;
 export type CosmosSigner = SigningStargateClient;
 
 export type ExecuteRoute = {
@@ -47,9 +53,7 @@ export type ExecuteRoute = {
   signerAddress?: string; // cosmos specific
 };
 
-export type TransactionResponse =
-  | ethers.providers.TransactionResponse
-  | DeliverTxResponse;
+export type TransactionResponses = TransactionResponse | DeliverTxResponse;
 
 export type GetStatus = {
   transactionId: string;
@@ -65,7 +69,7 @@ export type RouteParamsPopulated = Omit<
   toChain: ChainData;
   fromToken: Token;
   toToken: Token;
-  fromTokenContract: ethers.Contract | undefined;
-  fromProvider: ethers.providers.JsonRpcProvider;
+  fromTokenContract: Contract | undefined;
+  fromProvider: RpcProvider;
   fromIsNative: boolean;
 };

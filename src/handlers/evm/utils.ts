@@ -1,6 +1,6 @@
 import { ChainData, SquidData } from "@0xsquid/squid-types";
-import { ethers } from "ethers";
 
+import { Contract, RpcProvider } from "../../types/ethers";
 import { OverrideParams } from "../../types";
 
 export class Utils {
@@ -10,7 +10,7 @@ export class Utils {
     amount,
     fromChain
   }: {
-    fromProvider: ethers.providers.JsonRpcProvider;
+    fromProvider: RpcProvider;
     sender: string;
     amount: bigint;
     fromChain: ChainData;
@@ -36,14 +36,12 @@ export class Utils {
     fromChain
   }: {
     amount: bigint;
-    fromTokenContract: ethers.Contract;
+    fromTokenContract: Contract;
     sender: string;
     fromChain: ChainData;
   }) {
     const balance = BigInt(
-      (
-        await (fromTokenContract as ethers.Contract).balanceOf(sender)
-      ).toString()
+      (await (fromTokenContract as Contract).balanceOf(sender)).toString()
     );
 
     if (amount > balance) {
@@ -55,7 +53,7 @@ export class Utils {
     return {
       isApproved: true,
       message: `User has approved Squid to use ${amount} of ${await (
-        fromTokenContract as ethers.Contract
+        fromTokenContract as Contract
       ).symbol()}`
     };
   }

@@ -1,7 +1,7 @@
 import { ChainType, RouteRequest } from "@0xsquid/squid-types";
-import { ethers } from "ethers";
 
 import HttpAdapter from "./adapter/HttpAdapter";
+import { EthersAdapter } from "./adapter/EthersAdapter";
 import { nativeTokenConstant } from "./constants";
 import {
   Config,
@@ -9,7 +9,7 @@ import {
   GetStatus,
   ExecuteRoute,
   RouteParamsPopulated,
-  TransactionResponse
+  TransactionResponses
 } from "./types";
 
 import { TokensChains } from "./TokensChains";
@@ -18,6 +18,8 @@ import { EvmHandler, CosmosHandler } from "./handlers";
 import erc20Abi from "./abi/erc20.json";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
+
+const ethersAdapter = new EthersAdapter();
 
 export class Squid extends TokensChains {
   private httpInstance: HttpAdapter;
@@ -106,7 +108,7 @@ export class Squid extends TokensChains {
     return response.data;
   }
 
-  async executeRoute(data: ExecuteRoute): Promise<TransactionResponse> {
+  async executeRoute(data: ExecuteRoute): Promise<TransactionResponses> {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
@@ -197,13 +199,13 @@ export class Squid extends TokensChains {
     const _fromToken = this.getTokenData(fromToken, fromChain);
     const _toToken = this.getTokenData(toToken, toChain);
 
-    const fromProvider = new ethers.providers.JsonRpcProvider(_fromChain.rpc);
+    const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
 
     const fromIsNative = _fromToken.address === nativeTokenConstant;
     let fromTokenContract;
 
     if (!fromIsNative) {
-      fromTokenContract = new ethers.Contract(
+      fromTokenContract = ethersAdapter.contract(
         _fromToken.address,
         erc20Abi,
         fromProvider
