@@ -112,10 +112,15 @@ export class EvmHandler extends Utils {
     }
 
     // validate balance
-    await this.isRouteApproved({ sender: address, params });
+    const { isApproved } = await this.isRouteApproved({
+      sender: address,
+      params
+    });
 
     // approve token spent if necessary
-    await this.approveRoute({ data, params });
+    if (!isApproved) {
+      await this.approveRoute({ data, params });
+    }
 
     return true;
   }
