@@ -17,7 +17,7 @@ import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
 
-const baseUrl = "https://testnet.api.0xsquid.com/";
+const baseUrl = "https://testnet.api.squidrouter.com/";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -112,7 +112,7 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
-    const params = await this.populateRouteParams(data.route.params);
+    const params = this.populateRouteParams(data.route.params);
 
     switch (params.fromChain.chainType) {
       case ChainType.EVM:
@@ -141,7 +141,7 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(route);
 
-    const params = await this.populateRouteParams(route.params);
+    const params = this.populateRouteParams(route.params);
 
     switch (params.fromChain.chainType) {
       case ChainType.EVM:
@@ -158,7 +158,7 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
-    const params = await this.populateRouteParams(data.route.params);
+    const params = this.populateRouteParams(data.route.params);
 
     switch (params.fromChain.chainType) {
       case ChainType.EVM:
