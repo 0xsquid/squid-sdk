@@ -52,10 +52,30 @@ export class Utils {
 
     return {
       isApproved: true,
-      message: `User has approved Squid to use ${amount} of ${await (
+      message: `User has the expected balance ${amount} of ${await (
         fromTokenContract as Contract
       ).symbol()}`
     };
+  }
+
+  async validateAllowance({
+    amount,
+    fromTokenContract,
+    sender,
+    router
+  }: {
+    amount: bigint;
+    fromTokenContract: Contract;
+    sender: string;
+    router: string;
+  }) {
+    const allowance = BigInt(
+      (
+        await (fromTokenContract as Contract).allowance(sender, router)
+      ).toString()
+    );
+
+    return !(amount > allowance);
   }
 
   getGasData = ({
@@ -63,7 +83,7 @@ export class Utils {
     overrides
   }: {
     transactionRequest: SquidData;
-    overrides: OverrideParams | undefined;
+    overrides?: OverrideParams;
   }) => {
     const { gasLimit, gasPrice, maxPriorityFeePerGas, maxFeePerGas } =
       transactionRequest;
