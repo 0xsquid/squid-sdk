@@ -256,7 +256,9 @@ export const parseParams = (data: any): RouteParams => {
     customContractCalls: data.customContractCalls
       ? parseCustomContractCall(data.customContractCalls)
       : undefined,
-    collectFees: parseCollectFees(data.collectFees)
+    collectFees: data.collectFees
+      ? parseCollectFees(data.collectFees)
+      : undefined
   });
 };
 
