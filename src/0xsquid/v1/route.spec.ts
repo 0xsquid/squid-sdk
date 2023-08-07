@@ -12,7 +12,8 @@ import {
   parseOptimalRoute,
   parseSwap,
   parseTransactionRequest,
-  parseRouteResponse
+  parseRouteResponse,
+  parseCollectFees
 } from "./route";
 
 describe("route", () => {
@@ -247,6 +248,35 @@ describe("route", () => {
         additional: ""
       };
       const result = parseBridge(selected);
+      it("should exclude additional properties", () => {
+        expect(result).not.toHaveProperty("additional");
+      });
+    });
+  });
+  describe("parseCollectFees", () => {
+    describe("exact match", () => {
+      const data = {
+        integratorAddress: "0x",
+        fee: 1
+      };
+      const result = parseCollectFees(data);
+      it("should match provided data", () => {
+        expect(result).toEqual(data);
+      });
+      it("should have type Custom", () => {
+        expect(result).toHaveProperty("integratorAddress");
+      });
+      it("should contain callType", () => {
+        expect(result).toHaveProperty("fee");
+      });
+    });
+    describe("additional properties", () => {
+      const data = {
+        integratorAddress: "0x",
+        fee: 1,
+        additional: ""
+      };
+      const result = parseBridge(data);
       it("should exclude additional properties", () => {
         expect(result).not.toHaveProperty("additional");
       });
