@@ -168,6 +168,11 @@ export enum SquidCallType {
   COLLECT_TOKEN_BALANCE = 3
 }
 
+export type CollectFees = {
+  integratorAddress: string;
+  fee: number;
+};
+
 export type ContractCall = {
   callType: SquidCallType;
   target: string;
@@ -193,6 +198,7 @@ export type GetRoute = {
   customContractCalls?: ContractCall[];
   prefer?: string[];
   receiveGasOnDestination?: boolean;
+  collectFees?: CollectFees;
 };
 
 export type TransactionRequest = {

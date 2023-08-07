@@ -12,7 +12,8 @@ import {
   GasCost,
   CustomCall,
   ContractCall,
-  OptimalRoute
+  OptimalRoute,
+  CollectFees
 } from "../../types";
 import { removeEmpty } from "./util";
 import { parseTokenData } from "./tokens";
@@ -210,6 +211,14 @@ export const parseTransactionRequest = (request: any): TransactionRequest => {
   } as TransactionRequest;
 };
 
+export const parseCollectFees = (data: any): CollectFees => {
+  const { integratorAddress, fee } = data;
+  return removeEmpty({
+    integratorAddress,
+    fee
+  } as CollectFees);
+};
+
 export const parseCustomContractCall = (data: any): ContractCall => {
   const { callType, target, value, callData, estimatedGas } = data;
   return removeEmpty({
@@ -246,6 +255,9 @@ export const parseParams = (data: any): RouteParams => {
     enableExpress: enableExpress ? enableExpress : undefined,
     customContractCalls: data.customContractCalls
       ? parseCustomContractCall(data.customContractCalls)
+      : undefined,
+    collectFees: data.collectFees
+      ? parseCollectFees(data.collectFees)
       : undefined
   });
 };
