@@ -1,6 +1,6 @@
 import { ChainData, SquidData } from "@0xsquid/squid-types";
 
-import { Contract, RpcProvider } from "../../types/ethers";
+import { Contract, GasData, RpcProvider } from "../../types/ethers";
 import { OverrideParams } from "../../types";
 
 export class Utils {
@@ -84,7 +84,7 @@ export class Utils {
   }: {
     transactionRequest: SquidData;
     overrides?: OverrideParams;
-  }) => {
+  }): GasData => {
     const { gasLimit, gasPrice, maxPriorityFeePerGas, maxFeePerGas } =
       transactionRequest;
 
@@ -99,6 +99,6 @@ export class Utils {
           gasPrice
         };
 
-    return overrides ? { ...gasParams, ...overrides } : gasParams;
+    return overrides ? { ...gasParams, ...overrides } : (gasParams as GasData);
   };
 }

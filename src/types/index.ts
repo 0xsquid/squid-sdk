@@ -8,11 +8,11 @@ import {
 import { DeliverTxResponse, SigningStargateClient } from "@cosmjs/stargate";
 
 import {
-  EvmSigner,
-  TransactionRequest,
+  EvmWallet,
   TransactionResponse,
   RpcProvider,
-  Contract
+  Contract,
+  GasData
 } from "./ethers";
 
 export type LogLevel = "info" | "error" | "debug";
@@ -34,10 +34,7 @@ export type RouteData = {
   params: RouteRequest;
 };
 
-export type OverrideParams = Omit<
-  TransactionRequest,
-  "to" | "data" | "value" | "from"
->;
+export type OverrideParams = GasData;
 
 export type ExecutionSettings = {
   infiniteApproval?: boolean;
@@ -46,7 +43,7 @@ export type ExecutionSettings = {
 export type CosmosSigner = SigningStargateClient;
 
 export type ExecuteRoute = {
-  signer: EvmSigner | CosmosSigner;
+  signer: EvmWallet | CosmosSigner;
   route: RouteData;
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
