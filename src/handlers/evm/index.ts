@@ -3,18 +3,18 @@ import { EthersAdapter } from "../../adapter/EthersAdapter";
 import { ExecuteRoute, RouteParamsPopulated } from "../../types";
 import {
   Contract,
-  EvmSigner,
-  Signer,
+  EvmWallet,
   TransactionRequest,
-  TransactionResponse,
-  UnsignedTransaction,
-  Wallet
+  TransactionResponse
 } from "../../types/ethers";
 
 import { uint256MaxValue } from "../../constants";
 import { Utils } from "./utils";
 
+import erc20Abi from "../../abi/erc20.json";
+
 const ethersAdapter = new EthersAdapter();
+const erc20Interface = ethersAdapter.interface(erc20Abi);
 
 export class EvmHandler extends Utils {
   async executeRoute({
@@ -30,7 +30,7 @@ export class EvmHandler extends Utils {
       },
       overrides
     } = data;
-    const signer = data.signer as EvmSigner;
+    const signer = data.signer as EvmWallet;
 
     const gasData = this.getGasData({
       transactionRequest: data.route.transactionRequest,
@@ -99,16 +99,9 @@ export class EvmHandler extends Utils {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
   }): Promise<boolean> {
-    const signer = data.signer as EvmSigner;
+    const wallet = data.signer as EvmWallet;
 
-    let address: string;
-
-    // get address from differents ethers instances
-    if (signer && ethersAdapter.isSigner(signer)) {
-      address = await (signer as Signer).getAddress();
-    } else {
-      address = (signer as Wallet).address;
-    }
+    const address = wallet.address;
 
     // validate balance
     await this.validateBalance({
@@ -121,7 +114,7 @@ export class EvmHandler extends Utils {
     }
 
     const hasAllowance = this.validateAllowance({
-      fromTokenContract: params.fromTokenContract,
+      fromTokenContract: params.fromTokenContract as Contract,
       sender: address,
       router: data.route.transactionRequest.target,
       amount: BigInt(params.fromAmount)
@@ -149,7 +142,7 @@ export class EvmHandler extends Utils {
       executionSettings,
       overrides
     } = data;
-    const signer = data.signer as EvmSigner;
+    const signer = data.signer as EvmWallet;
     const { fromIsNative, fromAmount, fromTokenContract } = params;
 
     if (fromIsNative) {
@@ -162,10 +155,24 @@ export class EvmHandler extends Utils {
       amountToApprove = BigInt(fromAmount);
     }
 
-    const approveTx = await (fromTokenContract as Contract)
-      .connect(signer)
-      .approve(target, amountToApprove, overrides);
-    await approveTx.wait();
+    const connectedContract = await (fromTokenContract as Contract).connect(
+      signer
+    );
+
+    if (connectedContract?.runner?.sendTransaction) {
+      const approveTx = await connectedContract?.runner?.sendTransaction({
+        to: fromTokenContract?.getAddress(),
+        data: erc20Interface.encodeFunctionData("approve", [
+          target,
+          amountToApprove
+        ]),
+        ...overrides
+      });
+
+      await approveTx.wait();
+    } else {
+      throw new Error("No contract runner with signer provided");
+    }
 
     return true;
   }
@@ -182,7 +189,7 @@ export class EvmHandler extends Utils {
     const result = await this.validateBalance({ sender, params });
 
     const hasAllowance = await this.validateAllowance({
-      fromTokenContract: params.fromTokenContract,
+      fromTokenContract: params.fromTokenContract as Contract,
       sender,
       router: target,
       amount: BigInt(params.fromAmount)
@@ -211,12 +218,12 @@ export class EvmHandler extends Utils {
     });
 
     return ethersAdapter.serializeTransaction({
-      chainId: parseInt(route.params.fromChain as string),
+      chainId: parseInt(route.params.fromChain as string, 10),
       to: target,
       data: data,
       value: value,
       nonce,
       ...gasData
-    } as UnsignedTransaction);
+    });
   }
 }

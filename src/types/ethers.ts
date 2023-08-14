@@ -1,12 +1,19 @@
 import { ethers } from "ethers";
 
-export type RpcProvider = ethers.providers.JsonRpcProvider;
+export type RpcProvider = ethers.JsonRpcProvider;
 export type Contract = ethers.Contract;
+export type ContractRunner = ethers.ContractRunner;
+export type Interface = ethers.Interface;
 
-export type Signer = ethers.Signer;
-export type Wallet = ethers.Wallet;
-export type EvmSigner = Signer | Wallet;
+export type EvmWallet = ethers.Wallet;
 
-export type UnsignedTransaction = ethers.UnsignedTransaction;
-export type TransactionResponse = ethers.providers.TransactionResponse;
-export type TransactionRequest = ethers.providers.TransactionRequest;
+export type Transaction = ethers.Transaction;
+export type TransactionResponse = ethers.TransactionResponse;
+export type TransactionRequest = ethers.TransactionRequest;
+
+export type GasData = {
+  gasLimit: string;
+  gasPrice?: string;
+  maxPriorityFeePerGas?: string;
+  maxFeePerGas?: string;
+};
