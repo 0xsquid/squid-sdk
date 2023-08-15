@@ -1,5 +1,19 @@
 
 
+## [2.1.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.1.0) (2023-08-15)
+
+
+### Bug Fixes
+
+* add npm auth token ([619fa95](https://github.com/0xsquid/api-sdk/commit/619fa950424469ab4f9e3cdfd814cc2aa7ff517e))
+* add yml to linter ([fa1a5c0](https://github.com/0xsquid/api-sdk/commit/fa1a5c052d1f4ecf580cf64a5c4f192d92cf56cd))
+* adjust sdk after types update ([f6f0c7e](https://github.com/0xsquid/api-sdk/commit/f6f0c7eb38b7d78edaf04e65ef38bda3cab8d739))
+* adjust to new backend response ([5bae21b](https://github.com/0xsquid/api-sdk/commit/5bae21b7fe69035d6a1dc848e07c5c94adf377c5))
+* import error ([6b2cd03](https://github.com/0xsquid/api-sdk/commit/6b2cd03600f4febd9f6f192b8715642b5ddefe9e))
+* type issue ([4cee2be](https://github.com/0xsquid/api-sdk/commit/4cee2befd96613b7464c7d25110bbd99571e0cdc))
+* workflow formating ([420d51d](https://github.com/0xsquid/api-sdk/commit/420d51dbfafe4a30cffe8ec4230a8beb1b0f8f22))
+* yml format ([93e2978](https://github.com/0xsquid/api-sdk/commit/93e29782830edd6201e143aefd1a19b227aead55))
+
 ## [2.0.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.0.0) (2023-07-22)
 
 
