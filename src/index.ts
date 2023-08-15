@@ -1,11 +1,10 @@
-import { ChainType, RouteRequest } from "@0xsquid/squid-types";
+import { ChainType, RouteRequest, RouteResponse } from "@0xsquid/squid-types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
 import { EthersAdapter } from "./adapter/EthersAdapter";
 import { nativeTokenConstant } from "./constants";
 import {
   Config,
-  RouteData,
   GetStatus,
   ExecuteRoute,
   RouteParamsPopulated,
@@ -95,7 +94,7 @@ export class Squid extends TokensChains {
     return response.data;
   }
 
-  async getRoute(params: RouteRequest): Promise<{ route: RouteData }> {
+  async getRoute(params: RouteRequest): Promise<{ route: RouteResponse }> {
     this.validateInit();
 
     const response = await this.httpInstance.get("v2/route", {
@@ -136,7 +135,7 @@ export class Squid extends TokensChains {
     route,
     sender
   }: {
-    route: RouteData;
+    route: RouteResponse["route"];
     sender: string;
   }): Promise<{
     isApproved: boolean;
@@ -235,7 +234,7 @@ export class Squid extends TokensChains {
     };
   }
 
-  private validateTransactionRequest(route: RouteData) {
+  private validateTransactionRequest(route: RouteResponse["route"]) {
     if (!route.transactionRequest) {
       throw new Error("transactionRequest param not found in route object");
     }

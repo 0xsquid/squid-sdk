@@ -1,9 +1,8 @@
 import {
   ChainData,
   Token,
-  SquidData,
   RouteRequest,
-  Estimate
+  RouteResponse
 } from "@0xsquid/squid-types";
 import { DeliverTxResponse, SigningStargateClient } from "@cosmjs/stargate";
 
@@ -28,12 +27,6 @@ export type Config = {
   integratorId?: string;
 };
 
-export type RouteData = {
-  estimate: Estimate;
-  transactionRequest: SquidData;
-  params: RouteRequest;
-};
-
 export type OverrideParams = GasData;
 
 export type ExecutionSettings = {
@@ -44,7 +37,7 @@ export type CosmosSigner = SigningStargateClient;
 
 export type ExecuteRoute = {
   signer: EvmWallet | CosmosSigner;
-  route: RouteData;
+  route: RouteResponse["route"];
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
   signerAddress?: string; // cosmos specific
