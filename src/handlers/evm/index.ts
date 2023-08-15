@@ -11,10 +11,7 @@ import {
 import { uint256MaxValue } from "../../constants";
 import { Utils } from "./utils";
 
-import erc20Abi from "../../abi/erc20.json";
-
 const ethersAdapter = new EthersAdapter();
-const erc20Interface = ethersAdapter.interface(erc20Abi);
 
 export class EvmHandler extends Utils {
   async executeRoute({
