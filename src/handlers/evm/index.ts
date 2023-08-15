@@ -142,8 +142,8 @@ export class EvmHandler extends Utils {
       executionSettings,
       overrides
     } = data;
-    const signer = data.signer as EvmWallet;
-    const { fromIsNative, fromAmount, fromTokenContract } = params;
+    const { fromIsNative, fromAmount } = params;
+    const fromTokenContract = params.fromTokenContract as Contract;
 
     if (fromIsNative) {
       return true;
@@ -155,24 +155,7 @@ export class EvmHandler extends Utils {
       amountToApprove = BigInt(fromAmount);
     }
 
-    const connectedContract = await (fromTokenContract as Contract).connect(
-      signer
-    );
-
-    if (connectedContract?.runner?.sendTransaction) {
-      const approveTx = await connectedContract?.runner?.sendTransaction({
-        to: fromTokenContract?.getAddress(),
-        data: erc20Interface.encodeFunctionData("approve", [
-          target,
-          amountToApprove
-        ]),
-        ...overrides
-      });
-
-      await approveTx.wait();
-    } else {
-      throw new Error("No contract runner with signer provided");
-    }
+    await fromTokenContract.approve(target, amountToApprove, overrides);
 
     return true;
   }
