@@ -19,17 +19,7 @@ export class EthersAdapter {
     return new ethers.Interface(abi);
   }
 
-  serializeTransaction({
-    chainId,
-    to,
-    data,
-    value,
-    nonce,
-    gasLimit,
-    gasPrice,
-    maxPriorityFeePerGas,
-    maxFeePerGas
-  }: {
+  serializeTransaction(tx: {
     chainId: number;
     to: string;
     data: string;
@@ -40,22 +30,6 @@ export class EthersAdapter {
     maxPriorityFeePerGas?: string;
     maxFeePerGas?: string;
   }): string {
-    const transaction = new ethers.Transaction();
-
-    transaction.chainId = chainId;
-    transaction.to = to;
-    transaction.data = data;
-    transaction.value = value;
-    transaction.nonce = nonce;
-    transaction.gasLimit = gasLimit;
-
-    if (maxPriorityFeePerGas) {
-      transaction.maxPriorityFeePerGas = maxPriorityFeePerGas;
-      transaction.maxFeePerGas = maxFeePerGas as string;
-    } else {
-      transaction.gasPrice = gasPrice as string;
-    }
-
-    return transaction.unsignedSerialized;
+    return ethers.Transaction.from(tx).unsignedSerialized;
   }
 }
