@@ -152,7 +152,7 @@ export class EvmHandler extends Utils {
       amountToApprove = BigInt(fromAmount);
     }
 
-    await fromTokenContract.approve(target, amountToApprove, overrides);
+    await fromTokenContract.approve(target, amountToApprove, overrides || {});
 
     return true;
   }
