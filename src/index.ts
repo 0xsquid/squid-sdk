@@ -16,7 +16,6 @@ import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
 import { EvmWallet } from "types/ethers";
-import { Wallet } from "ethers";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -168,7 +167,7 @@ export class Squid extends TokensChains {
 
     const params = this.populateRouteParams(
       data.route.params,
-      data.signer as Wallet
+      data.signer as EvmWallet
     );
 
     switch (params.fromChain.chainType) {
