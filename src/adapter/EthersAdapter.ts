@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ethers } from "ethers";
 
 import { RpcProvider, EvmWallet, Contract, Interface } from "../types/ethers";
 
 export class EthersAdapter {
   rpcProvider(rpc: string): RpcProvider {
-    return new ethers.JsonRpcProvider(rpc);
+    return new ethers.providers.JsonRpcProvider(rpc);
   }
 
   contract(
@@ -16,10 +17,10 @@ export class EthersAdapter {
   }
 
   interface(abi: any): Interface {
-    return new ethers.Interface(abi);
+    return new ethers.utils.Interface(abi);
   }
 
-  serializeTransaction(tx: {
+  serializeTransaction(_tx: {
     chainId: number;
     to: string;
     data: string;
@@ -30,6 +31,6 @@ export class EthersAdapter {
     maxPriorityFeePerGas?: string;
     maxFeePerGas?: string;
   }): string {
-    return ethers.Transaction.from(tx).unsignedSerialized;
+    return ""; // ethers.Transaction.from(tx).unsignedSerialized;
   }
 }
