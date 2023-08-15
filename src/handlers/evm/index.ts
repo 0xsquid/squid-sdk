@@ -98,7 +98,14 @@ export class EvmHandler extends Utils {
   }): Promise<boolean> {
     const wallet = data.signer as EvmWallet;
 
-    const address = wallet.address;
+    let address = wallet.address;
+
+    // ethers v5 & v6 support
+    try {
+      address = await wallet.getAddress();
+    } catch (error) {
+      // do nothing
+    }
 
     // validate balance
     await this.validateBalance({
