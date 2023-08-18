@@ -181,6 +181,11 @@ export type ContractCall = {
   estimatedGas: string;
 };
 
+export type CustomCosmosContractCall = {
+  contract?: string;
+  msg: object;
+};
+
 export type GetRoute = {
   fromChain: number | string;
   toChain: number | string;
@@ -193,7 +198,7 @@ export type GetRoute = {
   slippage: number;
   quoteOnly?: boolean;
   enableExpress?: boolean;
-  customContractCalls?: ContractCall[];
+  customContractCalls?: ContractCall[] | CustomCosmosContractCall[];
   prefer?: string[];
   receiveGasOnDestination?: boolean;
 };
