@@ -1,5 +1,14 @@
 import axios, { AxiosInstance } from "axios";
 import { BigNumber, ethers, UnsignedTransaction } from "ethers";
+import {
+  Coin,
+  DeliverTxResponse,
+  GasPrice,
+  SigningStargateClient,
+  calculateFee
+} from "@cosmjs/stargate";
+import { toUtf8 } from "@cosmjs/encoding";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 
 import {
   Allowance,
@@ -18,7 +27,11 @@ import {
   StatusResponse,
   TokenData,
   TransactionRequest,
-  ValidateBalanceAndApproval
+  ValidateBalanceAndApproval,
+  CosmosMsg,
+  IBC_TRANSFER_TYPE,
+  WASM_TYPE,
+  WasmHookMsg
 } from "./types";
 
 import { parseRouteResponse } from "./0xsquid/v1/route";
@@ -207,6 +220,29 @@ export class Squid {
     return transactionRequest;
   }
 
+  private async validateCosmosBalance(
+    signer: SigningStargateClient,
+    signerAddress: string,
+    coin: Coin
+  ): Promise<void> {
+    const signerCoinBalance = await signer.getBalance(
+      signerAddress,
+      coin.denom
+    );
+
+    const currentBalance = ethers.BigNumber.from(signerCoinBalance.amount);
+    const transferAmount = ethers.BigNumber.from(coin.amount);
+
+    if (transferAmount.gt(currentBalance)) {
+      throw new SquidError({
+        message: `transfer amount is greater then account balance`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+  }
+
   public async init() {
     const response = await this.axiosInstance.get("/v1/sdk-info");
     if (response.status != 200) {
@@ -259,10 +295,13 @@ export class Squid {
 
   public async executeRoute({
     signer,
+    signerAddress,
     route,
     executionSettings,
     overrides
-  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse> {
+  }: ExecuteRoute): Promise<
+    ethers.providers.TransactionResponse | DeliverTxResponse
+  > {
     this.validateInit();
 
     if (!route.transactionRequest) {
@@ -272,6 +311,18 @@ export class Squid {
         logging: this.config.logging,
         logLevel: this.config.logLevel
       });
+    }
+
+    // handle cosmos case
+    if (
+      signer instanceof SigningStargateClient ||
+      signer.constructor.name === "SigningStargateClient"
+    ) {
+      return await this.executeRouteCosmos(
+        signer as SigningStargateClient,
+        signerAddress!,
+        route
+      );
     }
 
     const { transactionRequest, params } = route;
@@ -392,6 +443,67 @@ export class Squid {
       nonce,
       ..._overrides
     } as UnsignedTransaction);
+  }
+
+  private async executeRouteCosmos(
+    signer: SigningStargateClient,
+    signerAddress: string,
+    route: RouteData
+  ): Promise<DeliverTxResponse> {
+    const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
+    const msgs = [];
+
+    switch (cosmosMsg.msgTypeUrl) {
+      case IBC_TRANSFER_TYPE: {
+        msgs.push({
+          typeUrl: cosmosMsg.msgTypeUrl,
+          value: cosmosMsg.msg
+        });
+
+        break;
+      }
+      case WASM_TYPE: {
+        // register execute wasm msg type for signer
+        signer.registry.register(WASM_TYPE, MsgExecuteContract);
+
+        const wasmHook = cosmosMsg.msg as WasmHookMsg;
+        msgs.push({
+          typeUrl: cosmosMsg.msgTypeUrl,
+          value: {
+            sender: signerAddress,
+            contract: wasmHook.wasm.contract,
+            msg: toUtf8(JSON.stringify(wasmHook.wasm.msg)),
+            funds: [
+              {
+                denom: route.params.fromToken.address,
+                amount: route.params.fromAmount
+              }
+            ]
+          }
+        });
+
+        break;
+      }
+    }
+
+    // validating that user has enough balance for the transfer
+    await this.validateCosmosBalance(signer, signerAddress, {
+      denom: route.params.fromToken.address,
+      amount: route.params.fromAmount
+    });
+
+    // simulate tx to estimate gas cost
+    const estimatedGas = await signer.simulate(signerAddress, msgs, "");
+    const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
+
+    return await signer.signAndBroadcast(
+      signerAddress,
+      msgs,
+      calculateFee(
+        Math.trunc(estimatedGas * gasMultiplier),
+        GasPrice.fromString(route.transactionRequest!.gasPrice)
+      )
+    );
   }
 
   public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{
