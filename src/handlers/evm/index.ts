@@ -175,6 +175,10 @@ export class EvmHandler extends Utils {
   }) {
     const result = await this.validateBalance({ sender, params });
 
+    if (params.fromIsNative) {
+      return true;
+    }
+
     const hasAllowance = await this.validateAllowance({
       fromTokenContract: params.fromTokenContract as Contract,
       sender,
