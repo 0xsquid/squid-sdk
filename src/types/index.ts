@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { SigningStargateClient } from "@cosmjs/stargate";
 import { LogLevel } from "../error";
 
 export enum ChainName {
@@ -185,6 +186,11 @@ export type ContractCall = {
   estimatedGas: string;
 };
 
+export type CustomCosmosContractCall = {
+  contract?: string;
+  msg: object;
+};
+
 export type GetRoute = {
   fromChain: number | string;
   toChain: number | string;
@@ -195,10 +201,12 @@ export type GetRoute = {
   slippage: number;
   quoteOnly?: boolean;
   enableExpress?: boolean;
-  customContractCalls?: ContractCall[];
+  customContractCalls?: ContractCall[] | CustomCosmosContractCall[];
   prefer?: string[];
   receiveGasOnDestination?: boolean;
   collectFees?: CollectFees;
+  cosmosSignerAddress?: string;
+  evmFallbackAddress?: string;
 };
 
 export type TransactionRequest = {
@@ -222,7 +230,9 @@ export type Route = Call[];
 export enum CallType {
   SWAP = "SWAP",
   BRIDGE = "BRIDGE",
-  CUSTOM = "CUSTOM"
+  CUSTOM = "CUSTOM",
+  OSMOSIS_SWAP = "Swap",
+  COSMOS_TRANSFER = "Transfer"
 }
 
 export type BaseCall = {
@@ -261,7 +271,35 @@ export type Bridge = BaseCall & {
 
 export type CustomCall = BaseCall & ContractCall;
 
-export type Call = Swap | CustomCall | Bridge;
+export type CosmosTransferAction = BaseCall & {
+  fromChain: string;
+  toChain: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromChannel: string;
+  toChannel: string;
+};
+
+export type SwapActionCosmosEstimate = BaseCall & {
+  chainId: string;
+  dex: string;
+  poolId: string;
+  fromToken: TokenData;
+  toToken: TokenData;
+  fromAmount: string;
+  toAmount: string;
+  toAmountMin: string;
+  exchangeRate: string;
+  priceImpact: string;
+  dynamicSlippage?: number;
+};
+
+export type Call =
+  | Swap
+  | CustomCall
+  | Bridge
+  | CosmosTransferAction
+  | SwapActionCosmosEstimate;
 
 export type Estimate = {
   fromAmount: string;
@@ -321,7 +359,8 @@ export type OverrideParams = Omit<
 >;
 
 export type ExecuteRoute = {
-  signer: ethers.Wallet | ethers.Signer;
+  signer: ethers.Wallet | ethers.Signer | SigningStargateClient;
+  signerAddress?: string;
   route: RouteData;
   executionSettings?: {
     infiniteApproval?: boolean;
@@ -386,6 +425,8 @@ export type GetStatus = {
   transactionId: string;
   requestId?: string;
   integratorId?: string;
+  fromChainId?: string | number;
+  toChainId?: string | number;
 };
 
 export type GasCost = {
@@ -439,5 +480,21 @@ export type StatusResponse = ApiBasicResponse & {
   timeSpent?: Record<string, number>;
   requestId?: string;
   integratorId?: string;
+  routeStatus?: any; //TODO add type
   squidTransactionStatus?: string;
 };
+
+export type CosmosMsg = {
+  msgTypeUrl: string;
+  msg: object;
+};
+
+export type WasmHookMsg = {
+  wasm: {
+    contract: string;
+    msg: object;
+  };
+};
+
+export const IBC_TRANSFER_TYPE = "/ibc.applications.transfer.v1.MsgTransfer";
+export const WASM_TYPE = "/cosmwasm.wasm.v1.MsgExecuteContract";

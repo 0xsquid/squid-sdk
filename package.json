@@ -1,6 +1,6 @@
 {
   "name": "@0xsquid/sdk",
-  "version": "1.8.0",
+  "version": "1.8.1-beta.0",
   "description": "🛠 An SDK for building applications on top of 0xsquid",
   "repository": {
     "type": "git",
@@ -34,7 +34,10 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "ethers": "^5.7.1"
+    "ethers": "^5.7.1",
+    "@cosmjs/encoding": "^0.31.0",
+    "@cosmjs/stargate": "^0.31.0",
+    "cosmjs-types": "^0.8.0"
   },
   "resolutions": {
     "semver": "^7.5.4"
