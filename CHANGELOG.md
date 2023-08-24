@@ -1,5 +1,7 @@
 
 
+## [1.8.1-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v1.8.1-beta.0) (2023-08-24)
+
 ## [1.8.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v1.8.0) (2023-08-07)
 
 ## [1.7.4](https://github.com/0xsquid/api-sdk/compare/v1.7.3...v1.7.4) (2023-07-19)
