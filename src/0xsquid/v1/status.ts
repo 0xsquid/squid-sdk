@@ -59,6 +59,7 @@ export const parseStatusResponse = (
     fromChain,
     toChain,
     timeSpent,
+    routeStatus,
     squidTransactionStatus
   } = response.data;
   return removeEmpty({
@@ -70,6 +71,7 @@ export const parseStatusResponse = (
     fromChain: parseTransactionStatus(fromChain),
     toChain: parseTransactionStatus(toChain),
     timeSpent: timeSpent,
+    routeStatus: routeStatus,
     squidTransactionStatus: squidTransactionStatus,
     ...getHeaderTracker(headers),
     ...apiBasicResponse
