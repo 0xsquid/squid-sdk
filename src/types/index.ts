@@ -197,6 +197,7 @@ export type GetRoute = {
   fromToken: string;
   toToken: string;
   fromAmount: string;
+  fromAddress: string;
   toAddress: string;
   slippage: number;
   quoteOnly?: boolean;
@@ -205,8 +206,6 @@ export type GetRoute = {
   prefer?: string[];
   receiveGasOnDestination?: boolean;
   collectFees?: CollectFees;
-  cosmosSignerAddress?: string;
-  evmFallbackAddress?: string;
 };
 
 export type TransactionRequest = {
