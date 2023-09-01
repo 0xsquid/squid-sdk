@@ -45,6 +45,11 @@ export type ExecuteRoute = {
 
 export type TransactionResponses = TransactionResponse | DeliverTxResponse;
 
+export type SquidError = {
+  message: string;
+  code: number;
+};
+
 export type GetStatus = {
   transactionId: string;
   requestId?: string;

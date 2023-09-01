@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@^0.1.10":
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.10.tgz#b02283f4c443d8697d0e35f69e2d7a84269430bc"
-  integrity sha512-/bwIReQmzwLwWAEE/hr3XX7TpPMafKofFqTg0mq2w8JfPxcg/4kPdsU9Kkwu8BYSxuow1j8vGDe8fzoIprC/6Q==
+"@0xsquid/squid-types@^0.1.12":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.12.tgz#0b7691a34aff0f7051c177e9dc35bff3512ad455"
+  integrity sha512-auny/fut/hRcPO8uidc7YS1Xb4ZxXCPLWVGdGYVBJx3DM417TKCBOmcZ0bi2/5e63WRUKcW+3VqTR6TOsDN2aA==
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"

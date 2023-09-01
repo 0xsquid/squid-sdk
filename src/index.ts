@@ -1,5 +1,4 @@
 import { ChainType, RouteRequest, RouteResponse } from "@0xsquid/squid-types";
-
 import HttpAdapter from "./adapter/HttpAdapter";
 import { EthersAdapter } from "./adapter/EthersAdapter";
 import { nativeTokenConstant } from "./constants";
@@ -10,12 +9,15 @@ import {
   RouteParamsPopulated,
   TransactionResponses
 } from "./types";
-
 import { TokensChains } from "./TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
 import { EvmWallet } from "types/ethers";
+import { SquidError } from "error/index";
+
+export { ChainType, RouteRequest, RouteResponse, SquidError };
+export * from "./types";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -97,10 +99,10 @@ export class Squid extends TokensChains {
   async getRoute(params: RouteRequest): Promise<RouteResponse> {
     this.validateInit();
 
-    const response = await this.httpInstance.post("v2/route", { ...params });
+    const response = await this.httpInstance.post("v2/route", params);
 
     if (response.status != 200) {
-      throw new Error(response.data.error);
+      throw new SquidError(response.data.message);
     }
 
     return response.data;
