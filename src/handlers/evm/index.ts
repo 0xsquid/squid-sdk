@@ -176,7 +176,10 @@ export class EvmHandler extends Utils {
     const result = await this.validateBalance({ sender, params });
 
     if (params.fromIsNative) {
-      return true;
+      return {
+        isApproved: true,
+        message: "Not required for native token"
+      };
     }
 
     const hasAllowance = await this.validateAllowance({

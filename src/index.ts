@@ -97,7 +97,7 @@ export class Squid extends TokensChains {
   async getRoute(params: RouteRequest): Promise<RouteResponse> {
     this.validateInit();
 
-    const response = await this.httpInstance.get("v2/route", {
+    const response = await this.httpInstance.post("v2/route", {
       params
     });
 
