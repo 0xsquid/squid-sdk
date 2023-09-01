@@ -26,7 +26,7 @@ export default class HttpAdapter {
     url: string,
     headers?: { [key: string]: any }
   ): Promise<HttpResponse> => {
-    const { status, data } = await this.axios.get(url, headers);
+    const { status, data } = await this.axios.get(url, { headers });
     return { status, data };
   };
 
@@ -35,7 +35,9 @@ export default class HttpAdapter {
     data: { [key: string]: any },
     headers?: { [key: string]: any }
   ): Promise<HttpResponse> => {
-    const { status, data: _data } = await this.axios.post(url, data, headers);
+    const { status, data: _data } = await this.axios.post(url, data, {
+      headers
+    });
     return { status, data: _data };
   };
 }
