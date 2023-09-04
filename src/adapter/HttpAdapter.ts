@@ -24,18 +24,18 @@ export default class HttpAdapter {
 
   get = async (
     url: string,
-    headers?: { [key: string]: any }
+    config?: { [key: string]: any }
   ): Promise<HttpResponse> => {
-    const { status, data } = await this.axios.get(url, headers);
+    const { status, data } = await this.axios.get(url, config);
     return { status, data };
   };
 
   post = async (
     url: string,
     data: { [key: string]: any },
-    headers?: { [key: string]: any }
+    config?: { [key: string]: any }
   ): Promise<HttpResponse> => {
-    const { status, data: _data } = await this.axios.post(url, data, headers);
+    const { status, data: _data } = await this.axios.post(url, data, config);
     return { status, data: _data };
   };
 }

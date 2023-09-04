@@ -1,4 +1,9 @@
-import { ChainType, RouteRequest, RouteResponse } from "@0xsquid/squid-types";
+import {
+  ChainType,
+  RouteRequest,
+  RouteResponse,
+  StatusResponse
+} from "@0xsquid/squid-types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
 import { EthersAdapter } from "./adapter/EthersAdapter";
@@ -79,8 +84,7 @@ export class Squid extends TokensChains {
 
   // PUBLIC METHODS
 
-  // TODO: ADD STATUS TYPE
-  async getStatus(params: GetStatus): Promise<any> {
+  async getStatus(params: GetStatus): Promise<StatusResponse> {
     const response = await this.httpInstance.axios.get("/v1/status", {
       params,
       headers: {
@@ -97,9 +101,7 @@ export class Squid extends TokensChains {
   async getRoute(params: RouteRequest): Promise<RouteResponse> {
     this.validateInit();
 
-    const response = await this.httpInstance.get("v2/route", {
-      params
-    });
+    const response = await this.httpInstance.post("v2/route", params);
 
     if (response.status != 200) {
       throw new Error(response.data.error);
