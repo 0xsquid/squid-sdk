@@ -1,4 +1,9 @@
-import { ChainType, RouteRequest, RouteResponse } from "@0xsquid/squid-types";
+import {
+  ChainType,
+  RouteRequest,
+  RouteResponse,
+  StatusResponse
+} from "@0xsquid/squid-types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
 import { EthersAdapter } from "./adapter/EthersAdapter";
@@ -79,8 +84,7 @@ export class Squid extends TokensChains {
 
   // PUBLIC METHODS
 
-  // TODO: ADD STATUS TYPE
-  async getStatus(params: GetStatus): Promise<any> {
+  async getStatus(params: GetStatus): Promise<StatusResponse> {
     const response = await this.httpInstance.axios.get("/v1/status", {
       params,
       headers: {
