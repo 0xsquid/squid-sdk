@@ -117,7 +117,7 @@ export class EvmHandler extends Utils {
       return true;
     }
 
-    const hasAllowance = this.validateAllowance({
+    const hasAllowance = await this.validateAllowance({
       fromTokenContract: params.fromTokenContract as Contract,
       sender: address,
       router: data.route.transactionRequest.target,
@@ -159,7 +159,13 @@ export class EvmHandler extends Utils {
       amountToApprove = BigInt(fromAmount);
     }
 
-    await fromTokenContract.approve(target, amountToApprove, overrides || {});
+    const tx = await fromTokenContract.approve(
+      target,
+      amountToApprove,
+      overrides || {}
+    );
+
+    await tx.wait();
 
     return true;
   }
@@ -176,7 +182,10 @@ export class EvmHandler extends Utils {
     const result = await this.validateBalance({ sender, params });
 
     if (params.fromIsNative) {
-      return true;
+      return {
+        isApproved: true,
+        message: "Not required for native token"
+      };
     }
 
     const hasAllowance = await this.validateAllowance({

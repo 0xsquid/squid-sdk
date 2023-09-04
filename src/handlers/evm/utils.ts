@@ -15,7 +15,7 @@ export class Utils {
     amount: bigint;
     fromChain: ChainData;
   }) {
-    const balance = BigInt((await fromProvider.getBalance(sender)).toString());
+    const balance = await fromProvider.getBalance(sender);
 
     if (amount > balance) {
       throw new Error(
@@ -40,9 +40,7 @@ export class Utils {
     sender: string;
     fromChain: ChainData;
   }) {
-    const balance = BigInt(
-      (await (fromTokenContract as Contract).balanceOf(sender)).toString()
-    );
+    const balance = await (fromTokenContract as Contract).balanceOf(sender);
 
     if (amount > balance) {
       throw new Error(
@@ -69,10 +67,9 @@ export class Utils {
     sender: string;
     router: string;
   }) {
-    const allowance = BigInt(
-      (
-        await (fromTokenContract as Contract).allowance(sender, router)
-      ).toString()
+    const allowance = await (fromTokenContract as Contract).allowance(
+      sender,
+      router
     );
 
     return !(amount > allowance);
