@@ -2,8 +2,7 @@ import {
   ChainType,
   RouteRequest,
   RouteResponse,
-  StatusResponse,
-  SquidErrorResponse
+  StatusResponse
 } from "@0xsquid/squid-types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
@@ -12,7 +11,6 @@ import { nativeTokenConstant } from "./constants";
 import {
   Config,
   GetStatus,
-  GetRouteResponse,
   ExecuteRoute,
   RouteParamsPopulated,
   TransactionResponses
@@ -23,15 +21,6 @@ import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
 import { EvmWallet } from "types/ethers";
-export {
-  ChainType,
-  GetRouteResponse,
-  RouteRequest,
-  StatusResponse,
-  GetStatus,
-  SquidErrorResponse
-};
-export * from "./types";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
