@@ -22,7 +22,14 @@ import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
 import { EvmWallet } from "types/ethers";
-export { ChainType, RouteRequest, RouteResponse, SquidErrorResponse };
+export {
+  ChainType,
+  RouteRequest,
+  RouteResponse,
+  StatusResponse,
+  GetStatus,
+  SquidErrorResponse
+};
 export * from "./types";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
