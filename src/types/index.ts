@@ -27,6 +27,11 @@ export type Config = {
   integratorId?: string;
 };
 
+export type GetRouteResponse = {
+  route: RouteResponse["route"];
+  integratorId?: string;
+};
+
 export type OverrideParams = GasData;
 
 export type ExecutionSettings = {
