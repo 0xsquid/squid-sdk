@@ -37,6 +37,7 @@ export class Squid extends TokensChains {
   public config: Config;
   public isInMaintenanceMode = false;
   public maintenanceMessage: string | undefined;
+  public axelarscanURL: string | undefined;
 
   constructor(config = {} as Config) {
     super();
@@ -84,6 +85,7 @@ export class Squid extends TokensChains {
     this.chains = response.data.chains;
     this.isInMaintenanceMode = response.data.isInMaintenanceMode;
     this.maintenanceMessage = response.data.maintenanceMessage;
+    this.axelarscanURL = response.data.axlScanUrl;
     this.initialized = true;
   }
 
