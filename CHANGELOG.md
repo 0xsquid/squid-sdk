@@ -1,5 +1,22 @@
 
 
+## [2.5.1](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.5.1) (2023-09-05)
+
+
+### Bug Fixes
+
+* add npm auth token ([619fa95](https://github.com/0xsquid/api-sdk/commit/619fa950424469ab4f9e3cdfd814cc2aa7ff517e))
+* add status type export ([b1decb4](https://github.com/0xsquid/api-sdk/commit/b1decb48863ce01349610811a3bb7af7b4e6d572))
+* add yml to linter ([fa1a5c0](https://github.com/0xsquid/api-sdk/commit/fa1a5c052d1f4ecf580cf64a5c4f192d92cf56cd))
+* adjust sdk after types update ([f6f0c7e](https://github.com/0xsquid/api-sdk/commit/f6f0c7eb38b7d78edaf04e65ef38bda3cab8d739))
+* adjust to new backend response ([5bae21b](https://github.com/0xsquid/api-sdk/commit/5bae21b7fe69035d6a1dc848e07c5c94adf377c5))
+* import error ([6b2cd03](https://github.com/0xsquid/api-sdk/commit/6b2cd03600f4febd9f6f192b8715642b5ddefe9e))
+* missing sdk properties ([44f0242](https://github.com/0xsquid/api-sdk/commit/44f0242b7119e2419f332116d93b301661731e87))
+* type export ([5a4db3e](https://github.com/0xsquid/api-sdk/commit/5a4db3e0464438f449406e310e1a103825c06a25))
+* type issue ([4cee2be](https://github.com/0xsquid/api-sdk/commit/4cee2befd96613b7464c7d25110bbd99571e0cdc))
+* workflow formating ([420d51d](https://github.com/0xsquid/api-sdk/commit/420d51dbfafe4a30cffe8ec4230a8beb1b0f8f22))
+* yml format ([93e2978](https://github.com/0xsquid/api-sdk/commit/93e29782830edd6201e143aefd1a19b227aead55))
+
 ## [2.5.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.5.0) (2023-08-15)
 
 
