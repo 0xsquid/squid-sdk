@@ -1,9 +1,7 @@
+import { AxiosResponse } from "axios";
 import { Config } from ".";
 
-export interface HttpResponse {
-  status: number;
-  data: any;
-}
+export type HttpResponse = AxiosResponse;
 
 export interface RequestConfig {
   baseUrl?: string;
