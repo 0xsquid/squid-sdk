@@ -12,6 +12,7 @@ import { nativeTokenConstant } from "./constants";
 import {
   Config,
   GetStatus,
+  GetRouteResponse,
   ExecuteRoute,
   RouteParamsPopulated,
   TransactionResponses
@@ -24,8 +25,8 @@ import erc20Abi from "./abi/erc20.json";
 import { EvmWallet } from "types/ethers";
 export {
   ChainType,
+  GetRouteResponse,
   RouteRequest,
-  RouteResponse,
   StatusResponse,
   GetStatus,
   SquidErrorResponse
@@ -47,6 +48,7 @@ export class Squid extends TokensChains {
   public config: Config;
   public isInMaintenanceMode = false;
   public maintenanceMessage: string | undefined;
+  public axelarscanURL: string | undefined;
 
   constructor(config = {} as Config) {
     super();
@@ -90,6 +92,7 @@ export class Squid extends TokensChains {
     this.isInMaintenanceMode = response.data.isInMaintenanceMode;
     this.maintenanceMessage = response.data.maintenanceMessage;
     this.initialized = true;
+    this.axelarscanURL = response.data.axlScanUrl;
   }
 
   // PUBLIC METHODS
@@ -108,16 +111,22 @@ export class Squid extends TokensChains {
     return response.data;
   }
 
-  async getRoute(params: RouteRequest): Promise<RouteResponse> {
+  async getRoute(
+    params: RouteRequest
+  ): Promise<{ route: RouteResponse; requestId: string }> {
     this.validateInit();
 
-    const response = await this.httpInstance.post("v2/route", params);
+    const { status, data, headers } = await this.httpInstance.post(
+      "v2/route",
+      params
+    );
 
-    if (response.status != 200) {
-      throw new Error(response.data.error);
+    if (status != 200) {
+      throw new Error(data.error);
     }
+    const { requestId } = headers;
 
-    return response.data;
+    return { route: data.route, requestId };
   }
 
   async executeRoute(data: ExecuteRoute): Promise<TransactionResponses> {

@@ -26,8 +26,8 @@ export default class HttpAdapter {
     url: string,
     config?: { [key: string]: any }
   ): Promise<HttpResponse> => {
-    const { status, data } = await this.axios.get(url, config);
-    return { status, data };
+    const { status, data, headers } = await this.axios.get(url, config);
+    return { status, data, headers };
   };
 
   post = async (
