@@ -1,12 +1,13 @@
 import { EthersAdapter } from "../../adapter/EthersAdapter";
 
-import { ExecuteRoute, RouteParamsPopulated } from "../../types";
 import {
+  ExecuteRoute,
+  RouteParamsPopulated,
   Contract,
   EvmWallet,
   TransactionRequest,
   TransactionResponse
-} from "../../types/ethers";
+} from "../../types";
 
 import { uint256MaxValue } from "../../constants";
 import { Utils } from "./utils";

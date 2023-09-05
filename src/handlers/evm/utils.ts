@@ -1,7 +1,6 @@
 import { ChainData, SquidData } from "@0xsquid/squid-types";
 
-import { Contract, GasData, RpcProvider } from "../../types/ethers";
-import { OverrideParams } from "../../types";
+import { OverrideParams, Contract, GasData, RpcProvider } from "../../types";
 
 export class Utils {
   async validateNativeBalance({

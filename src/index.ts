@@ -2,8 +2,9 @@ import {
   ChainType,
   RouteRequest,
   RouteResponse,
-  StatusResponse
-} from "@0xsquid/squid-types";
+  StatusResponse,
+  EvmWallet
+} from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
 import { EthersAdapter } from "./adapter/EthersAdapter";
@@ -20,7 +21,6 @@ import { TokensChains } from "./TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
-import { EvmWallet } from "types/ethers";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
