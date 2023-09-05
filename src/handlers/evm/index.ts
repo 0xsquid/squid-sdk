@@ -6,7 +6,8 @@ import {
   Contract,
   EvmWallet,
   TransactionRequest,
-  TransactionResponse
+  TransactionResponse,
+  WalletV6
 } from "../../types";
 
 import { uint256MaxValue } from "../../constants";
@@ -99,7 +100,7 @@ export class EvmHandler extends Utils {
   }): Promise<boolean> {
     const wallet = data.signer as EvmWallet;
 
-    let address = wallet.address;
+    let address = (wallet as WalletV6).address;
 
     // ethers v5 & v6 support
     try {
