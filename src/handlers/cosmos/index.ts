@@ -7,13 +7,15 @@ import {
 } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 
-import { CosmosSigner, ExecuteRoute, RouteParamsPopulated } from "../../types";
 import {
+  CosmosSigner,
+  ExecuteRoute,
+  RouteParamsPopulated,
   CosmosMsg,
   IBC_TRANSFER_TYPE,
   WasmHookMsg,
   WASM_TYPE
-} from "../../types/cosmos";
+} from "../../types";
 
 export class CosmosHandler {
   async validateBalance({

@@ -1,4 +1,4 @@
-import { ChainData, SquidData } from "@0xsquid/squid-types";
+import { ChainData, SquidData } from "../../types";
 import { Contract, RpcProvider } from "../../types/ethers";
 import { Utils } from "./utils";
 
@@ -168,6 +168,7 @@ describe("ethers Utils", () => {
       const gasData = utils.getGasData({
         transactionRequest: mockedTransactionRequest,
         overrides: {
+          gasLimit: "100000",
           maxPriorityFeePerGas: "33"
         }
       });

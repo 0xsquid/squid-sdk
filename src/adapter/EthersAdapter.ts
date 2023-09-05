@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-import { RpcProvider, EvmWallet, Contract, Interface } from "../types/ethers";
+import { RpcProvider, EvmWallet, Contract, Interface } from "../types";
 
 export class EthersAdapter {
   rpcProvider(rpc: string): RpcProvider {

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import { omit } from "lodash";
 
-import { HttpResponse, RequestConfig } from "../types/http";
+import { HttpResponse, RequestConfig } from "../types";
 
 export default class HttpAdapter {
   axios: AxiosInstance;
@@ -26,8 +26,7 @@ export default class HttpAdapter {
     url: string,
     config?: { [key: string]: any }
   ): Promise<HttpResponse> => {
-    const { status, data } = await this.axios.get(url, config);
-    return { status, data };
+    return await this.axios.get(url, config);
   };
 
   post = async (
@@ -35,7 +34,6 @@ export default class HttpAdapter {
     data: { [key: string]: any },
     config?: { [key: string]: any }
   ): Promise<HttpResponse> => {
-    const { status, data: _data } = await this.axios.post(url, data, config);
-    return { status, data: _data };
+    return await this.axios.post(url, data, config);
   };
 }
