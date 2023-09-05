@@ -29,7 +29,7 @@ export type Config = {
   };
   logging?: boolean;
   logLevel?: LogLevel;
-  integratorId?: string;
+  integratorId: string;
 };
 
 export type OverrideParams = GasData;

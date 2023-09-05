@@ -40,11 +40,16 @@ export class Squid extends TokensChains {
 
   constructor(config = {} as Config) {
     super();
+
+    if (!config.integratorId) {
+      throw new Error("integratorId required");
+    }
+
     this.httpInstance = new HttpAdapter({
       baseUrl: config?.baseUrl || baseUrl,
       config,
       headers: {
-        "x-integrator-id": config.integratorId || "squid-sdk"
+        "x-integrator-id": config.integratorId
       }
     });
 
