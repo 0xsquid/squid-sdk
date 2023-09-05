@@ -92,7 +92,7 @@ export class Squid extends TokensChains {
   // PUBLIC METHODS
 
   async getStatus(params: GetStatus): Promise<StatusResponse> {
-    const response = await this.httpInstance.axios.get("/v1/status", {
+    const { data, headers } = await this.httpInstance.axios.get("/v1/status", {
       params,
       headers: {
         ...(this.httpInstance.axios.defaults.headers.common &&
@@ -102,19 +102,42 @@ export class Squid extends TokensChains {
       }
     });
 
-    return response.data;
+    const requestId =
+      headers && "x-request-id" in headers
+        ? (headers["x-request-id"] as string)
+        : undefined;
+    const integratorId =
+      headers && "x-integrator-id" in headers
+        ? (headers["x-integrator-id"] as string)
+        : undefined;
+
+    return { ...data, requestId, integratorId };
   }
 
-  async getRoute(params: RouteRequest): Promise<RouteResponse> {
+  async getRoute(
+    params: RouteRequest
+  ): Promise<RouteResponse & { requestId?: string; integratorId?: string }> {
     this.validateInit();
 
-    const response = await this.httpInstance.post("v2/route", params);
+    const { data, headers, status } = await this.httpInstance.post(
+      "v2/route",
+      params
+    );
 
-    if (response.status != 200) {
-      throw new Error(response.data.error);
+    if (status != 200) {
+      throw new Error(data.error);
     }
 
-    return response.data;
+    const requestId =
+      headers && "x-request-id" in headers
+        ? (headers["x-request-id"] as string)
+        : undefined;
+    const integratorId =
+      headers && "x-integrator-id" in headers
+        ? (headers["x-integrator-id"] as string)
+        : undefined;
+
+    return { ...data, requestId, integratorId };
   }
 
   async executeRoute(data: ExecuteRoute): Promise<TransactionResponses> {

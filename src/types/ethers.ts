@@ -5,7 +5,7 @@ export type Contract = ethers.Contract;
 export type ContractRunner = ethers.ContractRunner;
 export type Interface = ethers.Interface;
 
-export type EvmWallet = ethers.Wallet;
+export type EvmWallet = ethers.Wallet | ethers.Signer;
 
 export type Transaction = ethers.Transaction;
 export type TransactionResponse = ethers.TransactionResponse;
