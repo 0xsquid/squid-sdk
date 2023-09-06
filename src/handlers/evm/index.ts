@@ -29,7 +29,7 @@ export class EvmHandler extends Utils {
       },
       overrides
     } = data;
-    const signer = data.signer as EvmWallet;
+    const signer = data.signer as WalletV6;
 
     const gasData = this.getGasData({
       transactionRequest: data.route.transactionRequest,
@@ -100,7 +100,8 @@ export class EvmHandler extends Utils {
   }): Promise<boolean> {
     const wallet = data.signer as EvmWallet;
 
-    let address = (wallet as WalletV6).address;
+    // support of multiple signers type and versions
+    let address = (wallet as any).address;
 
     // ethers v5 & v6 support
     try {
