@@ -1,6 +1,12 @@
 import { ethers } from "ethers";
 
-import { RpcProvider, EvmWallet, Contract, Interface } from "../types";
+import {
+  RpcProvider,
+  Contract,
+  Interface,
+  WalletV6,
+  EvmWallet
+} from "../types";
 
 export class EthersAdapter {
   rpcProvider(rpc: string): RpcProvider {
@@ -12,7 +18,12 @@ export class EthersAdapter {
     abi: any,
     provider: RpcProvider | EvmWallet
   ): Contract {
-    return new ethers.Contract(address, abi, provider);
+    // type hack to support ethers v5
+    return new ethers.Contract(
+      address,
+      abi,
+      provider as RpcProvider | WalletV6
+    );
   }
 
   interface(abi: any): Interface {

@@ -1,3 +1,4 @@
+import { Signer } from "@ethersproject/abstract-signer";
 import { ethers } from "ethers";
 
 export type RpcProvider = ethers.JsonRpcProvider;
@@ -5,8 +6,8 @@ export type Contract = ethers.Contract;
 export type ContractRunner = ethers.ContractRunner;
 export type Interface = ethers.Interface;
 
-export type WalletV6 = ethers.Wallet;
-export type WalletV5 = ethers.Signer;
+export type WalletV5 = Signer;
+export type WalletV6 = ethers.Signer | ethers.Wallet;
 
 export type EvmWallet = WalletV6 | WalletV5;
 
