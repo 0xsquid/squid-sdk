@@ -1,14 +1,13 @@
-import axios, { AxiosInstance } from "axios";
-import { BigNumber, ethers, UnsignedTransaction } from "ethers";
-import {
-  Coin,
-  DeliverTxResponse,
-  GasPrice,
-  SigningStargateClient,
-  calculateFee
-} from "@cosmjs/stargate";
 import { toUtf8 } from "@cosmjs/encoding";
+import {
+  calculateFee,
+  Coin,
+  GasPrice,
+  SigningStargateClient
+} from "@cosmjs/stargate";
+import axios, { AxiosInstance } from "axios";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 
 import {
   Allowance,
@@ -16,9 +15,11 @@ import {
   ApproveRoute,
   ChainData,
   Config,
+  CosmosMsg,
   ExecuteRoute,
   GetRoute,
   GetStatus,
+  IBC_TRANSFER_TYPE,
   IsRouteApproved,
   RouteData,
   RouteParams,
@@ -28,12 +29,11 @@ import {
   TokenData,
   TransactionRequest,
   ValidateBalanceAndApproval,
-  CosmosMsg,
-  IBC_TRANSFER_TYPE,
   WASM_TYPE,
   WasmHookMsg
 } from "./types";
 
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseStatusResponse } from "./0xsquid/v1/status";
@@ -299,9 +299,7 @@ export class Squid {
     route,
     executionSettings,
     overrides
-  }: ExecuteRoute): Promise<
-    ethers.providers.TransactionResponse | DeliverTxResponse
-  > {
+  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse | TxRaw> {
     this.validateInit();
 
     if (!route.transactionRequest) {
@@ -449,7 +447,7 @@ export class Squid {
     signer: SigningStargateClient,
     signerAddress: string,
     route: RouteData
-  ): Promise<DeliverTxResponse> {
+  ): Promise<TxRaw> {
     const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
     const msgs = [];
 
@@ -496,13 +494,14 @@ export class Squid {
     const estimatedGas = await signer.simulate(signerAddress, msgs, "");
     const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
-    return await signer.signAndBroadcast(
+    return signer.sign(
       signerAddress,
       msgs,
       calculateFee(
         Math.trunc(estimatedGas * gasMultiplier),
         GasPrice.fromString(route.transactionRequest!.gasPrice)
-      )
+      ),
+      ""
     );
   }
 
