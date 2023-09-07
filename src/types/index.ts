@@ -4,7 +4,7 @@ import {
   RouteRequest,
   RouteResponse
 } from "@0xsquid/squid-types";
-import {  SigningStargateClient } from "@cosmjs/stargate";
+import { SigningStargateClient } from "@cosmjs/stargate";
 
 import {
   EvmWallet,

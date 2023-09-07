@@ -1,9 +1,5 @@
 import { toUtf8 } from "@cosmjs/encoding";
-import {
-  calculateFee,
-  Coin,
-  GasPrice
-} from "@cosmjs/stargate";
+import { calculateFee, Coin, GasPrice } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 
 import {
