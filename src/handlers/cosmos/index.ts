@@ -2,7 +2,6 @@ import { toUtf8 } from "@cosmjs/encoding";
 import {
   calculateFee,
   Coin,
-  DeliverTxResponse,
   GasPrice
 } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
@@ -16,6 +15,7 @@ import {
   WasmHookMsg,
   WASM_TYPE
 } from "../../types";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 export class CosmosHandler {
   async validateBalance({
@@ -57,7 +57,7 @@ export class CosmosHandler {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
-  }): Promise<DeliverTxResponse> {
+  }): Promise<TxRaw> {
     await this.validateBalance({ data, params });
 
     const { route } = data;
@@ -109,13 +109,14 @@ export class CosmosHandler {
     const gasMultiplier = Number(route.transactionRequest?.maxFeePerGas) || 1.3;
     const gasPrice = route.transactionRequest?.gasPrice as string;
 
-    return await signer.signAndBroadcast(
+    return signer.sign(
       signerAddress,
       msgs,
       calculateFee(
         Math.trunc(estimatedGas * gasMultiplier),
         GasPrice.fromString(gasPrice)
-      )
+      ),
+      ""
     );
   }
 }

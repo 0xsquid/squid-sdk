@@ -4,7 +4,7 @@ import {
   RouteRequest,
   RouteResponse
 } from "@0xsquid/squid-types";
-import { DeliverTxResponse, SigningStargateClient } from "@cosmjs/stargate";
+import {  SigningStargateClient } from "@cosmjs/stargate";
 
 import {
   EvmWallet,
@@ -13,6 +13,7 @@ import {
   Contract,
   GasData
 } from "./ethers";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 export * from "@0xsquid/squid-types";
 export * from "./cosmos";
@@ -48,7 +49,7 @@ export type ExecuteRoute = {
   signerAddress?: string; // cosmos specific
 };
 
-export type TransactionResponses = TransactionResponse | DeliverTxResponse;
+export type TransactionResponses = TransactionResponse | TxRaw;
 
 export type GetStatus = {
   transactionId: string;
