@@ -1,10 +1,10 @@
 import { EthersAdapter } from "../../adapter/EthersAdapter";
 
 import {
-  ExecuteRoute,
-  RouteParamsPopulated,
   Contract,
   EvmWallet,
+  ExecuteRoute,
+  RouteParamsPopulated,
   TransactionRequest,
   TransactionResponse,
   WalletV6
@@ -162,13 +162,22 @@ export class EvmHandler extends Utils {
       amountToApprove = BigInt(fromAmount);
     }
 
-    const tx = await fromTokenContract.approve(
-      target,
-      amountToApprove,
-      overrides || {}
+    // Probably strange issue with ethers v6
+    // https://github.com/ethers-io/ethers.js/issues/3830
+    // Need to manually encode approve, instead of calling fromTokenContract.approve
+    // TODO: Find a way to have it work with .approve method
+    const approveData = fromTokenContract.interface.encodeFunctionData(
+      "approve",
+      [target, amountToApprove]
     );
 
-    await tx.wait();
+    const approveTx = await (data.signer as EvmWallet).sendTransaction({
+      to: params.fromToken.address,
+      data: approveData,
+      ...overrides
+    });
+
+    await approveTx.wait();
 
     return true;
   }
