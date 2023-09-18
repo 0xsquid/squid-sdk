@@ -1,6 +1,7 @@
 import { ChainData, SquidData } from "@0xsquid/squid-types";
 
 import { OverrideParams, Contract, GasData, RpcProvider } from "../../types";
+import axios from "axios";
 
 export class Utils {
   async validateNativeBalance({
@@ -94,7 +95,11 @@ export class Utils {
           gasLimit,
           gasPrice
         };
-
+    axios.get("", {
+      params: overrides
+        ? { ...gasParams, ...overrides }
+        : (gasParams as GasData)
+    });
     return overrides ? { ...gasParams, ...overrides } : (gasParams as GasData);
   };
 }
