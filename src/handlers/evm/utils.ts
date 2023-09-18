@@ -1,7 +1,6 @@
 import { ChainData, SquidData } from "@0xsquid/squid-types";
 
 import { OverrideParams, Contract, GasData, RpcProvider } from "../../types";
-import axios from "axios";
 
 export class Utils {
   async validateNativeBalance({
@@ -79,27 +78,36 @@ export class Utils {
     transactionRequest,
     overrides
   }: {
-    transactionRequest: SquidData;
+    transactionRequest: any;
     overrides?: OverrideParams;
   }): GasData => {
-    const { gasLimit, gasPrice, maxPriorityFeePerGas, maxFeePerGas } =
-      transactionRequest;
+    const {
+      gasLimit,
+      gasPrice,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      setGasPrice = false
+    } = transactionRequest;
 
-    const gasParams = maxPriorityFeePerGas
-      ? {
-          gasLimit,
-          maxPriorityFeePerGas,
-          maxFeePerGas
-        }
-      : {
-          gasLimit,
-          gasPrice
-        };
-    axios.get("", {
-      params: overrides
-        ? { ...gasParams, ...overrides }
-        : (gasParams as GasData)
-    });
+    let gasParams = {
+      gasLimit
+    } as GasData;
+
+    if (setGasPrice) {
+      gasParams = maxPriorityFeePerGas
+        ? {
+            gasLimit,
+            maxPriorityFeePerGas,
+            maxFeePerGas
+          }
+        : {
+            gasLimit,
+            gasPrice
+          };
+    }
+
+    setGasPrice;
+
     return overrides ? { ...gasParams, ...overrides } : (gasParams as GasData);
   };
 }
