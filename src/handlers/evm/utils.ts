@@ -78,7 +78,7 @@ export class Utils {
     transactionRequest,
     overrides
   }: {
-    transactionRequest: any;
+    transactionRequest: SquidData & { setGasPrice?: boolean };
     overrides?: OverrideParams;
   }): GasData => {
     const {
@@ -91,7 +91,7 @@ export class Utils {
 
     let gasParams = {
       gasLimit
-    } as GasData;
+    } as any;
 
     if (setGasPrice) {
       gasParams = maxPriorityFeePerGas
@@ -105,8 +105,6 @@ export class Utils {
             gasPrice
           };
     }
-
-    setGasPrice;
 
     return overrides ? { ...gasParams, ...overrides } : (gasParams as GasData);
   };
