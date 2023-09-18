@@ -1,4 +1,19 @@
 
+## [2.7.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.7.0) (2023-09-18)
+
+
+### Bug Fixes
+
+* add npm auth token ([619fa95](https://github.com/0xsquid/api-sdk/commit/619fa950424469ab4f9e3cdfd814cc2aa7ff517e))
+* add yml to linter ([fa1a5c0](https://github.com/0xsquid/api-sdk/commit/fa1a5c052d1f4ecf580cf64a5c4f192d92cf56cd))
+* adjust sdk after types update ([f6f0c7e](https://github.com/0xsquid/api-sdk/commit/f6f0c7eb38b7d78edaf04e65ef38bda3cab8d739))
+* adjust to new backend response ([5bae21b](https://github.com/0xsquid/api-sdk/commit/5bae21b7fe69035d6a1dc848e07c5c94adf377c5))
+* import error ([6b2cd03](https://github.com/0xsquid/api-sdk/commit/6b2cd03600f4febd9f6f192b8715642b5ddefe9e))
+* manual tx encoding for token spend approval ([#201](https://github.com/0xsquid/api-sdk/issues/201)) ([f3d83f2](https://github.com/0xsquid/api-sdk/commit/f3d83f22dec0e79d57fdec73984c2d4278232539))
+* try sending only gasLimit ([3d4eeec](https://github.com/0xsquid/api-sdk/commit/3d4eeec8bdc69620511dd5cc17caa42c60dd0d8e))
+* type issue ([4cee2be](https://github.com/0xsquid/api-sdk/commit/4cee2befd96613b7464c7d25110bbd99571e0cdc))
+* workflow formating ([420d51d](https://github.com/0xsquid/api-sdk/commit/420d51dbfafe4a30cffe8ec4230a8beb1b0f8f22))
+* yml format ([93e2978](https://github.com/0xsquid/api-sdk/commit/93e29782830edd6201e143aefd1a19b227aead55))
 
 ## [2.6.1-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.6.1-beta.0) (2023-09-18)
 
