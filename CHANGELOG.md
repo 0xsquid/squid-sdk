@@ -1,5 +1,4 @@
 
-
 ## [2.7.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.7.0) (2023-09-18)
 
 
