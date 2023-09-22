@@ -206,6 +206,7 @@ export type GetRoute = {
   prefer?: string[];
   receiveGasOnDestination?: boolean;
   collectFees?: CollectFees;
+  fallbackAddresses?: string[];
 };
 
 export type TransactionRequest = {
