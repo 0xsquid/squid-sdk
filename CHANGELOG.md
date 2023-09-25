@@ -1,5 +1,12 @@
 
 
+## [1.12.4-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.4-beta.0) (2023-09-25)
+
+
+### Features
+
+* updated type ([e23de2e](https://github.com/0xsquid/api-sdk/commit/e23de2ee1773e35e14744d75777ed2473ab79f6c))
+
 ## [1.12.1](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.1) (2023-09-06)
 
 ## [1.12.0](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.0) (2023-08-29)
