@@ -206,6 +206,7 @@ export type GetRoute = {
   prefer?: string[];
   receiveGasOnDestination?: boolean;
   collectFees?: CollectFees;
+  fallbackAddresses?: CoinTypeAddress[];
 };
 
 export type TransactionRequest = {
@@ -493,6 +494,11 @@ export type WasmHookMsg = {
     contract: string;
     msg: object;
   };
+};
+
+export type CoinTypeAddress = {
+  coinType: number;
+  address: string;
 };
 
 export const IBC_TRANSFER_TYPE = "/ibc.applications.transfer.v1.MsgTransfer";
