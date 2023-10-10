@@ -10,6 +10,7 @@ import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 
 import {
+  AllBalancesResult,
   Allowance,
   Approve,
   ApproveRoute,
@@ -26,6 +27,7 @@ import {
   RouteParamsData,
   RouteResponse,
   StatusResponse,
+  TokenBalance,
   TokenData,
   TransactionRequest,
   ValidateBalanceAndApproval,
@@ -42,6 +44,7 @@ import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
 import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
+import { getAllEvmTokensBalance } from "services/getEvmBalances";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -729,6 +732,42 @@ export class Squid {
     });
 
     return response.data.price;
+  }
+
+  public async getAllBalances({
+    evmAddress,
+    cosmosAddress
+  }: {
+    evmAddress: string;
+    cosmosAddress: string;
+  }): Promise<AllBalancesResult> {
+    const cosmosBalances = await this.getAllCosmosBalances({
+      userAddress: cosmosAddress
+    });
+    const evmBalances = await this.getAllEvmBalances({
+      userAddress: evmAddress
+    });
+
+    return {
+      cosmosBalances,
+      evmBalances
+    };
+  }
+
+  public async getAllEvmBalances({
+    userAddress
+  }: {
+    userAddress: string;
+  }): Promise<TokenBalance[]> {
+    return getAllEvmTokensBalance(this.tokens, userAddress);
+  }
+
+  public async getAllCosmosBalances({
+    userAddress
+  }: {
+    userAddress: string;
+  }): Promise<TokenBalance[]> {
+    return [];
   }
 }
 
