@@ -1,32 +1,11 @@
 import { ethers } from "ethers";
 import { Multicall, ContractCallContext } from "ethereum-multicall";
 import { TokenBalance, TokenData } from "types";
-
-const supportedTokens: TokenData[] = [];
-
-const NATIVE_EVM_TOKEN_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-const multicallAddress = "0xcA11bde05977b3631167028862bE2a173976CA11";
-const multicallAbi = [
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address"
-      }
-    ],
-    name: "getEthBalance",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
-    ],
-    stateMutability: "view",
-    type: "function"
-  }
-];
+import {
+  NATIVE_EVM_TOKEN_ADDRESS,
+  multicallAbi,
+  MULTICALL_ADDRESS
+} from "../constants";
 
 type ContractAddress = `0x${string}`;
 
@@ -197,7 +176,7 @@ async function getMulticallTokensBalance(
                 stateMutability: "view"
               }
             ],
-        contractAddress: isNativeToken ? multicallAddress : token.address,
+        contractAddress: isNativeToken ? MULTICALL_ADDRESS : token.address,
         reference: token.symbol,
         calls: [
           {
