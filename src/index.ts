@@ -44,7 +44,7 @@ import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
 import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
-import { getAllEvmTokensBalance } from "services/getEvmBalances";
+import { getAllEvmTokensBalance } from "./services/getEvmBalances";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
