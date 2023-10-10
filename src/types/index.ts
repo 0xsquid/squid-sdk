@@ -507,9 +507,8 @@ export const WASM_TYPE = "/cosmwasm.wasm.v1.MsgExecuteContract";
 export type TokenBalance = {
   symbol: string;
   address: string;
-  balanceInWei: string;
-  decimal: number;
-  decimalBalance: string;
+  decimals: number;
+  balanceInDecimal: string;
 };
 
 export type AllBalancesResult = {

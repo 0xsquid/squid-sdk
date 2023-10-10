@@ -1,4 +1,4 @@
-import { BigNumber, ethers, constants } from "ethers";
+import { ethers } from "ethers";
 import { Multicall, ContractCallContext } from "ethereum-multicall";
 import { TokenBalance, TokenData } from "types";
 
@@ -41,26 +41,18 @@ const getTokensBalanceSupportingMultiCall = async (
     userAddress
   );
 
-  return nonNativeTokenBalances.map(({ symbol, value }) => {
-    const token = tokens.find(t => t.symbol === symbol);
+  // TODO: get native token balance
 
-    return {
-      symbol,
-      address: token?.address ?? "0x",
-      balanceInWei: ethers.utils.formatUnits(value),
-      decimal: token?.decimals ?? 18,
-      decimalBalance: "0"
-    };
-  });
+  return nonNativeTokenBalances;
 };
 
 const getTokensBalanceWithoutMultiCall = async (
   tokens: TokenData[],
   userAddress: ContractAddress
 ): Promise<TokenBalance[]> => {
-  const balances = await Promise.all(
+  const balances: (TokenBalance | null)[] = await Promise.all(
     tokens.map(async t => {
-      let balance: FetchBalanceResult | null;
+      let balance: TokenBalance | null;
       try {
         if (t.address === NATIVE_EVM_TOKEN_ADDRESS) {
           balance = await fetchBalance({
@@ -77,34 +69,13 @@ const getTokensBalanceWithoutMultiCall = async (
 
         return balance;
       } catch (error) {
-        return {
-          decimals: t.decimals,
-          formatted: "0",
-          symbol: t.symbol,
-          value: constants.Zero
-        };
+        return null;
       }
     })
   );
 
-  const formattedBalances = balances.map(balance => {
-    const {
-      decimals,
-      formatted = "0",
-      symbol = "",
-      value = "0"
-    } = balance ?? {};
-
-    return {
-      symbol,
-      address: tokens.find(t => t.symbol === symbol)?.address ?? "0x",
-      balanceInWei: formatted,
-      decimal: decimals ?? 18,
-      decimalBalance: value.toString()
-    };
-  });
-
-  return formattedBalances;
+  // filter out null values
+  return balances.filter(Boolean) as TokenBalance[];
 };
 
 export const getAllEvmTokensBalance = async (
@@ -147,13 +118,6 @@ export const getAllEvmTokensBalance = async (
   }
 };
 
-type FetchBalanceResult = {
-  decimals: number;
-  formatted: string;
-  symbol: string;
-  value: BigNumber;
-};
-
 type FetchBalanceParams = {
   address: string;
   chainId: number;
@@ -163,31 +127,33 @@ type FetchBalanceParams = {
 async function fetchBalance({
   address,
   chainId,
-  token
-}: FetchBalanceParams): Promise<FetchBalanceResult | null> {
+  token: tokenAddress = ""
+}: FetchBalanceParams): Promise<TokenBalance | null> {
   try {
     const provider = new ethers.providers.JsonRpcProvider(
       getRpcUrl(Number(chainId)) ?? ""
     );
 
     const tokenAbi = ["function balanceOf(address) view returns (uint256)"];
-    const tokenContract = new ethers.Contract(token ?? "", tokenAbi, provider);
+    const tokenContract = new ethers.Contract(
+      tokenAddress ?? "",
+      tokenAbi,
+      provider
+    );
 
     const balance = await tokenContract.balanceOf(address);
 
-    console.log("balance -->", balance);
-
-    const tokenData = supportedTokens.find(t => t.address === token);
+    const tokenData = supportedTokens.find(t => t.address === tokenAddress);
 
     if (!tokenData) return null;
 
     const { decimals, symbol } = tokenData;
 
     return {
-      decimals: decimals ?? 18,
-      formatted: ethers.utils.formatUnits(balance, decimals ?? 18),
-      symbol,
-      value: balance
+      address: tokenAddress,
+      balanceInDecimal: balance.toString(),
+      decimals,
+      symbol
     };
   } catch (error) {
     console.error("Error fetching token balance:", error);
@@ -208,8 +174,10 @@ function getRpcUrl(chainId: number) {
 async function getMulticallTokensBalance(
   tokens: TokenData[],
   userAddress: ContractAddress
-) {
-  const provider = ethers.getDefaultProvider();
+): Promise<TokenBalance[]> {
+  const provider = new ethers.providers.JsonRpcProvider(
+    "https://eth.llamarpc.com"
+  );
 
   const nonNativeTokenContractCallContext: ContractCallContext[] = tokens
     .filter(t => t.chainId === 1)
@@ -256,10 +224,20 @@ async function getMulticallTokensBalance(
 
   for (const symbol in results) {
     const data = results[symbol].callsReturnContext[0] ?? {};
-    const transformedData = {
+
+    const { decimals = 18, address = "0x" } =
+      tokens.find(t => t.symbol === symbol) ?? {};
+
+    const balanceInDecimal = ethers.utils.formatUnits(
+      data.returnValues[0]?.hex ?? "0x000",
+      decimals
+    );
+
+    const transformedData: TokenBalance = {
       symbol,
-      value: data.returnValues[0]?.hex ?? "0x000",
-      success: data.success
+      address,
+      decimals,
+      balanceInDecimal
     };
     resultArray.push(transformedData);
   }
