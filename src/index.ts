@@ -734,40 +734,17 @@ export class Squid {
     return response.data.price;
   }
 
-  public async getAllBalances({
-    evmAddress,
-    cosmosAddress
-  }: {
-    evmAddress: string;
-    cosmosAddress: string;
-  }): Promise<AllBalancesResult> {
-    const cosmosBalances = await this.getAllCosmosBalances({
-      userAddress: cosmosAddress
-    });
-    const evmBalances = await this.getAllEvmBalances({
-      userAddress: evmAddress
-    });
-
-    return {
-      cosmosBalances,
-      evmBalances
-    };
-  }
-
   public async getAllEvmBalances({
-    userAddress
+    userAddress,
+    chains
   }: {
     userAddress: string;
+    chains: number[];
   }): Promise<TokenBalance[]> {
-    return getAllEvmTokensBalance(this.tokens, userAddress);
-  }
-
-  public async getAllCosmosBalances({
-    userAddress
-  }: {
-    userAddress: string;
-  }): Promise<TokenBalance[]> {
-    return [];
+    return getAllEvmTokensBalance(
+      this.tokens.filter(t => chains.includes(Number(t.chainId))),
+      userAddress
+    );
   }
 }
 
