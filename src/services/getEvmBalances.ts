@@ -9,13 +9,20 @@ import {
 
 type ContractAddress = `0x${string}`;
 
+const CHAINS_WITHOUT_MULTICALL = [314, 3141]; // Filecoin, & Filecoin testnet
+const CHAINS_WITHOUT_MULTICALL_RPC_URLS: Record<number, string> = {
+  314: "https://rpc.ankr.com/filecoin",
+  3141: "https://rpc.ankr.com/filecoin"
+};
+
 const getTokensBalanceSupportingMultiCall = async (
   tokens: TokenData[],
   userAddress?: ContractAddress
 ): Promise<TokenBalance[]> => {
   if (!userAddress) return [];
 
-  const provider = new ethers.providers.JsonRpcProvider(getRpcUrl(1) ?? "");
+  const ETHEREUM_RPC_URL = "https://eth.meowrpc.com";
+  const provider = new ethers.providers.JsonRpcProvider(ETHEREUM_RPC_URL);
 
   const contractCallContext: ContractCallContext[] = tokens.map(token => {
     const isNativeToken =
@@ -118,10 +125,9 @@ export const getAllEvmTokensBalance = async (
   try {
     // Some tokens don't support multicall, so we need to fetch them with Promise.all
     // TODO: Once we support multicall on all chains, we can remove this split
-    const chainWithoutMulticall = [314, 3141]; // Filecoin, & Filecoin testnet
     const splittedTokensByMultiCallSupport = evmTokens.reduce(
       (acc, token) => {
-        if (chainWithoutMulticall.includes(+token.chainId)) {
+        if (CHAINS_WITHOUT_MULTICALL.includes(Number(token.chainId))) {
           acc[0].push(token);
         } else {
           acc[1].push(token);
@@ -161,8 +167,9 @@ async function fetchBalance({
   userAddress
 }: FetchBalanceParams): Promise<TokenBalance | null> {
   try {
-    const rpcUrl = getRpcUrl(Number(token.chainId)) ?? "";
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const provider = new ethers.providers.JsonRpcProvider(
+      CHAINS_WITHOUT_MULTICALL_RPC_URLS[Number(token.chainId)]
+    );
 
     const tokenAbi = ["function balanceOf(address) view returns (uint256)"];
     const tokenContract = new ethers.Contract(
@@ -187,14 +194,4 @@ async function fetchBalance({
     console.error("Error fetching token balance:", error);
     return null;
   }
-}
-
-function getRpcUrl(chainId: number) {
-  const rpcUrls = {
-    1: "https://rpc.flashbots.net",
-    43114: "https://avax.meowrpc.com",
-    8453: "https://1rpc.io/base"
-  };
-
-  return rpcUrls[chainId as keyof typeof rpcUrls] || null;
 }
