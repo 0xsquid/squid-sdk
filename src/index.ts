@@ -1,7 +1,6 @@
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { fromUtf8, toUtf8 } from "@cosmjs/encoding";
 import {
-  AminoMsgTransfer,
   AminoTypes,
   Coin,
   GasPrice,
@@ -38,7 +37,6 @@ import {
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
-import { omitDefault } from "cosmjs-types/helpers";
 import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 import Long from "long";
 import { parseRouteResponse } from "./0xsquid/v1/route";
@@ -746,6 +744,13 @@ export class Squid {
     return response.data.price;
   }
 
+  private getTimeoutTimestamp(): Long {
+    const PACKET_LIFETIME_NANOS = 3600 * 1_000_000_000; // 1 Hour
+
+    const currentTimeNanos = Math.floor(Date.now() * 1_000_000);
+    return Long.fromNumber(currentTimeNanos + PACKET_LIFETIME_NANOS);
+  }
+
   // TODO: There's probably a way to get this conversion from an existing library
   private getAminoTypeConverters(): AminoTypes {
     return new AminoTypes({
@@ -775,25 +780,18 @@ export class Squid {
           timeoutHeight,
           timeoutTimestamp,
           memo
-        }: MsgTransfer) => ({
-          source_port: sourcePort,
-          source_channel: sourceChannel,
-          token: token,
-          sender: sender,
-          receiver: receiver,
-          timeout_height: timeoutHeight
-            ? {
-                revision_height: omitDefault(
-                  timeoutHeight.revisionHeight
-                )?.toString(),
-                revision_number: omitDefault(
-                  timeoutHeight.revisionNumber
-                )?.toString()
-              }
-            : {},
-          timeout_timestamp: omitDefault(timeoutTimestamp)?.toString(),
-          memo: omitDefault(memo)?.toString()
-        }),
+        }: MsgTransfer) => {
+          return {
+            source_port: sourcePort,
+            source_channel: sourceChannel,
+            token: token,
+            sender: sender,
+            receiver: receiver,
+            timeout_height: timeoutHeight,
+            timeout_timestamp: timeoutTimestamp,
+            memo
+          };
+        },
         fromAmino: ({
           source_port,
           source_channel,
@@ -801,27 +799,18 @@ export class Squid {
           sender,
           receiver,
           timeout_height,
-          timeout_timestamp
-        }: AminoMsgTransfer["value"]): MsgTransfer =>
+          timeout_timestamp,
+          memo
+        }): MsgTransfer =>
           MsgTransfer.fromPartial({
             sourcePort: source_port,
             sourceChannel: source_channel,
             token: token,
             sender: sender,
             receiver: receiver,
-            timeoutHeight: timeout_height
-              ? {
-                  revisionHeight: Long.fromString(
-                    timeout_height.revision_height || "0",
-                    true
-                  ),
-                  revisionNumber: Long.fromString(
-                    timeout_height.revision_number || "0",
-                    true
-                  )
-                }
-              : undefined,
-            timeoutTimestamp: Long.fromString(timeout_timestamp || "0", true)
+            memo,
+            timeoutHeight: timeout_height,
+            timeoutTimestamp: Long.fromValue(timeout_timestamp)
           })
       }
     });
