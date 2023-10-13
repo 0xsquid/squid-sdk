@@ -1,5 +1,12 @@
 
 
+## [1.13.1-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.13.1-beta.0) (2023-10-13)
+
+
+### Bug Fixes
+
+* handle ledger amino messages ([89f8c32](https://github.com/0xsquid/api-sdk/commit/89f8c3282bcfd44d66d4c11ab703128ca65735ba))
+
 ## [1.12.1](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.1) (2023-09-06)
 
 ## [1.12.0](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.0) (2023-08-29)
