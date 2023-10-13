@@ -1,13 +1,16 @@
-import { toUtf8 } from "@cosmjs/encoding";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { fromUtf8, toUtf8 } from "@cosmjs/encoding";
 import {
-  calculateFee,
+  AminoMsgTransfer,
+  AminoTypes,
   Coin,
   GasPrice,
-  SigningStargateClient
+  SigningStargateClient,
+  calculateFee
 } from "@cosmjs/stargate";
 import axios, { AxiosInstance } from "axios";
-import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
-import { BigNumber, ethers, UnsignedTransaction } from "ethers";
+
+import { BigNumber, UnsignedTransaction, ethers } from "ethers";
 
 import {
   Allowance,
@@ -34,6 +37,10 @@ import {
 } from "./types";
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import { omitDefault } from "cosmjs-types/helpers";
+import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
+import Long from "long";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseStatusResponse } from "./0xsquid/v1/status";
@@ -221,7 +228,7 @@ export class Squid {
   }
 
   private async validateCosmosBalance(
-    signer: SigningStargateClient,
+    signer: SigningStargateClient | SigningCosmWasmClient,
     signerAddress: string,
     coin: Coin
   ): Promise<void> {
@@ -314,7 +321,9 @@ export class Squid {
     // handle cosmos case
     if (
       signer instanceof SigningStargateClient ||
-      signer.constructor.name === "SigningStargateClient"
+      signer.constructor.name === "SigningStargateClient" ||
+      signer instanceof SigningCosmWasmClient ||
+      signer.constructor.name === "SigningCosmWasmClient"
     ) {
       return await this.executeRouteCosmos(
         signer as SigningStargateClient,
@@ -444,13 +453,12 @@ export class Squid {
   }
 
   private async executeRouteCosmos(
-    signer: SigningStargateClient,
+    signer: SigningStargateClient | SigningCosmWasmClient,
     signerAddress: string,
     route: RouteData
   ): Promise<TxRaw> {
     const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
     const msgs = [];
-
     switch (cosmosMsg.msgTypeUrl) {
       case IBC_TRANSFER_TYPE: {
         msgs.push({
@@ -494,9 +502,16 @@ export class Squid {
     const estimatedGas = await signer.simulate(signerAddress, msgs, "");
     const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
+    // This conversion is needed for Ledger, They only supports Amino messages
+    // TODO: At the moment there's a limit on Ledger Nano S models
+    // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
+    const converter = this.getAminoTypeConverters();
+    const aminoMsg = converter.toAmino(msgs[0]);
+    const fromAminoMsg = converter.fromAmino(aminoMsg);
+
     return signer.sign(
       signerAddress,
-      msgs,
+      [fromAminoMsg],
       calculateFee(
         Math.trunc(estimatedGas * gasMultiplier),
         GasPrice.fromString(route.transactionRequest!.gasPrice)
@@ -729,6 +744,86 @@ export class Squid {
     });
 
     return response.data.price;
+  }
+
+  // TODO: There's probably a way to get this conversion from an existing library
+  private getAminoTypeConverters(): AminoTypes {
+    return new AminoTypes({
+      [WASM_TYPE]: {
+        aminoType: "wasm/MsgExecuteContract",
+        toAmino: ({ sender, contract, msg, funds }: MsgExecuteContract) => ({
+          sender: sender,
+          contract: contract,
+          msg: JSON.parse(fromUtf8(msg)),
+          funds: funds
+        }),
+        fromAmino: ({ sender, contract, msg, funds }): MsgExecuteContract => ({
+          sender: sender,
+          contract: contract,
+          msg: toUtf8(JSON.stringify(msg)),
+          funds: [...funds]
+        })
+      },
+      [IBC_TRANSFER_TYPE]: {
+        aminoType: "cosmos-sdk/MsgTransfer",
+        toAmino: ({
+          sourcePort,
+          sourceChannel,
+          token,
+          sender,
+          receiver,
+          timeoutHeight,
+          timeoutTimestamp,
+          memo
+        }: MsgTransfer): AminoMsgTransfer["value"] => ({
+          source_port: sourcePort,
+          source_channel: sourceChannel,
+          token: token,
+          sender: sender,
+          receiver: receiver,
+          timeout_height: timeoutHeight
+            ? {
+                revision_height: omitDefault(
+                  timeoutHeight.revisionHeight
+                )?.toString(),
+                revision_number: omitDefault(
+                  timeoutHeight.revisionNumber
+                )?.toString()
+              }
+            : {},
+          timeout_timestamp: omitDefault(timeoutTimestamp)?.toString()
+        }),
+        fromAmino: ({
+          source_port,
+          source_channel,
+          token,
+          sender,
+          receiver,
+          timeout_height,
+          timeout_timestamp
+        }: AminoMsgTransfer["value"]): MsgTransfer =>
+          MsgTransfer.fromPartial({
+            sourcePort: source_port,
+            sourceChannel: source_channel,
+            token: token,
+            sender: sender,
+            receiver: receiver,
+            timeoutHeight: timeout_height
+              ? {
+                  revisionHeight: Long.fromString(
+                    timeout_height.revision_height || "0",
+                    true
+                  ),
+                  revisionNumber: Long.fromString(
+                    timeout_height.revision_number || "0",
+                    true
+                  )
+                }
+              : undefined,
+            timeoutTimestamp: Long.fromString(timeout_timestamp || "0", true)
+          })
+      }
+    });
   }
 }
 
