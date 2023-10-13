@@ -775,7 +775,7 @@ export class Squid {
           timeoutHeight,
           timeoutTimestamp,
           memo
-        }: MsgTransfer): AminoMsgTransfer["value"] => ({
+        }: MsgTransfer) => ({
           source_port: sourcePort,
           source_channel: sourceChannel,
           token: token,
@@ -791,7 +791,8 @@ export class Squid {
                 )?.toString()
               }
             : {},
-          timeout_timestamp: omitDefault(timeoutTimestamp)?.toString()
+          timeout_timestamp: omitDefault(timeoutTimestamp)?.toString(),
+          memo: omitDefault(memo)?.toString()
         }),
         fromAmino: ({
           source_port,
