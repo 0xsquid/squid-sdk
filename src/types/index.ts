@@ -508,7 +508,7 @@ export type TokenBalance = {
   symbol: string;
   address: string;
   decimals: number;
-  balanceInDecimal: string;
+  balance: string;
 };
 
 export type AllBalancesResult = {

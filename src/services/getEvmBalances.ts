@@ -69,16 +69,12 @@ const getTokensBalanceSupportingMultiCall = async (
     const { decimals = 18, address = "0x" } =
       tokens.find(t => t.symbol === symbol) ?? {};
 
-    const balanceInDecimal = ethers.utils.formatUnits(
-      data.returnValues[0]?.hex ?? "0x000",
-      decimals
-    );
-
     const mappedBalance: TokenBalance = {
       symbol,
       address,
       decimals,
-      balanceInDecimal
+      // balance in wei
+      balance: parseInt(data.returnValues[0]?.hex ?? "0", 16).toString()
     };
 
     tokenBalances.push(mappedBalance);
@@ -178,7 +174,7 @@ async function fetchBalance({
       provider
     );
 
-    const balance = await tokenContract.balanceOf(userAddress);
+    const balance = (await tokenContract.balanceOf(userAddress)) ?? "0";
 
     if (!token) return null;
 
@@ -186,7 +182,8 @@ async function fetchBalance({
 
     return {
       address,
-      balanceInDecimal: balance.toString(),
+      // balance in wei
+      balance: parseInt(balance, 16).toString(),
       decimals,
       symbol
     };
