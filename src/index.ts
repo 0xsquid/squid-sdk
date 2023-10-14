@@ -10,7 +10,7 @@ import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { BigNumber, ethers, UnsignedTransaction } from "ethers";
 
 import {
-  AllBalancesResult,
+  ChainType,
   Allowance,
   Approve,
   ApproveRoute,
@@ -45,6 +45,7 @@ import { ErrorType, SquidError } from "./error";
 import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
 import { getAllEvmTokensBalance } from "./services/getEvmBalances";
+import { getCosmosBalances } from "./services/getCosmosBalances";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -745,6 +746,18 @@ export class Squid {
       this.tokens.filter(t => chains.includes(Number(t.chainId))),
       userAddress
     );
+  }
+
+  public async getAllCosmosBalances({
+    addresses
+  }: {
+    addresses: { chainId: string; address: string }[];
+  }) {
+    const cosmosChains = this.chains.filter(
+      c => c.chainType === ChainType.Cosmos
+    );
+
+    return getCosmosBalances({ addresses, cosmosChains });
   }
 }
 
