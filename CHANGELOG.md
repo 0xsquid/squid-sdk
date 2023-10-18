@@ -1,5 +1,7 @@
 
 
+## [1.14.0](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.14.0) (2023-09-26)
+
 ## [1.12.1](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.1) (2023-09-06)
 
 ## [1.12.0](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.0) (2023-08-29)
