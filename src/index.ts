@@ -3,7 +3,8 @@ import {
   RouteRequest,
   RouteResponse,
   StatusResponse,
-  EvmWallet
+  EvmWallet,
+  Token
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
@@ -273,5 +274,31 @@ export class Squid extends TokensChains {
     if (!route.transactionRequest) {
       throw new Error("transactionRequest param not found in route object");
     }
+  }
+
+  public getFromAmount({
+    fromToken,
+    toAmount,
+    toToken,
+    slippagePercentage = 1.5
+  }: {
+    fromToken: Token;
+    toToken: Token;
+    toAmount: string;
+    slippagePercentage?: number;
+  }): string {
+    const toTokenPrice = Number(toToken.usdPrice ?? 0);
+    const fromTokenPrice = Number(fromToken.usdPrice ?? 0);
+
+    // example fromAmount: 10
+    const fromAmount = (toTokenPrice * Number(toAmount ?? 0)) / fromTokenPrice;
+
+    // fromAmount (10) * slippagePercentage (1.5) / 100 = 0.15
+    const slippage = fromAmount * (slippagePercentage / 100);
+
+    // fromAmount (10) + slippage (0.15) = 10.15
+    const fromAmountPlusSlippage = fromAmount + slippage;
+
+    return fromAmountPlusSlippage.toString();
   }
 }
