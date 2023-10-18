@@ -1,5 +1,12 @@
 
 
+## [1.14.1](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.14.1) (2023-10-18)
+
+
+### Features
+
+* get from amount ([#218](https://github.com/0xsquid/api-sdk/issues/218)) ([d727de5](https://github.com/0xsquid/api-sdk/commit/d727de5d2c07b1ef12fb091bfe4bea49ba2cb987))
+
 ## [1.14.0](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.14.0) (2023-09-26)
 
 ## [1.12.1](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.12.1) (2023-09-06)
