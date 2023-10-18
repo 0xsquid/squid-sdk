@@ -741,27 +741,34 @@ export class Squid {
     toToken: TokenData;
     toAmount: string;
     slippagePercentage?: number;
-  }): Promise<string> {
-    const toTokenPrice = await this.getTokenPrice({
-      chainId: toToken.chainId,
-      tokenAddress: toToken.address
-    });
+  }): Promise<string | null> {
+    try {
+      // parallelize requests
+      const [fromTokenPrice, toTokenPrice] = await Promise.all([
+        this.getTokenPrice({
+          chainId: fromToken.chainId,
+          tokenAddress: fromToken.address
+        }),
+        this.getTokenPrice({
+          chainId: toToken.chainId,
+          tokenAddress: toToken.address
+        })
+      ]);
 
-    const fromTokenPrice = await this.getTokenPrice({
-      chainId: fromToken.chainId,
-      tokenAddress: fromToken.address
-    });
+      // example fromAmount: 10
+      const fromAmount =
+        (toTokenPrice * Number(toAmount ?? 0)) / fromTokenPrice;
 
-    // example fromAmount: 10
-    const fromAmount = (toTokenPrice * Number(toAmount ?? 0)) / fromTokenPrice;
+      // fromAmount (10) * slippagePercentage (1.5) / 100 = 0.15
+      const slippage = fromAmount * (slippagePercentage / 100);
 
-    // fromAmount (10) * slippagePercentage (1.5) / 100 = 0.15
-    const slippage = fromAmount * (slippagePercentage / 100);
+      // fromAmount (10) + slippage (0.15) = 10.15
+      const fromAmountPlusSlippage = fromAmount + slippage;
 
-    // fromAmount (10) + slippage (0.15) = 10.15
-    const fromAmountPlusSlippage = fromAmount + slippage;
-
-    return fromAmountPlusSlippage.toString();
+      return fromAmountPlusSlippage.toString();
+    } catch (error) {
+      return null;
+    }
   }
 }
 
