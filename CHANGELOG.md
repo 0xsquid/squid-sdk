@@ -1,5 +1,12 @@
 
 
+## [2.8.1-beta.0](https://github.com/0xsquid/api-sdk/compare/v2.8.0-beta.0...v2.8.1-beta.0) (2023-10-19)
+
+
+### Features
+
+* add method to get from amount ([#217](https://github.com/0xsquid/api-sdk/issues/217)) ([928dfc3](https://github.com/0xsquid/api-sdk/commit/928dfc3ff6cc238c600e8926ca796954339dfc2f))
+
 ## [2.8.0-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.7.4...v2.8.0-beta.0) (2023-09-18)
 
 
