@@ -32,7 +32,8 @@ import {
   TransactionRequest,
   ValidateBalanceAndApproval,
   WASM_TYPE,
-  WasmHookMsg
+  WasmHookMsg,
+  CosmosChain
 } from "./types";
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
@@ -751,11 +752,15 @@ export class Squid {
   public async getAllCosmosBalances({
     addresses
   }: {
-    addresses: { chainId: string; address: string }[];
+    addresses: Array<{
+      coinType: number;
+      chainId: string;
+      address: string;
+    }>;
   }) {
     const cosmosChains = this.chains.filter(
       c => c.chainType === ChainType.Cosmos
-    );
+    ) as CosmosChain[];
 
     return getCosmosBalances({ addresses, cosmosChains });
   }
