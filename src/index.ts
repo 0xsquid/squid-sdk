@@ -745,8 +745,8 @@ export class Squid {
     userAddress: string;
     chains: (string | number)[];
   }): Promise<TokenBalance[]> {
-    // remove invalid and duplicate chains
-    const filteredChains = new Set(chains.filter(c => !Number.isNaN(c)));
+    // remove invalid and duplicate chains and convert to number
+    const filteredChains = new Set(chains.map(Number).filter(c => !isNaN(c)));
 
     return getAllEvmTokensBalance(
       this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
@@ -756,13 +756,18 @@ export class Squid {
 
   public async getAllCosmosBalances({
     addresses,
-    chainIds
+    chainIds = []
   }: {
     addresses: CosmosAddress[];
     chainIds?: (string | number)[];
   }) {
-    const cosmosChains = this.chains.filter(
-      c => c.chainType === ChainType.Cosmos && chainIds?.includes(c.chainId)
+    const cosmosChains = this.chains.filter(c =>
+      c.chainType === ChainType.Cosmos &&
+      // if chainIds is not provided, return all cosmos chains
+      chainIds.length === 0
+        ? true
+        : // else return only chains that are in chainIds
+          chainIds?.includes(c.chainId)
     ) as CosmosChain[];
 
     return getCosmosBalances({
@@ -787,7 +792,7 @@ export class Squid {
       // fetch balances for all chains compatible with provided addresses
       const evmBalances = evmAddress
         ? await this.getAllEvmBalances({
-            chains: this.tokens.map(t => Number(t.chainId)),
+            chains: this.tokens.map(t => String(t.chainId)),
             userAddress: evmAddress
           })
         : [];
