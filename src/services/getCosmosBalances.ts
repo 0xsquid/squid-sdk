@@ -1,5 +1,5 @@
 import { StargateClient } from "@cosmjs/stargate";
-import { ChainType, CosmosChain } from "../types";
+import { ChainType, CosmosAddress, CosmosBalance, CosmosChain } from "../types";
 import { fromBech32, toBech32 } from "@cosmjs/encoding";
 
 const deriveCosmosAddress = (chainPrefix: string, address: string): string => {
@@ -10,18 +10,11 @@ export async function getCosmosBalances({
   addresses,
   cosmosChains
 }: {
-  addresses: Array<{
-    coinType: number;
-    chainId: string;
-    address: string;
-  }>;
+  addresses: CosmosAddress[];
   cosmosChains: CosmosChain[];
-}) {
-  const balances: {
-    amount: string;
-    denom: string;
-    chainId: string;
-  }[] = [];
+}): Promise<CosmosBalance[]> {
+  const balances: CosmosBalance[] = [];
+
   for (const chain of cosmosChains) {
     if (chain.chainType !== ChainType.Cosmos) continue;
 

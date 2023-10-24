@@ -33,7 +33,9 @@ import {
   ValidateBalanceAndApproval,
   WASM_TYPE,
   WasmHookMsg,
-  CosmosChain
+  CosmosChain,
+  CosmosAddress,
+  CosmosBalance
 } from "./types";
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
@@ -743,8 +745,13 @@ export class Squid {
     userAddress: string;
     chains: number[];
   }): Promise<TokenBalance[]> {
+    // remove invalid and duplicate chains
+    const filteredChains = new Set(
+      chains.filter(c => !Number.isNaN(c) && !isNaN(c))
+    );
+
     return getAllEvmTokensBalance(
-      this.tokens.filter(t => chains.includes(Number(t.chainId))),
+      this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
       userAddress
     );
   }
@@ -752,17 +759,49 @@ export class Squid {
   public async getAllCosmosBalances({
     addresses
   }: {
-    addresses: Array<{
-      coinType: number;
-      chainId: string;
-      address: string;
-    }>;
+    addresses: CosmosAddress[];
   }) {
     const cosmosChains = this.chains.filter(
       c => c.chainType === ChainType.Cosmos
     ) as CosmosChain[];
 
     return getCosmosBalances({ addresses, cosmosChains });
+  }
+
+  public async getAllBalances({
+    chainIds,
+    cosmosAddresses,
+    evmAddress
+  }: {
+    chainIds?: string[];
+    cosmosAddresses?: CosmosAddress[];
+    evmAddress?: string;
+  }): Promise<{
+    cosmosBalances?: CosmosBalance[];
+    evmBalances?: TokenBalance[];
+  }> {
+    if (!chainIds) {
+      // fetch balances for all chains compatible with provided addresses
+      const evmBalances = evmAddress
+        ? await this.getAllEvmBalances({
+            chains: this.tokens.map(t => Number(t.chainId)),
+            userAddress: evmAddress
+          })
+        : [];
+
+      const cosmosBalances = cosmosAddresses
+        ? await this.getAllCosmosBalances({
+            addresses: cosmosAddresses
+          })
+        : [];
+
+      return {
+        evmBalances,
+        cosmosBalances
+      };
+    }
+
+    return {};
   }
 }
 

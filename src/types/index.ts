@@ -515,3 +515,15 @@ export type AllBalancesResult = {
   cosmosBalances: TokenBalance[];
   evmBalances: TokenBalance[];
 };
+
+export type CosmosAddress = {
+  coinType: number;
+  chainId: string;
+  address: string;
+};
+
+export type CosmosBalance = {
+  amount: string;
+  denom: string;
+  chainId: string;
+};
