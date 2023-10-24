@@ -743,12 +743,10 @@ export class Squid {
     chains
   }: {
     userAddress: string;
-    chains: number[];
+    chains: (string | number)[];
   }): Promise<TokenBalance[]> {
     // remove invalid and duplicate chains
-    const filteredChains = new Set(
-      chains.filter(c => !Number.isNaN(c) && !isNaN(c))
-    );
+    const filteredChains = new Set(chains.filter(c => !Number.isNaN(c)));
 
     return getAllEvmTokensBalance(
       this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
@@ -757,15 +755,20 @@ export class Squid {
   }
 
   public async getAllCosmosBalances({
-    addresses
+    addresses,
+    chainIds
   }: {
     addresses: CosmosAddress[];
+    chainIds?: (string | number)[];
   }) {
     const cosmosChains = this.chains.filter(
-      c => c.chainType === ChainType.Cosmos
+      c => c.chainType === ChainType.Cosmos && chainIds?.includes(c.chainId)
     ) as CosmosChain[];
 
-    return getCosmosBalances({ addresses, cosmosChains });
+    return getCosmosBalances({
+      addresses,
+      cosmosChains
+    });
   }
 
   public async getAllBalances({
@@ -773,7 +776,7 @@ export class Squid {
     cosmosAddresses,
     evmAddress
   }: {
-    chainIds?: string[];
+    chainIds?: (string | number)[];
     cosmosAddresses?: CosmosAddress[];
     evmAddress?: string;
   }): Promise<{
@@ -801,7 +804,42 @@ export class Squid {
       };
     }
 
-    return {};
+    // fetch balances for provided chains
+    const [evmChainIds, cosmosChainIds] = this.chains.reduce(
+      (cosmosAndEvmChains, chain) => {
+        if (!chainIds.includes(chain.chainId)) {
+          return cosmosAndEvmChains;
+        }
+
+        if (chain.chainType === ChainType.Cosmos) {
+          cosmosAndEvmChains[1].push(chain.chainId);
+        } else {
+          cosmosAndEvmChains[0].push(chain.chainId);
+        }
+        return cosmosAndEvmChains;
+      },
+
+      [[], []] as [(string | number)[], (string | number)[]]
+    );
+
+    const evmBalances = evmAddress
+      ? await this.getAllEvmBalances({
+          chains: evmChainIds,
+          userAddress: evmAddress
+        })
+      : [];
+
+    const cosmosBalances = cosmosAddresses
+      ? await this.getAllCosmosBalances({
+          addresses: cosmosAddresses,
+          chainIds: cosmosChainIds
+        })
+      : [];
+
+    return {
+      evmBalances,
+      cosmosBalances
+    };
   }
 }
 
