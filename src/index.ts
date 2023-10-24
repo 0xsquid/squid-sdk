@@ -804,10 +804,12 @@ export class Squid {
       };
     }
 
+    const normalizedChainIds = chainIds.map(String);
+
     // fetch balances for provided chains
     const [evmChainIds, cosmosChainIds] = this.chains.reduce(
       (cosmosAndEvmChains, chain) => {
-        if (!chainIds.includes(chain.chainId)) {
+        if (!normalizedChainIds.includes(String(chain.chainId))) {
           return cosmosAndEvmChains;
         }
 
