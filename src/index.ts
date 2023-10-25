@@ -1,11 +1,15 @@
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { fromUtf8, toUtf8 } from "@cosmjs/encoding";
+import {
+  SigningCosmWasmClient,
+  createWasmAminoConverters
+} from "@cosmjs/cosmwasm-stargate";
+import { toUtf8 } from "@cosmjs/encoding";
 import {
   AminoTypes,
   Coin,
   GasPrice,
   SigningStargateClient,
-  calculateFee
+  calculateFee,
+  createIbcAminoConverters
 } from "@cosmjs/stargate";
 import axios, { AxiosInstance } from "axios";
 
@@ -37,7 +41,6 @@ import {
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
-import { MsgTransfer } from "cosmjs-types/ibc/applications/transfer/v1/tx";
 import Long from "long";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
@@ -503,11 +506,19 @@ export class Squid {
     // This conversion is needed for Ledger, They only supports Amino messages
     // TODO: At the moment there's a limit on Ledger Nano S models
     // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
-    const converter = this.getAminoTypeConverters();
-    const aminoMsg = converter.toAmino(msgs[0]);
-    const fromAminoMsg = converter.fromAmino(aminoMsg);
+    const aminoTypes = this.getAminoTypeConverters();
+    const formattedMsg = {
+      ...msgs[0],
+      value: {
+        ...msgs[0].value,
+        timeoutTimestamp: this.getTimeoutTimestamp()
+      }
+    };
 
-    return signer.sign(
+    const aminoMsg = aminoTypes.toAmino(formattedMsg);
+    const fromAminoMsg = aminoTypes.fromAmino(aminoMsg);
+
+    return (signer as SigningCosmWasmClient).sign(
       signerAddress,
       [fromAminoMsg],
       calculateFee(
@@ -751,68 +762,10 @@ export class Squid {
     return Long.fromNumber(currentTimeNanos + PACKET_LIFETIME_NANOS);
   }
 
-  // TODO: There's probably a way to get this conversion from an existing library
   private getAminoTypeConverters(): AminoTypes {
     return new AminoTypes({
-      [WASM_TYPE]: {
-        aminoType: "wasm/MsgExecuteContract",
-        toAmino: ({ sender, contract, msg, funds }: MsgExecuteContract) => ({
-          sender: sender,
-          contract: contract,
-          msg: JSON.parse(fromUtf8(msg)),
-          funds: funds
-        }),
-        fromAmino: ({ sender, contract, msg, funds }): MsgExecuteContract => ({
-          sender: sender,
-          contract: contract,
-          msg: toUtf8(JSON.stringify(msg)),
-          funds: [...funds]
-        })
-      },
-      [IBC_TRANSFER_TYPE]: {
-        aminoType: "cosmos-sdk/MsgTransfer",
-        toAmino: ({
-          sourcePort,
-          sourceChannel,
-          token,
-          sender,
-          receiver,
-          timeoutHeight,
-          timeoutTimestamp,
-          memo
-        }: MsgTransfer) => {
-          return {
-            source_port: sourcePort,
-            source_channel: sourceChannel,
-            token: token,
-            sender: sender,
-            receiver: receiver,
-            timeout_height: timeoutHeight,
-            timeout_timestamp: timeoutTimestamp,
-            memo
-          };
-        },
-        fromAmino: ({
-          source_port,
-          source_channel,
-          token,
-          sender,
-          receiver,
-          timeout_height,
-          timeout_timestamp,
-          memo
-        }): MsgTransfer =>
-          MsgTransfer.fromPartial({
-            sourcePort: source_port,
-            sourceChannel: source_channel,
-            token: token,
-            sender: sender,
-            receiver: receiver,
-            memo,
-            timeoutHeight: timeout_height,
-            timeoutTimestamp: Long.fromValue(timeout_timestamp)
-          })
-      }
+      ...createIbcAminoConverters(),
+      ...createWasmAminoConverters()
     });
   }
 }
