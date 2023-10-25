@@ -4,7 +4,11 @@ import {
   RouteResponse,
   StatusResponse,
   EvmWallet,
-  Token
+  Token,
+  TokenBalance,
+  CosmosAddress,
+  CosmosChain,
+  CosmosBalance
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
@@ -22,6 +26,8 @@ import { TokensChains } from "./TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
+import { getAllEvmTokensBalance } from "./services/getEvmBalances";
+import { getCosmosBalances } from "./services/getCosmosBalances";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -300,5 +306,116 @@ export class Squid extends TokensChains {
     const fromAmountPlusSlippage = fromAmount + slippage;
 
     return fromAmountPlusSlippage.toString();
+  }
+
+  public async getAllEvmBalances({
+    userAddress,
+    chains
+  }: {
+    userAddress: string;
+    chains: (string | number)[];
+  }): Promise<TokenBalance[]> {
+    // remove invalid and duplicate chains and convert to number
+    const filteredChains = new Set(chains.map(Number).filter(c => !isNaN(c)));
+
+    return getAllEvmTokensBalance(
+      this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
+      userAddress
+    );
+  }
+
+  public async getAllCosmosBalances({
+    addresses,
+    chainIds = []
+  }: {
+    addresses: CosmosAddress[];
+    chainIds?: (string | number)[];
+  }) {
+    const cosmosChains = this.chains.filter(c =>
+      c.chainType === ChainType.COSMOS &&
+      // if chainIds is not provided, return all cosmos chains
+      chainIds.length === 0
+        ? true
+        : // else return only chains that are in chainIds
+          chainIds?.includes(c.chainId)
+    ) as CosmosChain[];
+
+    return getCosmosBalances({
+      addresses,
+      cosmosChains
+    });
+  }
+
+  public async getAllBalances({
+    chainIds,
+    cosmosAddresses,
+    evmAddress
+  }: {
+    chainIds?: (string | number)[];
+    cosmosAddresses?: CosmosAddress[];
+    evmAddress?: string;
+  }): Promise<{
+    cosmosBalances?: CosmosBalance[];
+    evmBalances?: TokenBalance[];
+  }> {
+    if (!chainIds) {
+      // fetch balances for all chains compatible with provided addresses
+      const evmBalances = evmAddress
+        ? await this.getAllEvmBalances({
+            chains: this.tokens.map(t => String(t.chainId)),
+            userAddress: evmAddress
+          })
+        : [];
+
+      const cosmosBalances = cosmosAddresses
+        ? await this.getAllCosmosBalances({
+            addresses: cosmosAddresses
+          })
+        : [];
+
+      return {
+        evmBalances,
+        cosmosBalances
+      };
+    }
+
+    const normalizedChainIds = chainIds.map(String);
+
+    // fetch balances for provided chains
+    const [evmChainIds, cosmosChainIds] = this.chains.reduce(
+      (cosmosAndEvmChains, chain) => {
+        if (!normalizedChainIds.includes(String(chain.chainId))) {
+          return cosmosAndEvmChains;
+        }
+
+        if (chain.chainType === ChainType.COSMOS) {
+          cosmosAndEvmChains[1].push(chain.chainId);
+        } else {
+          cosmosAndEvmChains[0].push(chain.chainId);
+        }
+        return cosmosAndEvmChains;
+      },
+
+      [[], []] as [(string | number)[], (string | number)[]]
+    );
+
+    const evmBalances = evmAddress
+      ? await this.getAllEvmBalances({
+          chains: evmChainIds,
+          userAddress: evmAddress
+        })
+      : [];
+
+    const cosmosBalances = cosmosAddresses
+      ? await this.getAllCosmosBalances({
+          addresses: cosmosAddresses,
+          chainIds: cosmosChainIds
+        })
+      : [];
+
+    return {
+      evmBalances,
+      cosmosBalances
+    };
   }
 }
