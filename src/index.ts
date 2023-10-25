@@ -871,6 +871,7 @@ export class Squid {
       evmBalances,
       cosmosBalances
     };
+  }
 
   private getTimeoutTimestamp(): Long {
     const PACKET_LIFETIME_NANOS = 3600 * 1_000_000_000; // 1 Hour
