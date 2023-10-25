@@ -1,13 +1,19 @@
+import {
+  SigningCosmWasmClient,
+  createWasmAminoConverters
+} from "@cosmjs/cosmwasm-stargate";
 import { toUtf8 } from "@cosmjs/encoding";
 import {
-  calculateFee,
+  AminoTypes,
   Coin,
   GasPrice,
-  SigningStargateClient
+  SigningStargateClient,
+  calculateFee,
+  createIbcAminoConverters
 } from "@cosmjs/stargate";
 import axios, { AxiosInstance } from "axios";
-import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
-import { BigNumber, ethers, UnsignedTransaction } from "ethers";
+
+import { BigNumber, UnsignedTransaction, ethers } from "ethers";
 
 import {
   Allowance,
@@ -34,6 +40,8 @@ import {
 } from "./types";
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
+import Long from "long";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
 import { parseStatusResponse } from "./0xsquid/v1/status";
@@ -221,7 +229,7 @@ export class Squid {
   }
 
   private async validateCosmosBalance(
-    signer: SigningStargateClient,
+    signer: SigningStargateClient | SigningCosmWasmClient,
     signerAddress: string,
     coin: Coin
   ): Promise<void> {
@@ -314,7 +322,9 @@ export class Squid {
     // handle cosmos case
     if (
       signer instanceof SigningStargateClient ||
-      signer.constructor.name === "SigningStargateClient"
+      signer.constructor.name === "SigningStargateClient" ||
+      signer instanceof SigningCosmWasmClient ||
+      signer.constructor.name === "SigningCosmWasmClient"
     ) {
       return await this.executeRouteCosmos(
         signer as SigningStargateClient,
@@ -444,13 +454,12 @@ export class Squid {
   }
 
   private async executeRouteCosmos(
-    signer: SigningStargateClient,
+    signer: SigningStargateClient | SigningCosmWasmClient,
     signerAddress: string,
     route: RouteData
   ): Promise<TxRaw> {
     const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
     const msgs = [];
-
     switch (cosmosMsg.msgTypeUrl) {
       case IBC_TRANSFER_TYPE: {
         msgs.push({
@@ -494,9 +503,24 @@ export class Squid {
     const estimatedGas = await signer.simulate(signerAddress, msgs, "");
     const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
-    return signer.sign(
+    // This conversion is needed for Ledger, They only supports Amino messages
+    // TODO: At the moment there's a limit on Ledger Nano S models
+    // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
+    const aminoTypes = this.getAminoTypeConverters();
+    const formattedMsg = {
+      ...msgs[0],
+      value: {
+        ...msgs[0].value,
+        timeoutTimestamp: this.getTimeoutTimestamp()
+      }
+    };
+
+    const aminoMsg = aminoTypes.toAmino(formattedMsg);
+    const fromAminoMsg = aminoTypes.fromAmino(aminoMsg);
+
+    return (signer as SigningCosmWasmClient).sign(
       signerAddress,
-      msgs,
+      [fromAminoMsg],
       calculateFee(
         Math.trunc(estimatedGas * gasMultiplier),
         GasPrice.fromString(route.transactionRequest!.gasPrice)
@@ -729,6 +753,20 @@ export class Squid {
     });
 
     return response.data.price;
+  }
+
+  private getTimeoutTimestamp(): Long {
+    const PACKET_LIFETIME_NANOS = 3600 * 1_000_000_000; // 1 Hour
+
+    const currentTimeNanos = Math.floor(Date.now() * 1_000_000);
+    return Long.fromNumber(currentTimeNanos + PACKET_LIFETIME_NANOS);
+  }
+
+  private getAminoTypeConverters(): AminoTypes {
+    return new AminoTypes({
+      ...createIbcAminoConverters(),
+      ...createWasmAminoConverters()
+    });
   }
 
   public async getFromAmount({
