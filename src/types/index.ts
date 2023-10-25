@@ -503,3 +503,28 @@ export type CoinTypeAddress = {
 
 export const IBC_TRANSFER_TYPE = "/ibc.applications.transfer.v1.MsgTransfer";
 export const WASM_TYPE = "/cosmwasm.wasm.v1.MsgExecuteContract";
+
+export type TokenBalance = {
+  symbol: string;
+  address: string;
+  decimals: number;
+  balance: string;
+};
+
+export type AllBalancesResult = {
+  cosmosBalances: TokenBalance[];
+  evmBalances: TokenBalance[];
+};
+
+export type CosmosAddress = {
+  coinType: number;
+  chainId: string;
+  address: string;
+};
+
+export type CosmosBalance = {
+  decimals: number;
+  balance: string;
+  denom: string;
+  chainId: string;
+};
