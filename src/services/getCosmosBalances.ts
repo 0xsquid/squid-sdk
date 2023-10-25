@@ -13,7 +13,7 @@ export async function getCosmosBalances({
   addresses: CosmosAddress[];
   cosmosChains: CosmosChain[];
 }): Promise<CosmosBalance[]> {
-  const balances: CosmosBalance[] = [];
+  const cosmosBalances: CosmosBalance[] = [];
 
   for (const chain of cosmosChains) {
     if (chain.chainType !== ChainType.Cosmos) continue;
@@ -31,21 +31,26 @@ export async function getCosmosBalances({
 
     try {
       const client = await StargateClient.connect(chain.rpc);
-      const [account] = (await client.getAllBalances(cosmosAddress)) ?? [];
+      const balances = (await client.getAllBalances(cosmosAddress)) ?? [];
 
-      if (!account) continue;
+      if (balances.length === 0) continue;
 
-      const { amount, denom } = account;
+      balances.forEach(balance => {
+        const { amount, denom } = balance;
 
-      balances.push({
-        amount,
-        denom,
-        chainId: String(chain.chainId)
+        cosmosBalances.push({
+          balance: amount,
+          denom,
+          chainId: String(chain.chainId),
+          decimals:
+            chain.currencies.find(currency => currency.coinDenom === denom)
+              ?.coinDecimals ?? 6
+        });
       });
     } catch (error) {
       //
     }
   }
 
-  return balances;
+  return cosmosBalances;
 }

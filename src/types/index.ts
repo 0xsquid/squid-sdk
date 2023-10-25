@@ -523,7 +523,8 @@ export type CosmosAddress = {
 };
 
 export type CosmosBalance = {
-  amount: string;
+  decimals: number;
+  balance: string;
   denom: string;
   chainId: string;
 };
