@@ -1,5 +1,13 @@
 
 
+## [1.13.1-beta.1](https://github.com/0xsquid/api-sdk/compare/v1.14.1...v1.13.1-beta.1) (2023-10-25)
+
+
+### Bug Fixes
+
+* handle ledger amino messages ([89f8c32](https://github.com/0xsquid/api-sdk/commit/89f8c3282bcfd44d66d4c11ab703128ca65735ba))
+* update cosmjs for memo attribute & use cosmjs amino converters ([7212228](https://github.com/0xsquid/api-sdk/commit/72122286ca3ce6ce1d34444094a553e86587c165))
+
 ## [1.14.1](https://github.com/0xsquid/api-sdk/compare/v1.10.0...v1.14.1) (2023-10-18)
 
 
