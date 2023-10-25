@@ -16,6 +16,7 @@ import axios, { AxiosInstance } from "axios";
 import { BigNumber, UnsignedTransaction, ethers } from "ethers";
 
 import {
+  ChainType,
   Allowance,
   Approve,
   ApproveRoute,
@@ -32,11 +33,15 @@ import {
   RouteParamsData,
   RouteResponse,
   StatusResponse,
+  TokenBalance,
   TokenData,
   TransactionRequest,
   ValidateBalanceAndApproval,
   WASM_TYPE,
-  WasmHookMsg
+  WasmHookMsg,
+  CosmosChain,
+  CosmosAddress,
+  CosmosBalance
 } from "./types";
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
@@ -50,6 +55,8 @@ import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
 import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
+import { getAllEvmTokensBalance } from "./services/getEvmBalances";
+import { getCosmosBalances } from "./services/getCosmosBalances";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -754,6 +761,116 @@ export class Squid {
 
     return response.data.price;
   }
+
+  public async getAllEvmBalances({
+    userAddress,
+    chains
+  }: {
+    userAddress: string;
+    chains: (string | number)[];
+  }): Promise<TokenBalance[]> {
+    // remove invalid and duplicate chains and convert to number
+    const filteredChains = new Set(chains.map(Number).filter(c => !isNaN(c)));
+
+    return getAllEvmTokensBalance(
+      this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
+      userAddress
+    );
+  }
+
+  public async getAllCosmosBalances({
+    addresses,
+    chainIds = []
+  }: {
+    addresses: CosmosAddress[];
+    chainIds?: (string | number)[];
+  }) {
+    const cosmosChains = this.chains.filter(c =>
+      c.chainType === ChainType.Cosmos &&
+      // if chainIds is not provided, return all cosmos chains
+      chainIds.length === 0
+        ? true
+        : // else return only chains that are in chainIds
+          chainIds?.includes(c.chainId)
+    ) as CosmosChain[];
+
+    return getCosmosBalances({
+      addresses,
+      cosmosChains
+    });
+  }
+
+  public async getAllBalances({
+    chainIds,
+    cosmosAddresses,
+    evmAddress
+  }: {
+    chainIds?: (string | number)[];
+    cosmosAddresses?: CosmosAddress[];
+    evmAddress?: string;
+  }): Promise<{
+    cosmosBalances?: CosmosBalance[];
+    evmBalances?: TokenBalance[];
+  }> {
+    if (!chainIds) {
+      // fetch balances for all chains compatible with provided addresses
+      const evmBalances = evmAddress
+        ? await this.getAllEvmBalances({
+            chains: this.tokens.map(t => String(t.chainId)),
+            userAddress: evmAddress
+          })
+        : [];
+
+      const cosmosBalances = cosmosAddresses
+        ? await this.getAllCosmosBalances({
+            addresses: cosmosAddresses
+          })
+        : [];
+
+      return {
+        evmBalances,
+        cosmosBalances
+      };
+    }
+
+    const normalizedChainIds = chainIds.map(String);
+
+    // fetch balances for provided chains
+    const [evmChainIds, cosmosChainIds] = this.chains.reduce(
+      (cosmosAndEvmChains, chain) => {
+        if (!normalizedChainIds.includes(String(chain.chainId))) {
+          return cosmosAndEvmChains;
+        }
+
+        if (chain.chainType === ChainType.Cosmos) {
+          cosmosAndEvmChains[1].push(chain.chainId);
+        } else {
+          cosmosAndEvmChains[0].push(chain.chainId);
+        }
+        return cosmosAndEvmChains;
+      },
+
+      [[], []] as [(string | number)[], (string | number)[]]
+    );
+
+    const evmBalances = evmAddress
+      ? await this.getAllEvmBalances({
+          chains: evmChainIds,
+          userAddress: evmAddress
+        })
+      : [];
+
+    const cosmosBalances = cosmosAddresses
+      ? await this.getAllCosmosBalances({
+          addresses: cosmosAddresses,
+          chainIds: cosmosChainIds
+        })
+      : [];
+
+    return {
+      evmBalances,
+      cosmosBalances
+    };
 
   private getTimeoutTimestamp(): Long {
     const PACKET_LIFETIME_NANOS = 3600 * 1_000_000_000; // 1 Hour
