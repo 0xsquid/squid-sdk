@@ -105,3 +105,23 @@ export type StatusResponse = ApiBasicResponse & {
   squidTransactionStatus?: string;
 };
 // END STATUS TYPE
+
+export type TokenBalance = {
+  symbol: string;
+  address: string;
+  decimals: number;
+  balance: string;
+};
+
+export type CosmosAddress = {
+  coinType: number;
+  chainId: string;
+  address: string;
+};
+
+export type CosmosBalance = {
+  decimals: number;
+  balance: string;
+  denom: string;
+  chainId: string;
+};
