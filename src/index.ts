@@ -317,10 +317,18 @@ export class Squid extends TokensChains {
   }): Promise<TokenBalance[]> {
     // remove invalid and duplicate chains and convert to number
     const filteredChains = new Set(chains.map(Number).filter(c => !isNaN(c)));
+    const chainRpcUrls = this.chains.reduce(
+      (acc, chain) => ({
+        ...acc,
+        [chain.chainId]: chain.rpc
+      }),
+      {}
+    );
 
     return getAllEvmTokensBalance(
       this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
-      userAddress
+      userAddress,
+      chainRpcUrls
     );
   }
 

@@ -1,5 +1,9 @@
 import { ethers } from "ethers";
-import { Multicall, ContractCallContext } from "ethereum-multicall";
+import {
+  Multicall,
+  ContractCallContext,
+  MulticallOptionsEthers
+} from "ethereum-multicall";
 import { Token, TokenBalance } from "../types";
 import {
   NATIVE_EVM_TOKEN_ADDRESS,
@@ -10,19 +14,15 @@ import {
 type ContractAddress = `0x${string}`;
 
 const CHAINS_WITHOUT_MULTICALL = [314, 3141]; // Filecoin, & Filecoin testnet
-const CHAINS_WITHOUT_MULTICALL_RPC_URLS: Record<number, string> = {
-  314: "https://rpc.ankr.com/filecoin",
-  3141: "https://rpc.ankr.com/filecoin"
-};
 
 const getTokensBalanceSupportingMultiCall = async (
   tokens: Token[],
+  chainRpcUrl: string,
   userAddress?: ContractAddress
 ): Promise<TokenBalance[]> => {
   if (!userAddress) return [];
 
-  const ETHEREUM_RPC_URL = "https://avalanche.drpc.org";
-  const provider = new ethers.JsonRpcProvider(ETHEREUM_RPC_URL);
+  const provider = new ethers.JsonRpcProvider(chainRpcUrl);
 
   const contractCallContext: ContractCallContext[] = tokens.map(token => {
     const isNativeToken =
@@ -53,39 +53,46 @@ const getTokensBalanceSupportingMultiCall = async (
   });
 
   const multicallInstance = new Multicall({
-    ethersProvider: provider,
+    ethersProvider:
+      provider as unknown as MulticallOptionsEthers["ethersProvider"],
     tryAggregate: true
   });
 
-  const { results } = (await multicallInstance.call(contractCallContext)) ?? {
-    results: {}
-  };
-
-  const tokenBalances: TokenBalance[] = [];
-
-  for (const symbol in results) {
-    const data = results[symbol].callsReturnContext[0] ?? {};
-
-    const { decimals = 18, address = "0x" } =
-      tokens.find(t => t.symbol === symbol) ?? {};
-
-    const mappedBalance: TokenBalance = {
-      symbol,
-      address,
-      decimals,
-      // balance in wei
-      balance: parseInt(data.returnValues[0]?.hex ?? "0", 16).toString()
+  try {
+    const { results } = (await multicallInstance.call(contractCallContext)) ?? {
+      results: {}
     };
+    const tokenBalances: TokenBalance[] = [];
 
-    tokenBalances.push(mappedBalance);
+    for (const symbol in results) {
+      const data = results[symbol].callsReturnContext[0] ?? {};
+
+      const { decimals = 18, address = "0x" } =
+        tokens.find(t => t.symbol === symbol) ?? {};
+
+      const mappedBalance: TokenBalance = {
+        symbol,
+        address,
+        decimals,
+        // balance in wei
+        balance: parseInt(data.returnValues[0]?.hex ?? "0", 16).toString()
+      };
+
+      tokenBalances.push(mappedBalance);
+    }
+
+    return tokenBalances;
+  } catch (error) {
+    return [];
   }
-
-  return tokenBalances;
 };
 
 const getTokensBalanceWithoutMultiCall = async (
   tokens: Token[],
-  userAddress: ContractAddress
+  userAddress: ContractAddress,
+  rpcUrlsPerChain: {
+    [chainId: string]: string;
+  }
 ): Promise<TokenBalance[]> => {
   const balances: (TokenBalance | null)[] = await Promise.all(
     tokens.map(async t => {
@@ -94,12 +101,14 @@ const getTokensBalanceWithoutMultiCall = async (
         if (t.address === NATIVE_EVM_TOKEN_ADDRESS) {
           balance = await fetchBalance({
             token: t,
-            userAddress
+            userAddress,
+            rpcUrl: rpcUrlsPerChain[t.chainId]
           });
         } else {
           balance = await fetchBalance({
             token: t,
-            userAddress
+            userAddress,
+            rpcUrl: rpcUrlsPerChain[t.chainId]
           });
         }
 
@@ -116,7 +125,10 @@ const getTokensBalanceWithoutMultiCall = async (
 
 export const getAllEvmTokensBalance = async (
   evmTokens: Token[],
-  userAddress: string
+  userAddress: string,
+  chainRpcUrls: {
+    [chainId: string]: string;
+  }
 ): Promise<TokenBalance[]> => {
   try {
     // Some tokens don't support multicall, so we need to fetch them with Promise.all
@@ -136,14 +148,40 @@ export const getAllEvmTokensBalance = async (
     const tokensNotSupportingMulticall = splittedTokensByMultiCallSupport[0];
     const tokensSupportingMulticall = splittedTokensByMultiCallSupport[1];
 
-    const tokensMulticall = await getTokensBalanceSupportingMultiCall(
-      tokensSupportingMulticall,
-      userAddress as ContractAddress
+    const tokensByChainId = tokensSupportingMulticall.reduce(
+      (groupedTokens, token) => {
+        if (!groupedTokens[token.chainId]) {
+          groupedTokens[token.chainId] = [];
+        }
+
+        groupedTokens[token.chainId].push(token);
+
+        return groupedTokens;
+      },
+      {} as Record<string, Token[]>
     );
+
+    const tokensMulticall: TokenBalance[] = [];
+
+    for (const chainId in tokensByChainId) {
+      const tokens = tokensByChainId[chainId];
+      const rpcUrl = chainRpcUrls[chainId];
+
+      if (!rpcUrl) continue;
+
+      const tokensBalances = await getTokensBalanceSupportingMultiCall(
+        tokens,
+        rpcUrl,
+        userAddress as ContractAddress
+      );
+
+      tokensMulticall.push(...tokensBalances);
+    }
 
     const tokensNotMultiCall = await getTokensBalanceWithoutMultiCall(
       tokensNotSupportingMulticall,
-      userAddress as ContractAddress
+      userAddress as ContractAddress,
+      chainRpcUrls
     );
 
     return [...tokensMulticall, ...tokensNotMultiCall];
@@ -155,16 +193,16 @@ export const getAllEvmTokensBalance = async (
 type FetchBalanceParams = {
   token: Token;
   userAddress: ContractAddress;
+  rpcUrl: string;
 };
 
 async function fetchBalance({
   token,
-  userAddress
+  userAddress,
+  rpcUrl
 }: FetchBalanceParams): Promise<TokenBalance | null> {
   try {
-    const provider = new ethers.JsonRpcProvider(
-      CHAINS_WITHOUT_MULTICALL_RPC_URLS[Number(token.chainId)]
-    );
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
 
     const tokenAbi = ["function balanceOf(address) view returns (uint256)"];
     const tokenContract = new ethers.Contract(
