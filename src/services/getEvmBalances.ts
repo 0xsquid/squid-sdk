@@ -10,10 +10,6 @@ import {
 type ContractAddress = `0x${string}`;
 
 const CHAINS_WITHOUT_MULTICALL = [314, 3141]; // Filecoin, & Filecoin testnet
-const CHAINS_WITHOUT_MULTICALL_RPC_URLS: Record<number, string> = {
-  314: "https://rpc.ankr.com/filecoin",
-  3141: "https://rpc.ankr.com/filecoin"
-};
 
 const getTokensBalanceSupportingMultiCall = async (
   tokens: TokenData[],
@@ -91,7 +87,10 @@ const getTokensBalanceSupportingMultiCall = async (
 
 const getTokensBalanceWithoutMultiCall = async (
   tokens: TokenData[],
-  userAddress: ContractAddress
+  userAddress: ContractAddress,
+  rpcUrlsPerChain: {
+    [chainId: string]: string;
+  }
 ): Promise<TokenBalance[]> => {
   const balances: (TokenBalance | null)[] = await Promise.all(
     tokens.map(async t => {
@@ -100,12 +99,14 @@ const getTokensBalanceWithoutMultiCall = async (
         if (t.address === NATIVE_EVM_TOKEN_ADDRESS) {
           balance = await fetchBalance({
             token: t,
-            userAddress
+            userAddress,
+            rpcUrl: rpcUrlsPerChain[t.chainId]
           });
         } else {
           balance = await fetchBalance({
             token: t,
-            userAddress
+            userAddress,
+            rpcUrl: rpcUrlsPerChain[t.chainId]
           });
         }
 
@@ -174,10 +175,10 @@ export const getAllEvmTokensBalance = async (
 
       tokensMulticall.push(...tokensBalances);
     }
-
     const tokensNotMultiCall = await getTokensBalanceWithoutMultiCall(
       tokensNotSupportingMulticall,
-      userAddress as ContractAddress
+      userAddress as ContractAddress,
+      chainRpcUrls
     );
 
     return [...tokensMulticall, ...tokensNotMultiCall];
@@ -190,16 +191,16 @@ export const getAllEvmTokensBalance = async (
 type FetchBalanceParams = {
   token: TokenData;
   userAddress: ContractAddress;
+  rpcUrl: string;
 };
 
 async function fetchBalance({
   token,
-  userAddress
+  userAddress,
+  rpcUrl
 }: FetchBalanceParams): Promise<TokenBalance | null> {
   try {
-    const provider = new ethers.providers.JsonRpcProvider(
-      CHAINS_WITHOUT_MULTICALL_RPC_URLS[Number(token.chainId)]
-    );
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
     const tokenAbi = ["function balanceOf(address) view returns (uint256)"];
     const tokenContract = new ethers.Contract(
