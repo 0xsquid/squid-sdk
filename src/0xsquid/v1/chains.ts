@@ -98,7 +98,8 @@ export const parseCosmosChain = (data: any): CosmosChain => {
     coinType,
     features,
     gasPriceStep,
-    chainToAxelarChannelId
+    chainToAxelarChannelId,
+    rpcList
   } = data;
 
   return removeEmpty({
@@ -115,7 +116,8 @@ export const parseCosmosChain = (data: any): CosmosChain => {
     coinType,
     features,
     gasPriceStep,
-    chainToAxelarChannelId
+    chainToAxelarChannelId,
+    rpcList
   }) as CosmosChain;
 };
 

@@ -130,6 +130,7 @@ export type CosmosChain = BaseChain & {
   features?: string[];
   gasPriceStep?: CosmosGasType;
   chainToAxelarChannelId: string;
+  rpcList: string[];
 };
 
 export type ChainData = EvmChain | CosmosChain;
