@@ -73,7 +73,7 @@ const getTokensBalanceSupportingMultiCall = async (
         address,
         decimals,
         // balance in wei
-        balance: parseInt(data.returnValues[0]?.hex ?? "0", 16).toString()
+        balance: parseInt(data.returnValues[0]?.hex ?? "0", 10).toString()
       };
 
       tokenBalances.push(mappedBalance);
