@@ -66,8 +66,11 @@ const getTokensBalanceSupportingMultiCall = async (
     for (const symbol in results) {
       const data = results[symbol].callsReturnContext[0] ?? {};
 
-      const { decimals = 18, address = "0x" } =
-        tokens.find(t => t.symbol === symbol) ?? {};
+      const token = tokens.find(t => t.symbol === symbol);
+
+      if (!token) continue;
+
+      const { decimals, address } = token;
 
       const mappedBalance: TokenBalance = {
         symbol,
