@@ -1,5 +1,13 @@
 
 
+## [1.14.4](https://github.com/0xsquid/api-sdk/compare/v1.14.1...v1.14.4) (2023-10-26)
+
+
+### Bug Fixes
+
+* handle ledger amino messages ([#215](https://github.com/0xsquid/api-sdk/issues/215)) ([2ef50f7](https://github.com/0xsquid/api-sdk/commit/2ef50f76d2429cca74c71a1fd1324beff9a90f0c)), closes [#216](https://github.com/0xsquid/api-sdk/issues/216) [#224](https://github.com/0xsquid/api-sdk/issues/224)
+* use a different rpc url for each chain ([#230](https://github.com/0xsquid/api-sdk/issues/230)) ([53bfa60](https://github.com/0xsquid/api-sdk/commit/53bfa60b9b314a7412b265fdea6e7de4454e49ea))
+
 ## [1.14.3](https://github.com/0xsquid/api-sdk/compare/v1.14.1...v1.14.3) (2023-10-25)
 
 
