@@ -17,12 +17,12 @@ const CHAINS_WITHOUT_MULTICALL_RPC_URLS: Record<number, string> = {
 
 const getTokensBalanceSupportingMultiCall = async (
   tokens: TokenData[],
+  chainRpcUrl: string,
   userAddress?: ContractAddress
 ): Promise<TokenBalance[]> => {
   if (!userAddress) return [];
 
-  const ETHEREUM_RPC_URL = "https://eth.meowrpc.com";
-  const provider = new ethers.providers.JsonRpcProvider(ETHEREUM_RPC_URL);
+  const provider = new ethers.providers.JsonRpcProvider(chainRpcUrl);
 
   const contractCallContext: ContractCallContext[] = tokens.map(token => {
     const isNativeToken =
@@ -116,7 +116,10 @@ const getTokensBalanceWithoutMultiCall = async (
 
 export const getAllEvmTokensBalance = async (
   evmTokens: TokenData[],
-  userAddress: string
+  userAddress: string,
+  chainRpcUrls: {
+    [chainId: string]: string;
+  }
 ): Promise<TokenBalance[]> => {
   try {
     // Some tokens don't support multicall, so we need to fetch them with Promise.all
@@ -136,10 +139,35 @@ export const getAllEvmTokensBalance = async (
     const tokensNotSupportingMulticall = splittedTokensByMultiCallSupport[0];
     const tokensSupportingMulticall = splittedTokensByMultiCallSupport[1];
 
-    const tokensMulticall = await getTokensBalanceSupportingMultiCall(
-      tokensSupportingMulticall,
-      userAddress as ContractAddress
+    const tokensByChainId = tokensSupportingMulticall.reduce(
+      (groupedTokens, token) => {
+        if (!groupedTokens[token.chainId]) {
+          groupedTokens[token.chainId] = [];
+        }
+
+        groupedTokens[token.chainId].push(token);
+
+        return groupedTokens;
+      },
+      {} as Record<string, TokenData[]>
     );
+
+    const tokensMulticall: TokenBalance[] = [];
+
+    for (const chainId in tokensByChainId) {
+      const tokens = tokensByChainId[chainId];
+      const rpcUrl = chainRpcUrls[chainId];
+
+      if (!rpcUrl) continue;
+
+      const tokensBalances = await getTokensBalanceSupportingMultiCall(
+        tokens,
+        rpcUrl,
+        userAddress as ContractAddress
+      );
+
+      tokensMulticall.push(...tokensBalances);
+    }
 
     const tokensNotMultiCall = await getTokensBalanceWithoutMultiCall(
       tokensNotSupportingMulticall,
