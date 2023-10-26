@@ -57,30 +57,33 @@ const getTokensBalanceSupportingMultiCall = async (
     tryAggregate: true
   });
 
-  const { results } = (await multicallInstance.call(contractCallContext)) ?? {
-    results: {}
-  };
-
-  const tokenBalances: TokenBalance[] = [];
-
-  for (const symbol in results) {
-    const data = results[symbol].callsReturnContext[0] ?? {};
-
-    const { decimals = 18, address = "0x" } =
-      tokens.find(t => t.symbol === symbol) ?? {};
-
-    const mappedBalance: TokenBalance = {
-      symbol,
-      address,
-      decimals,
-      // balance in wei
-      balance: parseInt(data.returnValues[0]?.hex ?? "0", 16).toString()
+  try {
+    const { results } = (await multicallInstance.call(contractCallContext)) ?? {
+      results: {}
     };
+    const tokenBalances: TokenBalance[] = [];
 
-    tokenBalances.push(mappedBalance);
+    for (const symbol in results) {
+      const data = results[symbol].callsReturnContext[0] ?? {};
+
+      const { decimals = 18, address = "0x" } =
+        tokens.find(t => t.symbol === symbol) ?? {};
+
+      const mappedBalance: TokenBalance = {
+        symbol,
+        address,
+        decimals,
+        // balance in wei
+        balance: parseInt(data.returnValues[0]?.hex ?? "0", 16).toString()
+      };
+
+      tokenBalances.push(mappedBalance);
+    }
+
+    return tokenBalances;
+  } catch (error) {
+    return [];
   }
-
-  return tokenBalances;
 };
 
 const getTokensBalanceWithoutMultiCall = async (
