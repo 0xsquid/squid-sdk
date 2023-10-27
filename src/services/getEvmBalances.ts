@@ -1,9 +1,5 @@
-import { ethers } from "ethers";
-import {
-  Multicall,
-  ContractCallContext,
-  MulticallOptionsEthers
-} from "ethereum-multicall";
+import { Provider, ethers } from "ethers";
+import { MulticallWrapper } from "ethers-multicall-provider";
 import { Token, TokenBalance } from "../types";
 import {
   NATIVE_EVM_TOKEN_ADDRESS,
@@ -22,14 +18,19 @@ const getTokensBalanceSupportingMultiCall = async (
 ): Promise<TokenBalance[]> => {
   if (!userAddress) return [];
 
-  const provider = new ethers.JsonRpcProvider(chainRpcUrl);
+  const multicallProvider = MulticallWrapper.wrap(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    new ethers.JsonRpcProvider(chainRpcUrl)
+  );
 
-  const contractCallContext: ContractCallContext[] = tokens.map(token => {
+  const tokenBalances: Promise<TokenBalance>[] = tokens.map(token => {
     const isNativeToken =
       token.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS.toLowerCase();
 
-    return {
-      abi: isNativeToken
+    const contract = new ethers.Contract(
+      isNativeToken ? MULTICALL_ADDRESS : token.address,
+      isNativeToken
         ? multicallAbi
         : [
             {
@@ -40,48 +41,28 @@ const getTokensBalanceSupportingMultiCall = async (
               stateMutability: "view"
             }
           ],
-      contractAddress: isNativeToken ? MULTICALL_ADDRESS : token.address,
-      reference: token.symbol,
-      calls: [
-        {
-          reference: isNativeToken ? "getEthBalance" : "balanceOf",
-          methodName: isNativeToken ? "getEthBalance" : "balanceOf",
-          methodParameters: [userAddress]
-        }
-      ]
-    };
-  });
+      multicallProvider as unknown as Provider
+    );
 
-  const multicallInstance = new Multicall({
-    ethersProvider:
-      provider as unknown as MulticallOptionsEthers["ethersProvider"],
-    tryAggregate: true
+    const getTokenData = async () => {
+      const balanceInWei = await contract[
+        isNativeToken ? "getEthBalance" : "balanceOf"
+      ](userAddress);
+
+      return {
+        balance: balanceInWei.toString(),
+        symbol: token.symbol,
+        address: token.address,
+        decimals: token.decimals,
+        chainId: token.chainId
+      };
+    };
+
+    return getTokenData();
   });
 
   try {
-    const { results } = (await multicallInstance.call(contractCallContext)) ?? {
-      results: {}
-    };
-    const tokenBalances: TokenBalance[] = [];
-
-    for (const symbol in results) {
-      const data = results[symbol].callsReturnContext[0] ?? {};
-
-      const { decimals = 18, address = "0x" } =
-        tokens.find(t => t.symbol === symbol) ?? {};
-
-      const mappedBalance: TokenBalance = {
-        symbol,
-        address,
-        decimals,
-        // balance in wei
-        balance: parseInt(data.returnValues[0]?.hex ?? "0", 16).toString()
-      };
-
-      tokenBalances.push(mappedBalance);
-    }
-
-    return tokenBalances;
+    return Promise.all(tokenBalances);
   } catch (error) {
     return [];
   }
