@@ -1,5 +1,7 @@
 
 
+## [2.8.1](https://github.com/0xsquid/api-sdk/compare/v2.8.1-beta.0...v2.8.1) (2023-10-30)
+
 ## [2.8.1-beta.0](https://github.com/0xsquid/api-sdk/compare/v2.8.0-beta.0...v2.8.1-beta.0) (2023-10-19)
 
 
