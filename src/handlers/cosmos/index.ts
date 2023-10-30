@@ -1,5 +1,5 @@
-import { toUtf8 } from "@cosmjs/encoding";
-import { calculateFee, Coin, GasPrice } from "@cosmjs/stargate";
+import { fromBech32, toBech32, toUtf8 } from "@cosmjs/encoding";
+import { calculateFee, Coin, GasPrice, StargateClient } from "@cosmjs/stargate";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 
 import {
@@ -9,7 +9,11 @@ import {
   CosmosMsg,
   IBC_TRANSFER_TYPE,
   WasmHookMsg,
-  WASM_TYPE
+  WASM_TYPE,
+  CosmosBalance,
+  CosmosChain,
+  CosmosAddress,
+  ChainType
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
@@ -114,5 +118,59 @@ export class CosmosHandler {
       ),
       ""
     );
+  }
+
+  async getBalances({
+    addresses,
+    cosmosChains
+  }: {
+    addresses: CosmosAddress[];
+    cosmosChains: CosmosChain[];
+  }): Promise<CosmosBalance[]> {
+    const cosmosBalances: CosmosBalance[] = [];
+
+    for (const chain of cosmosChains) {
+      if (chain.chainType !== ChainType.COSMOS) continue;
+
+      const addressData = addresses.find(
+        address => address.coinType === chain.coinType
+      );
+
+      if (!addressData) continue;
+
+      const cosmosAddress = this.deriveCosmosAddress(
+        chain.bech32Config.bech32PrefixAccAddr,
+        addressData.address
+      );
+
+      try {
+        const client = await StargateClient.connect(chain.rpc);
+
+        const balances = (await client.getAllBalances(cosmosAddress)) ?? [];
+
+        if (balances.length === 0) continue;
+
+        balances.forEach(balance => {
+          const { amount, denom } = balance;
+
+          cosmosBalances.push({
+            balance: amount,
+            denom,
+            chainId: String(chain.chainId),
+            decimals:
+              chain.currencies.find(currency => currency.coinDenom === denom)
+                ?.coinDecimals ?? 6
+          });
+        });
+      } catch (error) {
+        //
+      }
+    }
+
+    return cosmosBalances;
+  }
+
+  deriveCosmosAddress(chainPrefix: string, address: string): string {
+    return toBech32(chainPrefix, fromBech32(address).data);
   }
 }
