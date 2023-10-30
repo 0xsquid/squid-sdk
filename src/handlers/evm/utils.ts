@@ -1,6 +1,19 @@
-import { ChainData, SquidData } from "@0xsquid/squid-types";
+import { ChainData, SquidData, Token } from "@0xsquid/squid-types";
 
-import { OverrideParams, Contract, GasData, RpcProvider } from "../../types";
+import {
+  OverrideParams,
+  Contract,
+  GasData,
+  RpcProvider,
+  TokenBalance
+} from "../../types";
+import { MulticallWrapper } from "ethers-multicall-provider";
+import { Provider, ethers } from "ethers";
+import {
+  multicallAbi,
+  MULTICALL_ADDRESS,
+  NATIVE_EVM_TOKEN_ADDRESS
+} from "../../constants";
 
 export class Utils {
   async validateNativeBalance({
@@ -108,4 +121,135 @@ export class Utils {
 
     return overrides ? { ...gasParams, ...overrides } : (gasParams as GasData);
   };
+
+  async getTokensBalanceSupportingMultiCall(
+    tokens: Token[],
+    chainRpcUrl: string,
+    userAddress?: string
+  ): Promise<TokenBalance[]> {
+    if (!userAddress) return [];
+
+    const multicallProvider = MulticallWrapper.wrap(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      new ethers.JsonRpcProvider(chainRpcUrl)
+    );
+
+    const tokenBalances: Promise<TokenBalance>[] = tokens.map(token => {
+      const isNativeToken =
+        token.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS.toLowerCase();
+
+      const contract = new ethers.Contract(
+        isNativeToken ? MULTICALL_ADDRESS : token.address,
+        isNativeToken
+          ? multicallAbi
+          : [
+              {
+                name: "balanceOf",
+                type: "function",
+                inputs: [{ name: "_owner", type: "address" }],
+                outputs: [{ name: "balance", type: "uint256" }],
+                stateMutability: "view"
+              }
+            ],
+        multicallProvider as unknown as Provider
+      );
+
+      const getTokenData = async () => {
+        const balanceInWei = await contract[
+          isNativeToken ? "getEthBalance" : "balanceOf"
+        ](userAddress);
+
+        return {
+          balance: balanceInWei.toString(),
+          symbol: token.symbol,
+          address: token.address,
+          decimals: token.decimals,
+          chainId: token.chainId
+        };
+      };
+
+      return getTokenData();
+    });
+
+    try {
+      return Promise.all(tokenBalances);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  async getTokensBalanceWithoutMultiCall(
+    tokens: Token[],
+    userAddress: string,
+    rpcUrlsPerChain: {
+      [chainId: string]: string;
+    }
+  ): Promise<TokenBalance[]> {
+    const balances: (TokenBalance | null)[] = await Promise.all(
+      tokens.map(async t => {
+        let balance: TokenBalance | null;
+        try {
+          if (t.address === NATIVE_EVM_TOKEN_ADDRESS) {
+            balance = await this.fetchBalance({
+              token: t,
+              userAddress,
+              rpcUrl: rpcUrlsPerChain[t.chainId]
+            });
+          } else {
+            balance = await this.fetchBalance({
+              token: t,
+              userAddress,
+              rpcUrl: rpcUrlsPerChain[t.chainId]
+            });
+          }
+
+          return balance;
+        } catch (error) {
+          return null;
+        }
+      })
+    );
+
+    // filter out null values
+    return balances.filter(Boolean) as TokenBalance[];
+  }
+
+  async fetchBalance({
+    token,
+    userAddress,
+    rpcUrl
+  }: {
+    token: Token;
+    userAddress: string;
+    rpcUrl: string;
+  }): Promise<TokenBalance | null> {
+    try {
+      const provider = new ethers.JsonRpcProvider(rpcUrl);
+
+      const tokenAbi = ["function balanceOf(address) view returns (uint256)"];
+      const tokenContract = new ethers.Contract(
+        token.address ?? "",
+        tokenAbi,
+        provider
+      );
+
+      const balance = (await tokenContract.balanceOf(userAddress)) ?? "0";
+
+      if (!token) return null;
+
+      const { decimals, symbol, address } = token;
+
+      return {
+        address,
+        // balance in wei
+        balance: parseInt(balance, 16).toString(),
+        decimals,
+        symbol
+      };
+    } catch (error) {
+      console.error("Error fetching token balance:", error);
+      return null;
+    }
+  }
 }

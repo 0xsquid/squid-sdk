@@ -26,8 +26,6 @@ import { TokensChains } from "./TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
-import { getAllEvmTokensBalance } from "./services/getEvmBalances";
-import { getCosmosBalances } from "./services/getCosmosBalances";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -308,7 +306,7 @@ export class Squid extends TokensChains {
     return fromAmountPlusSlippage.toString();
   }
 
-  public async getAllEvmBalances({
+  public async getEvmBalances({
     userAddress,
     chains
   }: {
@@ -325,14 +323,14 @@ export class Squid extends TokensChains {
       {}
     );
 
-    return getAllEvmTokensBalance(
+    return this.handlers.evm.getBalances(
       this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
       userAddress,
       chainRpcUrls
     );
   }
 
-  public async getAllCosmosBalances({
+  public async getCosmosBalances({
     addresses,
     chainIds = []
   }: {
@@ -347,8 +345,7 @@ export class Squid extends TokensChains {
         : // else return only chains that are in chainIds
           chainIds?.includes(c.chainId)
     ) as CosmosChain[];
-
-    return getCosmosBalances({
+    return this.handlers.cosmos.getBalances({
       addresses,
       cosmosChains
     });
@@ -369,14 +366,14 @@ export class Squid extends TokensChains {
     if (!chainIds) {
       // fetch balances for all chains compatible with provided addresses
       const evmBalances = evmAddress
-        ? await this.getAllEvmBalances({
+        ? await this.getEvmBalances({
             chains: this.tokens.map(t => String(t.chainId)),
             userAddress: evmAddress
           })
         : [];
 
       const cosmosBalances = cosmosAddresses
-        ? await this.getAllCosmosBalances({
+        ? await this.getCosmosBalances({
             addresses: cosmosAddresses
           })
         : [];
@@ -408,14 +405,14 @@ export class Squid extends TokensChains {
     );
 
     const evmBalances = evmAddress
-      ? await this.getAllEvmBalances({
+      ? await this.getEvmBalances({
           chains: evmChainIds,
           userAddress: evmAddress
         })
       : [];
 
     const cosmosBalances = cosmosAddresses
-      ? await this.getAllCosmosBalances({
+      ? await this.getCosmosBalances({
           addresses: cosmosAddresses,
           chainIds: cosmosChainIds
         })

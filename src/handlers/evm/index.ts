@@ -5,12 +5,14 @@ import {
   EvmWallet,
   ExecuteRoute,
   RouteParamsPopulated,
+  Token,
+  TokenBalance,
   TransactionRequest,
   TransactionResponse,
   WalletV6
 } from "../../types";
 
-import { uint256MaxValue } from "../../constants";
+import { CHAINS_WITHOUT_MULTICALL, uint256MaxValue } from "../../constants";
 import { Utils } from "./utils";
 
 const ethersAdapter = new EthersAdapter();
@@ -237,5 +239,72 @@ export class EvmHandler extends Utils {
       nonce,
       ...gasData
     });
+  }
+
+  async getBalances(
+    evmTokens: Token[],
+    userAddress: string,
+    chainRpcUrls: {
+      [chainId: string]: string;
+    }
+  ): Promise<TokenBalance[]> {
+    try {
+      // Some tokens don't support multicall, so we need to fetch them with Promise.all
+      // TODO: Once we support multicall on all chains, we can remove this split
+      const splittedTokensByMultiCallSupport = evmTokens.reduce(
+        (acc, token) => {
+          if (CHAINS_WITHOUT_MULTICALL.includes(Number(token.chainId))) {
+            acc[0].push(token);
+          } else {
+            acc[1].push(token);
+          }
+          return acc;
+        },
+        [[], []] as Token[][]
+      );
+
+      const tokensNotSupportingMulticall = splittedTokensByMultiCallSupport[0];
+      const tokensSupportingMulticall = splittedTokensByMultiCallSupport[1];
+
+      const tokensByChainId = tokensSupportingMulticall.reduce(
+        (groupedTokens, token) => {
+          if (!groupedTokens[token.chainId]) {
+            groupedTokens[token.chainId] = [];
+          }
+
+          groupedTokens[token.chainId].push(token);
+
+          return groupedTokens;
+        },
+        {} as Record<string, Token[]>
+      );
+
+      const tokensMulticall: TokenBalance[] = [];
+
+      for (const chainId in tokensByChainId) {
+        const tokens = tokensByChainId[chainId];
+        const rpcUrl = chainRpcUrls[chainId];
+
+        if (!rpcUrl) continue;
+
+        const tokensBalances = await this.getTokensBalanceSupportingMultiCall(
+          tokens,
+          rpcUrl,
+          userAddress
+        );
+
+        tokensMulticall.push(...tokensBalances);
+      }
+
+      const tokensNotMultiCall = await this.getTokensBalanceWithoutMultiCall(
+        tokensNotSupportingMulticall,
+        userAddress,
+        chainRpcUrls
+      );
+
+      return [...tokensMulticall, ...tokensNotMultiCall];
+    } catch (error) {
+      return [];
+    }
   }
 }

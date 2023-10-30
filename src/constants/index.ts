@@ -26,3 +26,4 @@ export const multicallAbi = [
     type: "function"
   }
 ];
+export const CHAINS_WITHOUT_MULTICALL = [314, 3141]; // Filecoin, & Filecoin testnet
