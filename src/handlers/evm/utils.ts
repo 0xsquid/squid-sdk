@@ -248,7 +248,6 @@ export class Utils {
         symbol
       };
     } catch (error) {
-      console.error("Error fetching token balance:", error);
       return null;
     }
   }
