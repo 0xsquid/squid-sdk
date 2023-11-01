@@ -1,5 +1,12 @@
 
 
+## [2.8.2](https://github.com/0xsquid/api-sdk/compare/v2.8.1-beta.0...v2.8.2) (2023-11-01)
+
+
+### Bug Fixes
+
+* use all chains when no chains are specified ([#234](https://github.com/0xsquid/api-sdk/issues/234)) ([46195d1](https://github.com/0xsquid/api-sdk/commit/46195d103ad89912a9f2bfff05cfd5869b36cbca))
+
 ## [2.8.1](https://github.com/0xsquid/api-sdk/compare/v2.8.1-beta.0...v2.8.1) (2023-10-30)
 
 ## [2.8.1-beta.0](https://github.com/0xsquid/api-sdk/compare/v2.8.0-beta.0...v2.8.1-beta.0) (2023-10-19)
