@@ -16,12 +16,15 @@ import axios, { AxiosInstance } from "axios";
 import { BigNumber, UnsignedTransaction, ethers } from "ethers";
 
 import {
-  ChainType,
   Allowance,
   Approve,
   ApproveRoute,
   ChainData,
+  ChainType,
   Config,
+  CosmosAddress,
+  CosmosBalance,
+  CosmosChain,
   CosmosMsg,
   ExecuteRoute,
   GetRoute,
@@ -38,10 +41,7 @@ import {
   TransactionRequest,
   ValidateBalanceAndApproval,
   WASM_TYPE,
-  WasmHookMsg,
-  CosmosChain,
-  CosmosAddress,
-  CosmosBalance
+  WasmHookMsg
 } from "./types";
 
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
@@ -53,10 +53,10 @@ import { parseStatusResponse } from "./0xsquid/v1/status";
 import erc20Abi from "./abi/erc20.json";
 import { nativeTokenConstant, uint256MaxValue } from "./constants";
 import { ErrorType, SquidError } from "./error";
+import { getCosmosBalances } from "./services/getCosmosBalances";
+import { getAllEvmTokensBalance } from "./services/getEvmBalances";
 import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
-import { getAllEvmTokensBalance } from "./services/getEvmBalances";
-import { getCosmosBalances } from "./services/getCosmosBalances";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -514,10 +514,14 @@ export class Squid {
     // TODO: At the moment there's a limit on Ledger Nano S models
     // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
     const aminoTypes = this.getAminoTypeConverters();
+    const firstMsg = msgs[0];
     const formattedMsg = {
-      ...msgs[0],
+      ...firstMsg,
       value: {
-        ...msgs[0].value,
+        ...firstMsg.value,
+        // Memo cannot be undefined, otherwise amino converter throws error
+        memo: (firstMsg.value as any).memo || "",
+        // Timeout wasn't formatted in the right way, so getting it manually
         timeoutTimestamp: this.getTimeoutTimestamp()
       }
     };
