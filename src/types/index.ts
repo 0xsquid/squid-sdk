@@ -510,6 +510,7 @@ export type TokenBalance = {
   address: string;
   decimals: number;
   balance: string;
+  chainId: string | number;
 };
 
 export type AllBalancesResult = {
