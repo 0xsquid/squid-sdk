@@ -238,14 +238,15 @@ export class Utils {
 
       if (!token) return null;
 
-      const { decimals, symbol, address } = token;
+      const { decimals, symbol, address, chainId } = token;
 
       return {
         address,
         // balance in wei
         balance: parseInt(balance, 16).toString(),
         decimals,
-        symbol
+        symbol,
+        chainId
       };
     } catch (error) {
       return null;
