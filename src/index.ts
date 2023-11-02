@@ -119,9 +119,7 @@ export class Squid extends TokensChains {
     return { ...data, requestId, integratorId };
   }
 
-  async getRoute(
-    params: RouteRequest
-  ): Promise<RouteResponse & { requestId?: string; integratorId?: string }> {
+  async getRoute(params: RouteRequest): Promise<RouteResponse> {
     this.validateInit();
 
     const { data, headers, status } = await this.httpInstance.post(
@@ -218,7 +216,6 @@ export class Squid extends TokensChains {
     }
   }
 
-  // TODO: IS THIS METHOD GONNA BE EVM ONLY ?
   public getRawTxHex(
     data: Omit<ExecuteRoute, "signer"> & { nonce: number }
   ): string {
@@ -226,58 +223,6 @@ export class Squid extends TokensChains {
     this.validateTransactionRequest(data.route);
 
     return this.handlers.evm.getRawTxHex({ ...data });
-  }
-
-  // INTERNAL PRIVATES METHODS
-
-  private validateInit() {
-    if (!this.initialized) {
-      throw new Error(
-        "SquidSdk must be initialized! Please call the SquidSdk.init method"
-      );
-    }
-  }
-
-  private populateRouteParams(
-    params: RouteRequest,
-    signer?: EvmWallet
-  ): RouteParamsPopulated {
-    const { fromChain, toChain, fromToken, toToken } = params;
-
-    const _fromChain = this.getChainData(fromChain);
-    const _toChain = this.getChainData(toChain);
-    const _fromToken = this.getTokenData(fromToken, fromChain);
-    const _toToken = this.getTokenData(toToken, toChain);
-
-    const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
-
-    const fromIsNative = _fromToken.address === nativeTokenConstant;
-    let fromTokenContract;
-
-    if (!fromIsNative) {
-      fromTokenContract = ethersAdapter.contract(
-        _fromToken.address,
-        erc20Abi,
-        signer || fromProvider
-      );
-    }
-
-    return {
-      ...params,
-      fromChain: _fromChain,
-      toChain: _toChain,
-      fromToken: _fromToken,
-      toToken: _toToken,
-      fromTokenContract,
-      fromProvider,
-      fromIsNative
-    };
-  }
-
-  private validateTransactionRequest(route: RouteResponse["route"]) {
-    if (!route.transactionRequest) {
-      throw new Error("transactionRequest param not found in route object");
-    }
   }
 
   public getFromAmount({
@@ -340,7 +285,7 @@ export class Squid extends TokensChains {
   }: {
     addresses: CosmosAddress[];
     chainIds?: (string | number)[];
-  }) {
+  }): Promise<CosmosBalance[]> {
     const cosmosChains = this.chains.filter(c =>
       c.chainType === ChainType.COSMOS &&
       // if chainIds is not provided, return all cosmos chains
@@ -405,5 +350,57 @@ export class Squid extends TokensChains {
       evmBalances,
       cosmosBalances
     };
+  }
+
+  // INTERNAL PRIVATES METHODS
+
+  private validateInit() {
+    if (!this.initialized) {
+      throw new Error(
+        "SquidSdk must be initialized! Please call the SquidSdk.init method"
+      );
+    }
+  }
+
+  private populateRouteParams(
+    params: RouteRequest,
+    signer?: EvmWallet
+  ): RouteParamsPopulated {
+    const { fromChain, toChain, fromToken, toToken } = params;
+
+    const _fromChain = this.getChainData(fromChain);
+    const _toChain = this.getChainData(toChain);
+    const _fromToken = this.getTokenData(fromToken, fromChain);
+    const _toToken = this.getTokenData(toToken, toChain);
+
+    const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
+
+    const fromIsNative = _fromToken.address === nativeTokenConstant;
+    let fromTokenContract;
+
+    if (!fromIsNative) {
+      fromTokenContract = ethersAdapter.contract(
+        _fromToken.address,
+        erc20Abi,
+        signer || fromProvider
+      );
+    }
+
+    return {
+      ...params,
+      fromChain: _fromChain,
+      toChain: _toChain,
+      fromToken: _fromToken,
+      toToken: _toToken,
+      fromTokenContract,
+      fromProvider,
+      fromIsNative
+    };
+  }
+
+  private validateTransactionRequest(route: RouteResponse["route"]) {
+    if (!route.transactionRequest) {
+      throw new Error("transactionRequest param not found in route object");
+    }
   }
 }
