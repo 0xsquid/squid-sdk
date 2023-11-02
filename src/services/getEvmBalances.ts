@@ -73,7 +73,8 @@ const getTokensBalanceSupportingMultiCall = async (
         address,
         decimals,
         // balance in wei
-        balance: parseInt(data.returnValues[0]?.hex ?? "0", 10).toString()
+        balance: parseInt(data.returnValues[0]?.hex ?? "0", 10).toString(),
+        chainId: token.chainId
       };
 
       tokenBalances.push(mappedBalance);
@@ -220,7 +221,8 @@ async function fetchBalance({
       // balance in wei
       balance: parseInt(balance, 16).toString(),
       decimals,
-      symbol
+      symbol,
+      chainId: token.chainId
     };
   } catch (error) {
     console.error("Error fetching token balance:", error);
