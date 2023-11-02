@@ -2,7 +2,7 @@ import {
   ChainData,
   Token,
   RouteRequest,
-  RouteResponse
+  RouteResponse as _RouteResponse
 } from "@0xsquid/squid-types";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
@@ -43,10 +43,15 @@ export type CosmosSigner = SigningStargateClient;
 
 export type ExecuteRoute = {
   signer: EvmWallet | CosmosSigner;
-  route: RouteResponse["route"];
+  route: _RouteResponse["route"];
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
   signerAddress?: string; // cosmos specific
+};
+
+export type RouteResponse = _RouteResponse & {
+  requestId?: string;
+  integratorId?: string;
 };
 
 export type TransactionResponses = TransactionResponse | TxRaw;
