@@ -225,7 +225,21 @@ export class Squid extends TokensChains {
     return this.handlers.evm.getRawTxHex({ ...data });
   }
 
-  public getFromAmount({
+  public async getTokenPrice({
+    tokenAddress,
+    chainId
+  }: {
+    tokenAddress: string;
+    chainId: string | number;
+  }) {
+    const response = await this.httpInstance.axios.get("/v2/token-price", {
+      params: { tokenAddress, chainId }
+    });
+
+    return response.data.token.usdPrice;
+  }
+
+  public async getFromAmount({
     fromToken,
     toAmount,
     toToken,
@@ -235,9 +249,22 @@ export class Squid extends TokensChains {
     toToken: Token;
     toAmount: string;
     slippagePercentage?: number;
-  }): string {
-    const toTokenPrice = Number(toToken.usdPrice ?? 0);
-    const fromTokenPrice = Number(fromToken.usdPrice ?? 0);
+  }): Promise<string> {
+    // if there is an error getting real-time prices,
+    // use the price at the time of initialization
+    const [
+      fromTokenPrice = fromToken.usdPrice,
+      toTokenPrice = toToken.usdPrice
+    ] = await Promise.all([
+      this.getTokenPrice({
+        chainId: fromToken.chainId,
+        tokenAddress: fromToken.address
+      }),
+      this.getTokenPrice({
+        chainId: toToken.chainId,
+        tokenAddress: toToken.address
+      })
+    ]);
 
     // example fromAmount: 10
     const fromAmount = (toTokenPrice * Number(toAmount ?? 0)) / fromTokenPrice;
