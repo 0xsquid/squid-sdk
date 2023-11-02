@@ -1,5 +1,17 @@
 
 
+## [2.8.3](https://github.com/0xsquid/api-sdk/compare/v2.8.1-beta.0...v2.8.3) (2023-11-02)
+
+
+### Features
+
+* add chainId property to evm balances response ([#240](https://github.com/0xsquid/api-sdk/issues/240)) ([ed4fe74](https://github.com/0xsquid/api-sdk/commit/ed4fe74a895a075364f5f585e4a7a464a94efffd))
+
+
+### Bug Fixes
+
+* use all chains when no chains are specified ([#234](https://github.com/0xsquid/api-sdk/issues/234)) ([46195d1](https://github.com/0xsquid/api-sdk/commit/46195d103ad89912a9f2bfff05cfd5869b36cbca))
+
 ## [2.8.2](https://github.com/0xsquid/api-sdk/compare/v2.8.1-beta.0...v2.8.2) (2023-11-01)
 
 
