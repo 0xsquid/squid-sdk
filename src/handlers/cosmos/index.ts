@@ -64,7 +64,9 @@ export class CosmosHandler {
     const signerAddress = data.signerAddress as string;
     const signer = data.signer as CosmosSigner;
 
-    const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest?.data);
+    const cosmosMsg: CosmosMsg = JSON.parse(
+      route.transactionRequest?.data as string
+    );
     const msgs = [];
 
     switch (cosmosMsg.msgTypeUrl) {

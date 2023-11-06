@@ -8,7 +8,8 @@ import {
   TokenBalance,
   CosmosAddress,
   CosmosChain,
-  CosmosBalance
+  CosmosBalance,
+  SquidData
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
@@ -186,7 +187,7 @@ export class Squid extends TokensChains {
         return await this.handlers.evm.isRouteApproved({
           sender,
           params,
-          target: route.transactionRequest.target
+          target: (route.transactionRequest as SquidData).target
         });
 
       default:
