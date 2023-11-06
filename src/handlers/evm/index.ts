@@ -5,6 +5,7 @@ import {
   EvmWallet,
   ExecuteRoute,
   RouteParamsPopulated,
+  SquidData,
   Token,
   TokenBalance,
   TransactionRequest,
@@ -26,15 +27,14 @@ export class EvmHandler extends Utils {
     params: RouteParamsPopulated;
   }): Promise<TransactionResponse> {
     const {
-      route: {
-        transactionRequest: { target, value, data: _data }
-      },
+      route: { transactionRequest },
       overrides
     } = data;
+    const { target, value, data: _data } = transactionRequest as SquidData;
     const signer = data.signer as WalletV6;
 
     const gasData = this.getGasData({
-      transactionRequest: data.route.transactionRequest,
+      transactionRequest: data.route.transactionRequest as SquidData,
       overrides
     });
 
@@ -125,7 +125,7 @@ export class EvmHandler extends Utils {
     const hasAllowance = await this.validateAllowance({
       fromTokenContract: params.fromTokenContract as Contract,
       sender: address,
-      router: data.route.transactionRequest.target,
+      router: (data.route.transactionRequest as SquidData).target,
       amount: BigInt(params.fromAmount)
     });
 
@@ -145,12 +145,11 @@ export class EvmHandler extends Utils {
     params: RouteParamsPopulated;
   }): Promise<boolean> {
     const {
-      route: {
-        transactionRequest: { target }
-      },
+      route: { transactionRequest },
       executionSettings,
       overrides
     } = data;
+    const { target } = transactionRequest as SquidData;
     const { fromIsNative, fromAmount } = params;
     const fromTokenContract = params.fromTokenContract as Contract;
 
@@ -224,10 +223,10 @@ export class EvmHandler extends Utils {
     route,
     overrides
   }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
-    const { target, data, value } = route.transactionRequest;
+    const { target, data, value } = route.transactionRequest as SquidData;
 
     const gasData = this.getGasData({
-      transactionRequest: route.transactionRequest,
+      transactionRequest: route.transactionRequest as SquidData,
       overrides
     });
 
