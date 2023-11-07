@@ -1,5 +1,21 @@
 
 
+## [1.14.8-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.14.1...v1.14.8-beta.0) (2023-11-07)
+
+
+### Features
+
+* add chainId property to evm balances response ([#239](https://github.com/0xsquid/api-sdk/issues/239)) ([e5166c0](https://github.com/0xsquid/api-sdk/commit/e5166c01790ad18f4517e83b20698d190fa60759))
+* added secrete token properties ([c6a790b](https://github.com/0xsquid/api-sdk/commit/c6a790bf75d822934b5884915c715b37cc4874b2))
+
+
+### Bug Fixes
+
+* handle ledger amino messages ([#215](https://github.com/0xsquid/api-sdk/issues/215)) ([2ef50f7](https://github.com/0xsquid/api-sdk/commit/2ef50f76d2429cca74c71a1fd1324beff9a90f0c)), closes [#216](https://github.com/0xsquid/api-sdk/issues/216) [#224](https://github.com/0xsquid/api-sdk/issues/224)
+* parse undefined memo sent from api ([#237](https://github.com/0xsquid/api-sdk/issues/237)) ([6d42fdd](https://github.com/0xsquid/api-sdk/commit/6d42fdd45afc33bb81b192fa3e1c42694f1c6ca7))
+* use a different rpc url for each chain ([#230](https://github.com/0xsquid/api-sdk/issues/230)) ([53bfa60](https://github.com/0xsquid/api-sdk/commit/53bfa60b9b314a7412b265fdea6e7de4454e49ea))
+* use all chains when no chains are specified ([#233](https://github.com/0xsquid/api-sdk/issues/233)) ([ca638dd](https://github.com/0xsquid/api-sdk/commit/ca638dd1aaa3395272788880fd0a195be55db525))
+
 ## [1.14.7](https://github.com/0xsquid/api-sdk/compare/v1.14.1...v1.14.7) (2023-11-02)
 
 
