@@ -11,7 +11,8 @@ export const parseTokenData = (data: any): TokenData => {
     coingeckoId,
     commonKey,
     bridgeOnly,
-    ibcDenom
+    ibcDenom,
+    codeHash
   } = data;
   return removeEmpty({
     chainId,
@@ -23,7 +24,8 @@ export const parseTokenData = (data: any): TokenData => {
     coingeckoId,
     commonKey,
     bridgeOnly,
-    ibcDenom
+    ibcDenom,
+    codeHash
   });
 };
 
