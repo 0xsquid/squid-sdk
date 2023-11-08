@@ -1,5 +1,5 @@
-import { ethers } from "ethers";
 import { SigningStargateClient } from "@cosmjs/stargate";
+import { ethers } from "ethers";
 import { LogLevel } from "../error";
 
 export enum ChainName {
@@ -150,6 +150,7 @@ export type TokenData = {
   commonKey?: string;
   bridgeOnly?: boolean;
   ibcDenom?: string;
+  codeHash?: string;
 };
 
 export type Config = {
