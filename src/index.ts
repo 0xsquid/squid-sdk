@@ -7,7 +7,6 @@ import {
   Token,
   TokenBalance,
   CosmosAddress,
-  CosmosChain,
   CosmosBalance,
   SquidData
 } from "./types";
@@ -27,6 +26,8 @@ import { TokensChains } from "./TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
+import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
+import { getCosmosChainsForChainIds } from "./utils/cosmos";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -286,25 +287,16 @@ export class Squid extends TokensChains {
     userAddress: string;
     chains?: (string | number)[];
   }): Promise<TokenBalance[]> {
-    // if no chains are provided, use all chains
-    const chainIds =
-      chains.length === 0 ? this.tokens.map(t => String(t.chainId)) : chains;
+    const chainRpcUrls = getChainRpcUrls({
+      chains: this.chains
+    });
 
-    // remove invalid and duplicate chains and convert to number
-    const filteredChains = new Set(chainIds.map(Number).filter(c => !isNaN(c)));
-    const chainRpcUrls = this.chains.reduce(
-      (acc, chain) => ({
-        ...acc,
-        [chain.chainId]: chain.rpc
-      }),
-      {}
-    );
+    const tokens = getEvmTokensForChainIds({
+      chainIds: chains,
+      tokens: this.tokens
+    });
 
-    return this.handlers.evm.getBalances(
-      this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
-      userAddress,
-      chainRpcUrls
-    );
+    return this.handlers.evm.getBalances(tokens, userAddress, chainRpcUrls);
   }
 
   public async getCosmosBalances({
@@ -314,14 +306,11 @@ export class Squid extends TokensChains {
     addresses: CosmosAddress[];
     chainIds?: (string | number)[];
   }): Promise<CosmosBalance[]> {
-    const cosmosChains = this.chains.filter(c =>
-      c.chainType === ChainType.COSMOS &&
-      // if chainIds is not provided, return all cosmos chains
-      chainIds.length === 0
-        ? true
-        : // else return only chains that are in chainIds
-          chainIds?.includes(c.chainId)
-    ) as CosmosChain[];
+    const cosmosChains = getCosmosChainsForChainIds({
+      chainIds,
+      chains: this.chains
+    });
+
     return this.handlers.cosmos.getBalances({
       addresses,
       cosmosChains
