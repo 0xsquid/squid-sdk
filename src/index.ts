@@ -27,6 +27,10 @@ import { TokensChains } from "./TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
+import {
+  getChainRpcUrls,
+  getTokensForChainIds as getTokensForChainIds
+} from "./utils";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -286,25 +290,16 @@ export class Squid extends TokensChains {
     userAddress: string;
     chains?: (string | number)[];
   }): Promise<TokenBalance[]> {
-    // if no chains are provided, use all chains
-    const chainIds =
-      chains.length === 0 ? this.tokens.map(t => String(t.chainId)) : chains;
+    const chainRpcUrls = getChainRpcUrls({
+      chains: this.chains
+    });
 
-    // remove invalid and duplicate chains and convert to number
-    const filteredChains = new Set(chainIds.map(Number).filter(c => !isNaN(c)));
-    const chainRpcUrls = this.chains.reduce(
-      (acc, chain) => ({
-        ...acc,
-        [chain.chainId]: chain.rpc
-      }),
-      {}
-    );
+    const tokens = getTokensForChainIds({
+      chainIds: chains,
+      tokens: this.tokens
+    });
 
-    return this.handlers.evm.getBalances(
-      this.tokens.filter(t => filteredChains.has(Number(t.chainId))),
-      userAddress,
-      chainRpcUrls
-    );
+    return this.handlers.evm.getBalances(tokens, userAddress, chainRpcUrls);
   }
 
   public async getCosmosBalances({
