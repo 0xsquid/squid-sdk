@@ -1,6 +1,6 @@
 import { ChainData, Token } from "@0xsquid/squid-types";
 
-export function getTokensForChainIds({
+export function getEvmTokensForChainIds({
   chainIds,
   tokens
 }: {

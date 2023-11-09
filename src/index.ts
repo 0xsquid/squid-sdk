@@ -7,7 +7,6 @@ import {
   Token,
   TokenBalance,
   CosmosAddress,
-  CosmosChain,
   CosmosBalance,
   SquidData
 } from "./types";
@@ -27,10 +26,8 @@ import { TokensChains } from "./TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
 import erc20Abi from "./abi/erc20.json";
-import {
-  getChainRpcUrls,
-  getTokensForChainIds as getTokensForChainIds
-} from "./utils";
+import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
+import { getCosmosChainsForChainIds } from "./utils/cosmos";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -294,7 +291,7 @@ export class Squid extends TokensChains {
       chains: this.chains
     });
 
-    const tokens = getTokensForChainIds({
+    const tokens = getEvmTokensForChainIds({
       chainIds: chains,
       tokens: this.tokens
     });
@@ -309,14 +306,11 @@ export class Squid extends TokensChains {
     addresses: CosmosAddress[];
     chainIds?: (string | number)[];
   }): Promise<CosmosBalance[]> {
-    const cosmosChains = this.chains.filter(c =>
-      c.chainType === ChainType.COSMOS &&
-      // if chainIds is not provided, return all cosmos chains
-      chainIds.length === 0
-        ? true
-        : // else return only chains that are in chainIds
-          chainIds?.includes(c.chainId)
-    ) as CosmosChain[];
+    const cosmosChains = getCosmosChainsForChainIds({
+      chainIds,
+      chains: this.chains
+    });
+
     return this.handlers.cosmos.getBalances({
       addresses,
       cosmosChains
