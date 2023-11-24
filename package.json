@@ -32,7 +32,7 @@
     "@ethersproject/abstract-signer": "^5.7.0",
     "axios": "^1.5.0",
     "cosmjs-types": "^0.8.0",
-    "ethers": "6.7.1",
+    "ethers": "6.8.1",
     "ethers-multicall-provider": "^5.0.0",
     "lodash": "^4.17.21"
   },
@@ -40,7 +40,7 @@
     "semver": "^7.5.4"
   },
   "devDependencies": {
-    "@0xsquid/squid-types": "^0.1.33",
+    "@0xsquid/squid-types": "^0.1.38",
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",
