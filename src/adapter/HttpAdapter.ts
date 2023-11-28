@@ -9,7 +9,8 @@ export default class HttpAdapter {
   constructor(config: RequestConfig) {
     this.axios = axios.create({
       ...omit(config, ["config"]),
-      baseURL: config?.baseUrl
+      baseURL: config?.baseUrl,
+      timeout: config?.timeout
     });
 
     if (config) {

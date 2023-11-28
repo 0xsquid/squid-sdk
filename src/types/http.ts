@@ -7,4 +7,5 @@ export interface RequestConfig {
   baseUrl?: string;
   config?: Config;
   headers?: Record<string, string | number | boolean>;
+  timeout?: number;
 }
