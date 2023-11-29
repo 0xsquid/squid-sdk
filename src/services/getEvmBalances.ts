@@ -1,10 +1,10 @@
-import { ethers } from "ethers";
-import { Multicall, ContractCallContext } from "ethereum-multicall";
+import { ContractCallContext, Multicall } from "ethereum-multicall";
+import { BigNumber, ethers } from "ethers";
 import { TokenBalance, TokenData } from "types";
 import {
+  MULTICALL_ADDRESS,
   NATIVE_EVM_TOKEN_ADDRESS,
-  multicallAbi,
-  MULTICALL_ADDRESS
+  multicallAbi
 } from "../constants";
 
 type ContractAddress = `0x${string}`;
@@ -72,8 +72,7 @@ const getTokensBalanceSupportingMultiCall = async (
         symbol,
         address,
         decimals,
-        // balance in wei
-        balance: parseInt(data.returnValues[0]?.hex ?? "0", 10).toString(),
+        balance: BigNumber.from(data.returnValues[0]).toString(),
         chainId: token.chainId
       };
 
