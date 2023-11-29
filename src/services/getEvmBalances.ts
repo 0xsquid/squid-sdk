@@ -72,7 +72,7 @@ const getTokensBalanceSupportingMultiCall = async (
         symbol,
         address,
         decimals,
-        balance: BigNumber.from(data.returnValues[0]).toString(),
+        balance: BigNumber.from(data.returnValues?.[0] ?? 0).toString(),
         chainId: token.chainId
       };
 
