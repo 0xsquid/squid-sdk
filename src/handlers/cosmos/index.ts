@@ -1,21 +1,23 @@
-import { fromBech32, toBech32, toUtf8 } from "@cosmjs/encoding";
+export * from "./cctpProto";
+
+import { fromBech32, toBech32 } from "@cosmjs/encoding";
 import { calculateFee, Coin, GasPrice, StargateClient } from "@cosmjs/stargate";
-import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 
 import {
   CosmosSigner,
   ExecuteRoute,
   RouteParamsPopulated,
   CosmosMsg,
-  IBC_TRANSFER_TYPE,
-  WasmHookMsg,
-  WASM_TYPE,
   CosmosBalance,
   CosmosChain,
   CosmosAddress,
-  ChainType
+  ChainType,
+  CCTP_TYPE,
+  RouteRequest
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { MsgDepositForBurn } from "./cctpProto";
+import { TokensChains } from "../../utils/TokensChains";
 
 export class CosmosHandler {
   async validateBalance({
@@ -64,46 +66,26 @@ export class CosmosHandler {
     const signerAddress = data.signerAddress as string;
     const signer = data.signer as CosmosSigner;
 
+    const msgs = [];
+
     const cosmosMsg: CosmosMsg = JSON.parse(
       route.transactionRequest?.data as string
     );
-    const msgs = [];
 
-    switch (cosmosMsg.msgTypeUrl) {
-      case IBC_TRANSFER_TYPE: {
-        msgs.push({
-          typeUrl: cosmosMsg.msgTypeUrl,
-          value: cosmosMsg.msg
-        });
+    switch (cosmosMsg.typeUrl) {
+      case CCTP_TYPE: {
+        signer.registry.register(CCTP_TYPE, MsgDepositForBurn);
 
-        break;
-      }
-
-      case WASM_TYPE: {
-        // register execute wasm msg type for signer
-        signer.registry.register(WASM_TYPE, MsgExecuteContract);
-
-        const wasmHook = cosmosMsg.msg as WasmHookMsg;
-        msgs.push({
-          typeUrl: cosmosMsg.msgTypeUrl,
-          value: {
-            sender: signerAddress,
-            contract: wasmHook.wasm.contract,
-            msg: toUtf8(JSON.stringify(wasmHook.wasm.msg)),
-            funds: [
-              {
-                denom: params.fromToken.address,
-                amount: route.params.fromAmount
-              }
-            ]
-          }
-        });
+        cosmosMsg.value.mintRecipient = new Uint8Array(
+          Buffer.from(cosmosMsg.value.mintRecipient, "base64")
+        );
+        msgs.push(cosmosMsg);
 
         break;
       }
 
       default:
-        throw new Error(`Cosmos message ${cosmosMsg.msgTypeUrl} not supported`);
+        throw new Error(`Cosmos message ${cosmosMsg.typeUrl} not supported`);
     }
 
     // simulate tx to estimate gas cost
@@ -174,5 +156,25 @@ export class CosmosHandler {
 
   deriveCosmosAddress(chainPrefix: string, address: string): string {
     return toBech32(chainPrefix, fromBech32(address).data);
+  }
+
+  populateRouteParams(
+    tokensChains: TokensChains,
+    params: RouteRequest
+  ): RouteParamsPopulated {
+    const { fromChain, toChain, fromToken, toToken } = params;
+
+    const _fromChain = tokensChains.getChainData(fromChain);
+    const _toChain = tokensChains.getChainData(toChain);
+    const _fromToken = tokensChains.getTokenData(fromToken, fromChain);
+    const _toToken = tokensChains.getTokenData(toToken, toChain);
+
+    return {
+      ...params,
+      fromChain: _fromChain,
+      toChain: _toChain,
+      fromToken: _fromToken,
+      toToken: _toToken
+    } as RouteParamsPopulated;
   }
 }
