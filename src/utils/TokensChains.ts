@@ -1,4 +1,4 @@
-import { ChainData, Token } from "./types";
+import { ChainData, Token } from "../types";
 
 export class TokensChains {
   public tokens: Token[] = [];
