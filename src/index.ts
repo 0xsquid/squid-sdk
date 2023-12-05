@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import {
   ChainType,
   RouteRequest,
@@ -12,26 +13,15 @@ import {
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
-import { EthersAdapter } from "./adapter/EthersAdapter";
-import { nativeTokenConstant } from "./constants";
-import {
-  Config,
-  GetStatus,
-  ExecuteRoute,
-  RouteParamsPopulated,
-  TransactionResponses
-} from "./types";
+import { Config, GetStatus, ExecuteRoute, TransactionResponses } from "./types";
 
 import { TokensChains } from "./utils/TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
-import erc20Abi from "./abi/erc20.json";
 import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
 import { getCosmosChainsForChainIds } from "./utils/cosmos";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
-
-const ethersAdapter = new EthersAdapter();
 
 export class Squid extends TokensChains {
   private httpInstance: HttpAdapter;
