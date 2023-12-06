@@ -218,23 +218,21 @@ export class CosmosHandler {
     return new AminoTypes({
       ...createIbcAminoConverters(),
       ...createWasmAminoConverters(),
-      ["circle.cctp.v1.MsgDepositForBurn"]: {
+      [CCTP_TYPE]: {
         aminoType: "cosmos-sdk/MsgDepositForBurn",
         toAmino: ({
           from,
           amount,
           destinationDomain,
           mintRecipient,
-          burnToken,
-          msg
+          burnToken
         }) => {
           return {
             from: from,
             amount: amount,
             destination_domain: destinationDomain,
             mint_recipient: mintRecipient,
-            burn_token: burnToken,
-            msg: msg
+            burn_token: burnToken
           };
         },
         fromAmino: ({
@@ -242,15 +240,13 @@ export class CosmosHandler {
           amount,
           destination_domain,
           mint_recipient,
-          burn_token,
-          msg
+          burn_token
         }) => ({
           from,
           amount,
           destinationDomain: destination_domain,
           mintRecipient: mint_recipient,
-          burnToken: burn_token,
-          msg
+          burnToken: burn_token
         })
       }
     });
