@@ -31,6 +31,7 @@ export type Config = {
   logging?: boolean;
   logLevel?: LogLevel;
   integratorId: string;
+  timeout?: number;
 };
 
 export type OverrideParams = GasData;

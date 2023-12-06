@@ -48,7 +48,8 @@ export class Squid extends TokensChains {
       config,
       headers: {
         "x-integrator-id": config.integratorId
-      }
+      },
+      timeout: config.timeout
     });
 
     this.config = {
@@ -63,7 +64,8 @@ export class Squid extends TokensChains {
       config,
       headers: {
         "x-integrator-id": config.integratorId || "squid-sdk"
-      }
+      },
+      timeout: config.timeout
     });
     this.config = {
       baseUrl: config?.baseUrl || baseUrl,
