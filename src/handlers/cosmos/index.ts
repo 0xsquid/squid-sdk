@@ -1,23 +1,33 @@
 export * from "./cctpProto";
 
 import { fromBech32, toBech32 } from "@cosmjs/encoding";
-import { calculateFee, Coin, GasPrice, StargateClient } from "@cosmjs/stargate";
-
 import {
+  AminoTypes,
+  Coin,
+  GasPrice,
+  StargateClient,
+  calculateFee,
+  createIbcAminoConverters
+} from "@cosmjs/stargate";
+
+import { createWasmAminoConverters } from "@cosmjs/cosmwasm-stargate";
+
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import Long from "long";
+import {
+  CCTP_TYPE,
+  ChainType,
+  CosmosAddress,
+  CosmosBalance,
+  CosmosChain,
+  CosmosMsg,
   CosmosSigner,
   ExecuteRoute,
   RouteParamsPopulated,
-  CosmosMsg,
-  CosmosBalance,
-  CosmosChain,
-  CosmosAddress,
-  ChainType,
-  CCTP_TYPE,
   RouteRequest
 } from "../../types";
-import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { MsgDepositForBurn } from "./cctpProto";
 import { TokensChains } from "../../utils/TokensChains";
+import { MsgDepositForBurn } from "./cctpProto";
 
 export class CosmosHandler {
   async validateBalance({
@@ -93,9 +103,28 @@ export class CosmosHandler {
     const gasMultiplier = Number(route.transactionRequest?.maxFeePerGas) || 1.3;
     const gasPrice = route.transactionRequest?.gasPrice as string;
 
+    // This conversion is needed for Ledger, They only supports Amino messages
+    // TODO: At the moment there's a limit on Ledger Nano S models
+    // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
+    const aminoTypes = this.getAminoTypeConverters();
+    const firstMsg = msgs[0];
+    const formattedMsg = {
+      ...firstMsg,
+      value: {
+        ...firstMsg.value,
+        // Memo cannot be undefined, otherwise amino converter throws error
+        memo: (firstMsg.value as any).memo || "",
+        // Timeout wasn't formatted in the right way, so getting it manually
+        timeoutTimestamp: this.getTimeoutTimestamp()
+      }
+    };
+
+    const aminoMsg = aminoTypes.toAmino(formattedMsg);
+    const fromAminoMsg = aminoTypes.fromAmino(aminoMsg);
+
     return signer.sign(
       signerAddress,
-      msgs,
+      [fromAminoMsg],
       calculateFee(
         Math.trunc(estimatedGas * gasMultiplier),
         GasPrice.fromString(gasPrice)
@@ -176,5 +205,54 @@ export class CosmosHandler {
       fromToken: _fromToken,
       toToken: _toToken
     } as RouteParamsPopulated;
+  }
+
+  private getTimeoutTimestamp(): Long {
+    const PACKET_LIFETIME_NANOS = 3600 * 1_000_000_000; // 1 Hour
+
+    const currentTimeNanos = Math.floor(Date.now() * 1_000_000);
+    return Long.fromNumber(currentTimeNanos + PACKET_LIFETIME_NANOS);
+  }
+
+  private getAminoTypeConverters(): AminoTypes {
+    return new AminoTypes({
+      ...createIbcAminoConverters(),
+      ...createWasmAminoConverters(),
+      ["circle.cctp.v1.MsgDepositForBurn"]: {
+        aminoType: "cosmos-sdk/MsgDepositForBurn",
+        toAmino: ({
+          from,
+          amount,
+          destinationDomain,
+          mintRecipient,
+          burnToken,
+          msg
+        }) => {
+          return {
+            from: from,
+            amount: amount,
+            destination_domain: destinationDomain,
+            mint_recipient: mintRecipient,
+            burn_token: burnToken,
+            msg: msg
+          };
+        },
+        fromAmino: ({
+          from,
+          amount,
+          destination_domain,
+          mint_recipient,
+          burn_token,
+          msg
+        }) => ({
+          from,
+          amount,
+          destinationDomain: destination_domain,
+          mintRecipient: mint_recipient,
+          burnToken: burn_token,
+          msg
+        })
+      }
+    });
   }
 }
