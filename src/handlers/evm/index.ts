@@ -1,10 +1,12 @@
 import { EthersAdapter } from "../../adapter/EthersAdapter";
+import erc20Abi from "../../abi/erc20.json";
 
 import {
   Contract,
   EvmWallet,
   ExecuteRoute,
   RouteParamsPopulated,
+  RouteRequest,
   SquidData,
   Token,
   TokenBalance,
@@ -13,8 +15,13 @@ import {
   WalletV6
 } from "../../types";
 
-import { CHAINS_WITHOUT_MULTICALL, uint256MaxValue } from "../../constants";
+import {
+  CHAINS_WITHOUT_MULTICALL,
+  nativeTokenConstant,
+  uint256MaxValue
+} from "../../constants";
 import { Utils } from "./utils";
+import { TokensChains } from "../../utils/TokensChains";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -305,5 +312,42 @@ export class EvmHandler extends Utils {
     } catch (error) {
       return [];
     }
+  }
+
+  populateRouteParams(
+    tokensChains: TokensChains,
+    params: RouteRequest,
+    signer?: EvmWallet
+  ): RouteParamsPopulated {
+    const { fromChain, toChain, fromToken, toToken } = params;
+
+    const _fromChain = tokensChains.getChainData(fromChain);
+    const _toChain = tokensChains.getChainData(toChain);
+    const _fromToken = tokensChains.getTokenData(fromToken, fromChain);
+    const _toToken = tokensChains.getTokenData(toToken, toChain);
+
+    const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
+
+    const fromIsNative = _fromToken.address === nativeTokenConstant;
+    let fromTokenContract;
+
+    if (!fromIsNative) {
+      fromTokenContract = ethersAdapter.contract(
+        _fromToken.address,
+        erc20Abi,
+        signer || fromProvider
+      );
+    }
+
+    return {
+      ...params,
+      fromChain: _fromChain,
+      toChain: _toChain,
+      fromToken: _fromToken,
+      toToken: _toToken,
+      fromTokenContract,
+      fromProvider,
+      fromIsNative
+    };
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import {
   ChainType,
   RouteRequest,
@@ -12,26 +13,15 @@ import {
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
-import { EthersAdapter } from "./adapter/EthersAdapter";
-import { nativeTokenConstant } from "./constants";
-import {
-  Config,
-  GetStatus,
-  ExecuteRoute,
-  RouteParamsPopulated,
-  TransactionResponses
-} from "./types";
+import { Config, GetStatus, ExecuteRoute, TransactionResponses } from "./types";
 
-import { TokensChains } from "./TokensChains";
+import { TokensChains } from "./utils/TokensChains";
 import { EvmHandler, CosmosHandler } from "./handlers";
 
-import erc20Abi from "./abi/erc20.json";
 import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
 import { getCosmosChainsForChainIds } from "./utils/cosmos";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
-
-const ethersAdapter = new EthersAdapter();
 
 export class Squid extends TokensChains {
   private httpInstance: HttpAdapter;
@@ -151,21 +141,31 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
-    const params = this.populateRouteParams(
-      data.route.params,
-      data.signer as EvmWallet
-    );
-
-    switch (params.fromChain.chainType) {
+    const fromChain = this.getChainData(data.route.params.fromChain);
+    switch (fromChain.chainType) {
       case ChainType.EVM:
-        return this.handlers.evm.executeRoute({ data, params });
+        const evmParams = this.handlers.evm.populateRouteParams(
+          this,
+          data.route.params,
+          data.signer as EvmWallet
+        );
+
+        return this.handlers.evm.executeRoute({ data, params: evmParams });
 
       case ChainType.COSMOS:
-        return this.handlers.cosmos.executeRoute({ data, params });
+        const cosmosParams = this.handlers.cosmos.populateRouteParams(
+          this,
+          data.route.params
+        );
+
+        return this.handlers.cosmos.executeRoute({
+          data,
+          params: cosmosParams
+        });
 
       default:
         throw new Error(
-          `Method not supported given chain type ${params.fromChain.chainType}`
+          `Method not supported given chain type ${fromChain.chainType}`
         );
     }
   }
@@ -183,10 +183,14 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(route);
 
-    const params = this.populateRouteParams(route.params);
-
-    switch (params.fromChain.chainType) {
+    const fromChain = this.getChainData(route.params.fromChain);
+    switch (fromChain.chainType) {
       case ChainType.EVM:
+        const params = this.handlers.evm.populateRouteParams(
+          this,
+          route.params
+        );
+
         return await this.handlers.evm.isRouteApproved({
           sender,
           params,
@@ -195,7 +199,7 @@ export class Squid extends TokensChains {
 
       default:
         throw new Error(
-          `Method not supported given chain type ${params.fromChain.chainType}`
+          `Method not supported given chain type ${fromChain.chainType}`
         );
     }
   }
@@ -204,18 +208,20 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
-    const params = this.populateRouteParams(
-      data.route.params,
-      data.signer as EvmWallet
-    );
-
-    switch (params.fromChain.chainType) {
+    const fromChain = this.getChainData(data.route.params.fromChain);
+    switch (fromChain.chainType) {
       case ChainType.EVM:
+        const params = this.handlers.evm.populateRouteParams(
+          this,
+          data.route.params,
+          data.signer as EvmWallet
+        );
+
         return this.handlers.evm.approveRoute({ data, params });
 
       default:
         throw new Error(
-          `Method not supported given chain type ${params.fromChain.chainType}`
+          `Method not supported given chain type ${fromChain.chainType}`
         );
     }
   }
@@ -379,42 +385,6 @@ export class Squid extends TokensChains {
         "SquidSdk must be initialized! Please call the SquidSdk.init method"
       );
     }
-  }
-
-  private populateRouteParams(
-    params: RouteRequest,
-    signer?: EvmWallet
-  ): RouteParamsPopulated {
-    const { fromChain, toChain, fromToken, toToken } = params;
-
-    const _fromChain = this.getChainData(fromChain);
-    const _toChain = this.getChainData(toChain);
-    const _fromToken = this.getTokenData(fromToken, fromChain);
-    const _toToken = this.getTokenData(toToken, toChain);
-
-    const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
-
-    const fromIsNative = _fromToken.address === nativeTokenConstant;
-    let fromTokenContract;
-
-    if (!fromIsNative) {
-      fromTokenContract = ethersAdapter.contract(
-        _fromToken.address,
-        erc20Abi,
-        signer || fromProvider
-      );
-    }
-
-    return {
-      ...params,
-      fromChain: _fromChain,
-      toChain: _toChain,
-      fromToken: _fromToken,
-      toToken: _toToken,
-      fromTokenContract,
-      fromProvider,
-      fromIsNative
-    };
   }
 
   private validateTransactionRequest(route: RouteResponse["route"]) {
