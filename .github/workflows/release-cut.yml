@@ -35,7 +35,7 @@ on:
 
 jobs:
   cut-release:
-    if: contains('["0x1NotMe","0x0Koda", "rajat43", "jmdev3", "odcey"]', github.actor)
+    if: contains('["0x0Koda", "rajat43", "jmdev3", "odcey"]', github.actor)
     name: Create release branch and PRs into develop/main
     runs-on: ubuntu-latest
     steps:
