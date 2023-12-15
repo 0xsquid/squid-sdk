@@ -10,7 +10,7 @@ export default class HttpAdapter {
     this.axios = axios.create({
       ...omit(config, ["config"]),
       baseURL: config?.baseUrl,
-      timeout: config?.timeout
+      timeout: config?.timeout,
     });
 
     if (config) {
@@ -23,17 +23,14 @@ export default class HttpAdapter {
     this.axios = axios.create({ ...config, baseURL: config.baseUrl });
   }
 
-  get = async (
-    url: string,
-    config?: { [key: string]: any }
-  ): Promise<HttpResponse> => {
+  get = async (url: string, config?: { [key: string]: any }): Promise<HttpResponse> => {
     return await this.axios.get(url, config);
   };
 
   post = async (
     url: string,
     data: { [key: string]: any },
-    config?: { [key: string]: any }
+    config?: { [key: string]: any },
   ): Promise<HttpResponse> => {
     return await this.axios.post(url, data, config);
   };

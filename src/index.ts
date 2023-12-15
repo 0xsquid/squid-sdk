@@ -9,7 +9,7 @@ import {
   TokenBalance,
   CosmosAddress,
   CosmosBalance,
-  SquidData
+  SquidData,
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
@@ -27,7 +27,7 @@ export class Squid extends TokensChains {
   private httpInstance: HttpAdapter;
   private handlers = {
     evm: new EvmHandler(),
-    cosmos: new CosmosHandler()
+    cosmos: new CosmosHandler(),
   };
 
   public initialized = false;
@@ -47,14 +47,14 @@ export class Squid extends TokensChains {
       baseUrl: config?.baseUrl || baseUrl,
       config,
       headers: {
-        "x-integrator-id": config.integratorId
+        "x-integrator-id": config.integratorId,
       },
-      timeout: config.timeout
+      timeout: config.timeout,
     });
 
     this.config = {
       baseUrl: config?.baseUrl || baseUrl,
-      ...config
+      ...config,
     };
   }
 
@@ -63,13 +63,13 @@ export class Squid extends TokensChains {
       baseUrl: config?.baseUrl || baseUrl,
       config,
       headers: {
-        "x-integrator-id": config.integratorId || "squid-sdk"
+        "x-integrator-id": config.integratorId || "squid-sdk",
       },
-      timeout: config.timeout
+      timeout: config.timeout,
     });
     this.config = {
       baseUrl: config?.baseUrl || baseUrl,
-      ...config
+      ...config,
     };
   }
 
@@ -97,18 +97,14 @@ export class Squid extends TokensChains {
         ...(this.httpInstance.axios.defaults.headers.common &&
           this.httpInstance.axios.defaults.headers.common),
         ...(params.requestId && { "x-request-id": params.requestId }),
-        ...(params.integratorId && { "x-integrator-id": params.integratorId })
-      }
+        ...(params.integratorId && { "x-integrator-id": params.integratorId }),
+      },
     });
 
     const requestId =
-      headers && "x-request-id" in headers
-        ? (headers["x-request-id"] as string)
-        : undefined;
+      headers && "x-request-id" in headers ? (headers["x-request-id"] as string) : undefined;
     const integratorId =
-      headers && "x-integrator-id" in headers
-        ? (headers["x-integrator-id"] as string)
-        : undefined;
+      headers && "x-integrator-id" in headers ? (headers["x-integrator-id"] as string) : undefined;
 
     return { ...data, requestId, integratorId };
   }
@@ -116,23 +112,16 @@ export class Squid extends TokensChains {
   async getRoute(params: RouteRequest): Promise<RouteResponse> {
     this.validateInit();
 
-    const { data, headers, status } = await this.httpInstance.post(
-      "v2/route",
-      params
-    );
+    const { data, headers, status } = await this.httpInstance.post("v2/route", params);
 
     if (status != 200) {
       throw new Error(data.error);
     }
 
     const requestId =
-      headers && "x-request-id" in headers
-        ? (headers["x-request-id"] as string)
-        : undefined;
+      headers && "x-request-id" in headers ? (headers["x-request-id"] as string) : undefined;
     const integratorId =
-      headers && "x-integrator-id" in headers
-        ? (headers["x-integrator-id"] as string)
-        : undefined;
+      headers && "x-integrator-id" in headers ? (headers["x-integrator-id"] as string) : undefined;
 
     return { ...data, requestId, integratorId };
   }
@@ -147,32 +136,27 @@ export class Squid extends TokensChains {
         const evmParams = this.handlers.evm.populateRouteParams(
           this,
           data.route.params,
-          data.signer as EvmWallet
+          data.signer as EvmWallet,
         );
 
         return this.handlers.evm.executeRoute({ data, params: evmParams });
 
       case ChainType.COSMOS:
-        const cosmosParams = this.handlers.cosmos.populateRouteParams(
-          this,
-          data.route.params
-        );
+        const cosmosParams = this.handlers.cosmos.populateRouteParams(this, data.route.params);
 
         return this.handlers.cosmos.executeRoute({
           data,
-          params: cosmosParams
+          params: cosmosParams,
         });
 
       default:
-        throw new Error(
-          `Method not supported given chain type ${fromChain.chainType}`
-        );
+        throw new Error(`Method not supported given chain type ${fromChain.chainType}`);
     }
   }
 
   async isRouteApproved({
     route,
-    sender
+    sender,
   }: {
     route: RouteResponse["route"];
     sender: string;
@@ -186,21 +170,16 @@ export class Squid extends TokensChains {
     const fromChain = this.getChainData(route.params.fromChain);
     switch (fromChain.chainType) {
       case ChainType.EVM:
-        const params = this.handlers.evm.populateRouteParams(
-          this,
-          route.params
-        );
+        const params = this.handlers.evm.populateRouteParams(this, route.params);
 
         return await this.handlers.evm.isRouteApproved({
           sender,
           params,
-          target: (route.transactionRequest as SquidData).target
+          target: (route.transactionRequest as SquidData).target,
         });
 
       default:
-        throw new Error(
-          `Method not supported given chain type ${fromChain.chainType}`
-        );
+        throw new Error(`Method not supported given chain type ${fromChain.chainType}`);
     }
   }
 
@@ -214,21 +193,17 @@ export class Squid extends TokensChains {
         const params = this.handlers.evm.populateRouteParams(
           this,
           data.route.params,
-          data.signer as EvmWallet
+          data.signer as EvmWallet,
         );
 
         return this.handlers.evm.approveRoute({ data, params });
 
       default:
-        throw new Error(
-          `Method not supported given chain type ${fromChain.chainType}`
-        );
+        throw new Error(`Method not supported given chain type ${fromChain.chainType}`);
     }
   }
 
-  public getRawTxHex(
-    data: Omit<ExecuteRoute, "signer"> & { nonce: number }
-  ): string {
+  public getRawTxHex(data: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
@@ -237,13 +212,13 @@ export class Squid extends TokensChains {
 
   public async getTokenPrice({
     tokenAddress,
-    chainId
+    chainId,
   }: {
     tokenAddress: string;
     chainId: string | number;
   }) {
     const response = await this.httpInstance.axios.get("/v2/token-price", {
-      params: { tokenAddress, chainId }
+      params: { tokenAddress, chainId },
     });
 
     return response.data.token.usdPrice;
@@ -253,7 +228,7 @@ export class Squid extends TokensChains {
     fromToken,
     toAmount,
     toToken,
-    slippagePercentage = 1.5
+    slippagePercentage = 1.5,
   }: {
     fromToken: Token;
     toToken: Token;
@@ -262,19 +237,17 @@ export class Squid extends TokensChains {
   }): Promise<string> {
     // if there is an error getting real-time prices,
     // use the price at the time of initialization
-    const [
-      fromTokenPrice = fromToken.usdPrice,
-      toTokenPrice = toToken.usdPrice
-    ] = await Promise.all([
-      this.getTokenPrice({
-        chainId: fromToken.chainId,
-        tokenAddress: fromToken.address
-      }),
-      this.getTokenPrice({
-        chainId: toToken.chainId,
-        tokenAddress: toToken.address
-      })
-    ]);
+    const [fromTokenPrice = fromToken.usdPrice, toTokenPrice = toToken.usdPrice] =
+      await Promise.all([
+        this.getTokenPrice({
+          chainId: fromToken.chainId,
+          tokenAddress: fromToken.address,
+        }),
+        this.getTokenPrice({
+          chainId: toToken.chainId,
+          tokenAddress: toToken.address,
+        }),
+      ]);
 
     // example fromAmount: 10
     const fromAmount = (toTokenPrice * Number(toAmount ?? 0)) / fromTokenPrice;
@@ -290,18 +263,18 @@ export class Squid extends TokensChains {
 
   public async getEvmBalances({
     userAddress,
-    chains = []
+    chains = [],
   }: {
     userAddress: string;
     chains?: (string | number)[];
   }): Promise<TokenBalance[]> {
     const chainRpcUrls = getChainRpcUrls({
-      chains: this.chains
+      chains: this.chains,
     });
 
     const tokens = getEvmTokensForChainIds({
       chainIds: chains,
-      tokens: this.tokens
+      tokens: this.tokens,
     });
 
     return this.handlers.evm.getBalances(tokens, userAddress, chainRpcUrls);
@@ -309,26 +282,26 @@ export class Squid extends TokensChains {
 
   public async getCosmosBalances({
     addresses,
-    chainIds = []
+    chainIds = [],
   }: {
     addresses: CosmosAddress[];
     chainIds?: (string | number)[];
   }): Promise<CosmosBalance[]> {
     const cosmosChains = getCosmosChainsForChainIds({
       chainIds,
-      chains: this.chains
+      chains: this.chains,
     });
 
     return this.handlers.cosmos.getBalances({
       addresses,
-      cosmosChains
+      cosmosChains,
     });
   }
 
   public async getAllBalances({
     chainIds = [],
     cosmosAddresses,
-    evmAddress
+    evmAddress,
   }: {
     chainIds?: (string | number)[];
     cosmosAddresses?: CosmosAddress[];
@@ -354,26 +327,26 @@ export class Squid extends TokensChains {
         return cosmosAndEvmChains;
       },
 
-      [[], []] as [(string | number)[], (string | number)[]]
+      [[], []] as [(string | number)[], (string | number)[]],
     );
 
     const evmBalances = evmAddress
       ? await this.getEvmBalances({
           chains: evmChainIds,
-          userAddress: evmAddress
+          userAddress: evmAddress,
         })
       : [];
 
     const cosmosBalances = cosmosAddresses
       ? await this.getCosmosBalances({
           addresses: cosmosAddresses,
-          chainIds: cosmosChainIds
+          chainIds: cosmosChainIds,
         })
       : [];
 
     return {
       evmBalances,
-      cosmosBalances
+      cosmosBalances,
     };
   }
 
@@ -381,9 +354,7 @@ export class Squid extends TokensChains {
 
   private validateInit() {
     if (!this.initialized) {
-      throw new Error(
-        "SquidSdk must be initialized! Please call the SquidSdk.init method"
-      );
+      throw new Error("SquidSdk must be initialized! Please call the SquidSdk.init method");
     }
   }
 
