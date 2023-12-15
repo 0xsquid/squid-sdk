@@ -1,9 +1,5 @@
-const mockValidateNativeBalance = jest
-  .fn()
-  .mockResolvedValue({ isApproved: true });
-const mockValidateTokenBalance = jest
-  .fn()
-  .mockResolvedValue({ isApproved: true });
+const mockValidateNativeBalance = jest.fn().mockResolvedValue({ isApproved: true });
+const mockValidateTokenBalance = jest.fn().mockResolvedValue({ isApproved: true });
 const mockValidateAllowance = jest.fn().mockResolvedValue("100000000000000000");
 const mockGetGasData = jest.fn().mockResolvedValue({ gasLimit: "100" });
 
@@ -13,13 +9,13 @@ jest.mock("./utils", () => ({
     validateTokenBalance = mockValidateTokenBalance;
     validateAllowance = mockValidateAllowance;
     getGasData = mockGetGasData;
-  }
+  },
 }));
 
 const mockedSendTransaction = jest.fn();
 const mockedSigner = {
   sendTransaction: mockedSendTransaction,
-  address: "0x"
+  address: "0x",
 };
 
 import { ExecuteRoute, RouteParamsPopulated } from "../../types";
@@ -38,12 +34,12 @@ describe("EvmHandler", () => {
 
   const data = {
     route: {
-      transactionRequest: { target: "0x", value: "100", data: "0x" }
+      transactionRequest: { target: "0x", value: "100", data: "0x" },
     },
-    signer: mockedSigner
+    signer: mockedSigner,
   } as unknown as ExecuteRoute;
   const params = {
-    fromAmount: "10000000000000000"
+    fromAmount: "10000000000000000",
   } as unknown as RouteParamsPopulated;
 
   describe("executeRoute method", () => {
@@ -65,7 +61,7 @@ describe("EvmHandler", () => {
 
       const tx = await handler.executeRoute({
         data,
-        params: { ...params, fromIsNative: true } as any
+        params: { ...params, fromIsNative: true } as any,
       });
 
       expect(mockGetGasData).toHaveBeenCalledTimes(1);

@@ -1,26 +1,16 @@
 import { ChainData, SquidData, Token } from "@0xsquid/squid-types";
 
-import {
-  OverrideParams,
-  Contract,
-  GasData,
-  RpcProvider,
-  TokenBalance
-} from "../../types";
+import { OverrideParams, Contract, GasData, RpcProvider, TokenBalance } from "../../types";
 import { MulticallWrapper } from "ethers-multicall-provider";
 import { Provider, ethers } from "ethers";
-import {
-  multicallAbi,
-  MULTICALL_ADDRESS,
-  NATIVE_EVM_TOKEN_ADDRESS
-} from "../../constants";
+import { multicallAbi, MULTICALL_ADDRESS, NATIVE_EVM_TOKEN_ADDRESS } from "../../constants";
 
 export class Utils {
   async validateNativeBalance({
     fromProvider,
     sender,
     amount,
-    fromChain
+    fromChain,
   }: {
     fromProvider: RpcProvider;
     sender: string;
@@ -30,14 +20,12 @@ export class Utils {
     const balance = await fromProvider.getBalance(sender);
 
     if (amount > balance) {
-      throw new Error(
-        `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`
-      );
+      throw new Error(`Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`);
     }
 
     return {
       isApproved: true,
-      message: `User has the expected balance ${amount} of ${fromChain.nativeCurrency.symbol}`
+      message: `User has the expected balance ${amount} of ${fromChain.nativeCurrency.symbol}`,
     };
   }
 
@@ -45,7 +33,7 @@ export class Utils {
     amount,
     fromTokenContract,
     sender,
-    fromChain
+    fromChain,
   }: {
     amount: bigint;
     fromTokenContract: Contract;
@@ -55,16 +43,14 @@ export class Utils {
     const balance = await (fromTokenContract as Contract).balanceOf(sender);
 
     if (amount > balance) {
-      throw new Error(
-        `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`
-      );
+      throw new Error(`Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`);
     }
 
     return {
       isApproved: true,
       message: `User has the expected balance ${amount} of ${await (
         fromTokenContract as Contract
-      ).symbol()}`
+      ).symbol()}`,
     };
   }
 
@@ -72,24 +58,21 @@ export class Utils {
     amount,
     fromTokenContract,
     sender,
-    router
+    router,
   }: {
     amount: bigint;
     fromTokenContract: Contract;
     sender: string;
     router: string;
   }) {
-    const allowance = await (fromTokenContract as Contract).allowance(
-      sender,
-      router
-    );
+    const allowance = await (fromTokenContract as Contract).allowance(sender, router);
 
     return !(amount > allowance);
   }
 
   getGasData = ({
     transactionRequest,
-    overrides
+    overrides,
   }: {
     transactionRequest: SquidData & { setGasPrice?: boolean };
     overrides?: OverrideParams;
@@ -99,11 +82,11 @@ export class Utils {
       gasPrice,
       maxPriorityFeePerGas,
       maxFeePerGas,
-      setGasPrice = false
+      setGasPrice = false,
     } = transactionRequest;
 
     let gasParams = {
-      gasLimit
+      gasLimit,
     } as any;
 
     if (setGasPrice) {
@@ -111,11 +94,11 @@ export class Utils {
         ? {
             gasLimit,
             maxPriorityFeePerGas,
-            maxFeePerGas
+            maxFeePerGas,
           }
         : {
             gasLimit,
-            gasPrice
+            gasPrice,
           };
     }
 
@@ -125,19 +108,18 @@ export class Utils {
   async getTokensBalanceSupportingMultiCall(
     tokens: Token[],
     chainRpcUrl: string,
-    userAddress?: string
+    userAddress?: string,
   ): Promise<TokenBalance[]> {
     if (!userAddress) return [];
 
     const multicallProvider = MulticallWrapper.wrap(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      new ethers.JsonRpcProvider(chainRpcUrl)
+      new ethers.JsonRpcProvider(chainRpcUrl),
     );
 
     const tokenBalances: Promise<TokenBalance>[] = tokens.map(token => {
-      const isNativeToken =
-        token.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS.toLowerCase();
+      const isNativeToken = token.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS.toLowerCase();
 
       const contract = new ethers.Contract(
         isNativeToken ? MULTICALL_ADDRESS : token.address,
@@ -149,23 +131,22 @@ export class Utils {
                 type: "function",
                 inputs: [{ name: "_owner", type: "address" }],
                 outputs: [{ name: "balance", type: "uint256" }],
-                stateMutability: "view"
-              }
+                stateMutability: "view",
+              },
             ],
-        multicallProvider as unknown as Provider
+        multicallProvider as unknown as Provider,
       );
 
       const getTokenData = async () => {
-        const balanceInWei = await contract[
-          isNativeToken ? "getEthBalance" : "balanceOf"
-        ](userAddress);
+        const balanceInWei =
+          await contract[isNativeToken ? "getEthBalance" : "balanceOf"](userAddress);
 
         return {
           balance: balanceInWei.toString(),
           symbol: token.symbol,
           address: token.address,
           decimals: token.decimals,
-          chainId: token.chainId
+          chainId: token.chainId,
         };
       };
 
@@ -184,7 +165,7 @@ export class Utils {
     userAddress: string,
     rpcUrlsPerChain: {
       [chainId: string]: string;
-    }
+    },
   ): Promise<TokenBalance[]> {
     const balances: (TokenBalance | null)[] = await Promise.all(
       tokens.map(async t => {
@@ -194,13 +175,13 @@ export class Utils {
             balance = await this.fetchBalance({
               token: t,
               userAddress,
-              rpcUrl: rpcUrlsPerChain[t.chainId]
+              rpcUrl: rpcUrlsPerChain[t.chainId],
             });
           } else {
             balance = await this.fetchBalance({
               token: t,
               userAddress,
-              rpcUrl: rpcUrlsPerChain[t.chainId]
+              rpcUrl: rpcUrlsPerChain[t.chainId],
             });
           }
 
@@ -208,7 +189,7 @@ export class Utils {
         } catch (error) {
           return null;
         }
-      })
+      }),
     );
 
     // filter out null values
@@ -218,7 +199,7 @@ export class Utils {
   async fetchBalance({
     token,
     userAddress,
-    rpcUrl
+    rpcUrl,
   }: {
     token: Token;
     userAddress: string;
@@ -228,11 +209,7 @@ export class Utils {
       const provider = new ethers.JsonRpcProvider(rpcUrl);
 
       const tokenAbi = ["function balanceOf(address) view returns (uint256)"];
-      const tokenContract = new ethers.Contract(
-        token.address ?? "",
-        tokenAbi,
-        provider
-      );
+      const tokenContract = new ethers.Contract(token.address ?? "", tokenAbi, provider);
 
       const balance = (await tokenContract.balanceOf(userAddress)) ?? "0";
 
@@ -246,7 +223,7 @@ export class Utils {
         balance: parseInt(balance, 16).toString(),
         decimals,
         symbol,
-        chainId
+        chainId,
       };
     } catch (error) {
       return null;

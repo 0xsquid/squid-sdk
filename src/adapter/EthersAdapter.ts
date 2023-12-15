@@ -1,29 +1,15 @@
 import { ethers } from "ethers";
 
-import {
-  RpcProvider,
-  Contract,
-  Interface,
-  WalletV6,
-  EvmWallet
-} from "../types";
+import { RpcProvider, Contract, Interface, WalletV6, EvmWallet } from "../types";
 
 export class EthersAdapter {
   rpcProvider(rpc: string): RpcProvider {
     return new ethers.JsonRpcProvider(rpc);
   }
 
-  contract(
-    address: string,
-    abi: any,
-    provider: RpcProvider | EvmWallet
-  ): Contract {
+  contract(address: string, abi: any, provider: RpcProvider | EvmWallet): Contract {
     // type hack to support ethers v5
-    return new ethers.Contract(
-      address,
-      abi,
-      provider as RpcProvider | WalletV6
-    );
+    return new ethers.Contract(address, abi, provider as RpcProvider | WalletV6);
   }
 
   interface(abi: any): Interface {

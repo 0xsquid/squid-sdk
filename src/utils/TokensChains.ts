@@ -6,15 +6,11 @@ export class TokensChains {
 
   getTokenData(address: string, chainId: string): Token {
     const token = this.tokens.find(
-      e =>
-        e.address.toLowerCase() === address?.toLowerCase() &&
-        e.chainId == chainId
+      e => e.address.toLowerCase() === address?.toLowerCase() && e.chainId == chainId,
     );
 
     if (!token) {
-      throw new Error(
-        `Could not find token with address ${address} on chain ${chainId}`
-      );
+      throw new Error(`Could not find token with address ${address} on chain ${chainId}`);
     }
 
     return token;

@@ -4,7 +4,7 @@ import { Utils } from "./utils";
 
 const mockedGetBalance = jest.fn();
 const mockedProvider = {
-  getBalance: mockedGetBalance
+  getBalance: mockedGetBalance,
 } as unknown as RpcProvider;
 
 const mockedBalanceOf = jest.fn();
@@ -12,7 +12,7 @@ const mockedAllowance = jest.fn();
 const mockedContract = {
   balanceOf: mockedBalanceOf,
   allowance: mockedAllowance,
-  symbol: jest.fn().mockResolvedValue("weth")
+  symbol: jest.fn().mockResolvedValue("weth"),
 } as unknown as Contract;
 
 describe("ethers Utils", () => {
@@ -23,8 +23,8 @@ describe("ethers Utils", () => {
   const fromChain = {
     chainId: "1",
     nativeCurrency: {
-      symbol: "eth"
-    }
+      symbol: "eth",
+    },
   } as ChainData;
 
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe("ethers Utils", () => {
         fromProvider: mockedProvider,
         sender: sender,
         amount: amount,
-        fromChain: fromChain
+        fromChain: fromChain,
       });
 
       expect(mockedGetBalance).toHaveBeenCalledWith(sender);
@@ -55,12 +55,12 @@ describe("ethers Utils", () => {
           fromProvider: mockedProvider,
           sender: sender,
           amount: amount,
-          fromChain: fromChain
+          fromChain: fromChain,
         });
       } catch (error: any) {
         expect(mockedGetBalance).toHaveBeenCalledWith(sender);
         expect(error.message).toBe(
-          `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`
+          `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
         );
       }
     });
@@ -74,7 +74,7 @@ describe("ethers Utils", () => {
         fromTokenContract: mockedContract,
         sender: sender,
         amount: amount,
-        fromChain: fromChain
+        fromChain: fromChain,
       });
 
       expect(mockedBalanceOf).toHaveBeenCalledWith(sender);
@@ -89,12 +89,12 @@ describe("ethers Utils", () => {
           fromTokenContract: mockedContract,
           sender: sender,
           amount: amount,
-          fromChain: fromChain
+          fromChain: fromChain,
         });
       } catch (error: any) {
         expect(mockedBalanceOf).toHaveBeenCalledWith(sender);
         expect(error.message).toBe(
-          `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`
+          `Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`,
         );
       }
     });
@@ -108,7 +108,7 @@ describe("ethers Utils", () => {
         fromTokenContract: mockedContract,
         sender: sender,
         amount: amount,
-        router: router
+        router: router,
       });
 
       expect(mockedAllowance).toHaveBeenCalledWith(sender, router);
@@ -122,7 +122,7 @@ describe("ethers Utils", () => {
         fromTokenContract: mockedContract,
         sender: sender,
         amount: amount,
-        router: router
+        router: router,
       });
 
       expect(mockedAllowance).toHaveBeenCalledWith(sender, router);
@@ -135,18 +135,18 @@ describe("ethers Utils", () => {
       gasLimit: "1",
       gasPrice: "2",
       maxPriorityFeePerGas: "3",
-      maxFeePerGas: "4"
+      maxFeePerGas: "4",
     } as SquidData;
 
     it("should return gas data without gas price", () => {
       const gasData = utils.getGasData({
-        transactionRequest: mockedTransactionRequest
+        transactionRequest: mockedTransactionRequest,
       });
 
       expect(gasData).toEqual({
         gasLimit: gasData.gasLimit,
         maxPriorityFeePerGas: gasData.maxPriorityFeePerGas,
-        maxFeePerGas: gasData.maxFeePerGas
+        maxFeePerGas: gasData.maxFeePerGas,
       });
     });
 
@@ -154,13 +154,13 @@ describe("ethers Utils", () => {
       const gasData = utils.getGasData({
         transactionRequest: {
           gasLimit: mockedTransactionRequest.gasLimit,
-          gasPrice: mockedTransactionRequest.gasPrice
-        } as SquidData
+          gasPrice: mockedTransactionRequest.gasPrice,
+        } as SquidData,
       });
 
       expect(gasData).toEqual({
         gasLimit: gasData.gasLimit,
-        gasPrice: gasData.gasPrice
+        gasPrice: gasData.gasPrice,
       });
     });
 
@@ -169,14 +169,14 @@ describe("ethers Utils", () => {
         transactionRequest: mockedTransactionRequest,
         overrides: {
           gasLimit: "100000",
-          maxPriorityFeePerGas: "33"
-        }
+          maxPriorityFeePerGas: "33",
+        },
       });
 
       expect(gasData).toEqual({
         gasLimit: gasData.gasLimit,
         maxPriorityFeePerGas: "33",
-        maxFeePerGas: gasData.maxFeePerGas
+        maxFeePerGas: gasData.maxFeePerGas,
       });
     });
   });
