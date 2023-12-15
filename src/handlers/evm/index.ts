@@ -12,14 +12,10 @@ import {
   TokenBalance,
   TransactionRequest,
   TransactionResponse,
-  WalletV6
+  WalletV6,
 } from "../../types";
 
-import {
-  CHAINS_WITHOUT_MULTICALL,
-  nativeTokenConstant,
-  uint256MaxValue
-} from "../../constants";
+import { CHAINS_WITHOUT_MULTICALL, nativeTokenConstant, uint256MaxValue } from "../../constants";
 import { Utils } from "./utils";
 import { TokensChains } from "../../utils/TokensChains";
 
@@ -28,36 +24,36 @@ const ethersAdapter = new EthersAdapter();
 export class EvmHandler extends Utils {
   async executeRoute({
     data,
-    params
+    params,
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
   }): Promise<TransactionResponse> {
     const {
       route: { transactionRequest },
-      overrides
+      overrides,
     } = data;
     const { target, value, data: _data } = transactionRequest as SquidData;
     const signer = data.signer as WalletV6;
 
     const gasData = this.getGasData({
       transactionRequest: data.route.transactionRequest as SquidData,
-      overrides
+      overrides,
     });
 
     await this.validateBalanceAndApproval({
       data: {
         ...data,
-        overrides: gasData
+        overrides: gasData,
       },
-      params
+      params,
     });
 
     const tx = {
       to: target,
       data: _data,
       value,
-      ...gasData
+      ...gasData,
     } as TransactionRequest;
 
     return await signer.sendTransaction(tx);
@@ -65,7 +61,7 @@ export class EvmHandler extends Utils {
 
   async validateBalance({
     sender,
-    params
+    params,
   }: {
     sender: string;
     params: RouteParamsPopulated;
@@ -73,13 +69,7 @@ export class EvmHandler extends Utils {
     isApproved: boolean;
     message: string;
   }> {
-    const {
-      fromAmount,
-      fromIsNative,
-      fromProvider,
-      fromChain,
-      fromTokenContract
-    } = params;
+    const { fromAmount, fromIsNative, fromProvider, fromChain, fromTokenContract } = params;
 
     const amount = BigInt(fromAmount);
 
@@ -88,21 +78,21 @@ export class EvmHandler extends Utils {
         fromProvider,
         sender,
         amount,
-        fromChain
+        fromChain,
       });
     } else {
       return await this.validateTokenBalance({
         amount,
         fromTokenContract: fromTokenContract as Contract,
         fromChain,
-        sender
+        sender,
       });
     }
   }
 
   async validateBalanceAndApproval({
     data,
-    params
+    params,
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
@@ -122,7 +112,7 @@ export class EvmHandler extends Utils {
     // validate balance
     await this.validateBalance({
       sender: address,
-      params
+      params,
     });
 
     if (params.fromIsNative) {
@@ -133,7 +123,7 @@ export class EvmHandler extends Utils {
       fromTokenContract: params.fromTokenContract as Contract,
       sender: address,
       router: (data.route.transactionRequest as SquidData).target,
-      amount: BigInt(params.fromAmount)
+      amount: BigInt(params.fromAmount),
     });
 
     // approve token spent if necessary
@@ -146,7 +136,7 @@ export class EvmHandler extends Utils {
 
   async approveRoute({
     data,
-    params
+    params,
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
@@ -154,7 +144,7 @@ export class EvmHandler extends Utils {
     const {
       route: { transactionRequest },
       executionSettings,
-      overrides
+      overrides,
     } = data;
     const { target } = transactionRequest as SquidData;
     const { fromIsNative, fromAmount } = params;
@@ -174,15 +164,15 @@ export class EvmHandler extends Utils {
     // https://github.com/ethers-io/ethers.js/issues/3830
     // Need to manually encode approve, instead of calling fromTokenContract.approve
     // TODO: Find a way to have it work with .approve method
-    const approveData = fromTokenContract.interface.encodeFunctionData(
-      "approve",
-      [target, amountToApprove]
-    );
+    const approveData = fromTokenContract.interface.encodeFunctionData("approve", [
+      target,
+      amountToApprove,
+    ]);
 
     const approveTx = await (data.signer as EvmWallet).sendTransaction({
       to: params.fromToken.address,
       data: approveData,
-      ...overrides
+      ...overrides,
     });
 
     await approveTx.wait();
@@ -193,7 +183,7 @@ export class EvmHandler extends Utils {
   async isRouteApproved({
     sender,
     target,
-    params
+    params,
   }: {
     sender: string;
     target: string;
@@ -204,7 +194,7 @@ export class EvmHandler extends Utils {
     if (params.fromIsNative) {
       return {
         isApproved: true,
-        message: "Not required for native token"
+        message: "Not required for native token",
       };
     }
 
@@ -212,13 +202,13 @@ export class EvmHandler extends Utils {
       fromTokenContract: params.fromTokenContract as Contract,
       sender,
       router: target,
-      amount: BigInt(params.fromAmount)
+      amount: BigInt(params.fromAmount),
     });
 
     if (!hasAllowance) {
       return {
         isApproved: false,
-        message: "Not enough allowance"
+        message: "Not enough allowance",
       };
     }
 
@@ -228,13 +218,13 @@ export class EvmHandler extends Utils {
   getRawTxHex({
     nonce,
     route,
-    overrides
+    overrides,
   }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
     const { target, data, value } = route.transactionRequest as SquidData;
 
     const gasData = this.getGasData({
       transactionRequest: route.transactionRequest as SquidData,
-      overrides
+      overrides,
     });
 
     return ethersAdapter.serializeTransaction({
@@ -243,7 +233,7 @@ export class EvmHandler extends Utils {
       data: data,
       value: value,
       nonce,
-      ...gasData
+      ...gasData,
     });
   }
 
@@ -252,7 +242,7 @@ export class EvmHandler extends Utils {
     userAddress: string,
     chainRpcUrls: {
       [chainId: string]: string;
-    }
+    },
   ): Promise<TokenBalance[]> {
     try {
       // Some tokens don't support multicall, so we need to fetch them with Promise.all
@@ -266,7 +256,7 @@ export class EvmHandler extends Utils {
           }
           return acc;
         },
-        [[], []] as Token[][]
+        [[], []] as Token[][],
       );
 
       const tokensNotSupportingMulticall = splittedTokensByMultiCallSupport[0];
@@ -282,7 +272,7 @@ export class EvmHandler extends Utils {
 
           return groupedTokens;
         },
-        {} as Record<string, Token[]>
+        {} as Record<string, Token[]>,
       );
 
       const tokensMulticall: TokenBalance[] = [];
@@ -296,7 +286,7 @@ export class EvmHandler extends Utils {
         const tokensBalances = await this.getTokensBalanceSupportingMultiCall(
           tokens,
           rpcUrl,
-          userAddress
+          userAddress,
         );
 
         tokensMulticall.push(...tokensBalances);
@@ -305,7 +295,7 @@ export class EvmHandler extends Utils {
       const tokensNotMultiCall = await this.getTokensBalanceWithoutMultiCall(
         tokensNotSupportingMulticall,
         userAddress,
-        chainRpcUrls
+        chainRpcUrls,
       );
 
       return [...tokensMulticall, ...tokensNotMultiCall];
@@ -317,7 +307,7 @@ export class EvmHandler extends Utils {
   populateRouteParams(
     tokensChains: TokensChains,
     params: RouteRequest,
-    signer?: EvmWallet
+    signer?: EvmWallet,
   ): RouteParamsPopulated {
     const { fromChain, toChain, fromToken, toToken } = params;
 
@@ -335,7 +325,7 @@ export class EvmHandler extends Utils {
       fromTokenContract = ethersAdapter.contract(
         _fromToken.address,
         erc20Abi,
-        signer || fromProvider
+        signer || fromProvider,
       );
     }
 
@@ -347,7 +337,7 @@ export class EvmHandler extends Utils {
       toToken: _toToken,
       fromTokenContract,
       fromProvider,
-      fromIsNative
+      fromIsNative,
     };
   }
 }

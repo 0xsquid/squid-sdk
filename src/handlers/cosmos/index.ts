@@ -13,7 +13,7 @@ import {
   CosmosAddress,
   ChainType,
   CCTP_TYPE,
-  RouteRequest
+  RouteRequest,
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { MsgDepositForBurn } from "./cctpProto";
@@ -22,7 +22,7 @@ import { TokensChains } from "../../utils/TokensChains";
 export class CosmosHandler {
   async validateBalance({
     data,
-    params
+    params,
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
@@ -31,17 +31,14 @@ export class CosmosHandler {
     const signer = data.signer as CosmosSigner;
     const coin = {
       denom: params.fromToken.address,
-      amount: params.fromAmount
+      amount: params.fromAmount,
     } as Coin;
 
     if (!signerAddress) {
       throw new Error("signerAddress not provided");
     }
 
-    const signerCoinBalance = await signer.getBalance(
-      signerAddress,
-      coin.denom
-    );
+    const signerCoinBalance = await signer.getBalance(signerAddress, coin.denom);
 
     const currentBalance = BigInt(signerCoinBalance.amount);
     const transferAmount = BigInt(coin.amount);
@@ -55,7 +52,7 @@ export class CosmosHandler {
 
   async executeRoute({
     data,
-    params
+    params,
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
@@ -68,16 +65,14 @@ export class CosmosHandler {
 
     const msgs = [];
 
-    const cosmosMsg: CosmosMsg = JSON.parse(
-      route.transactionRequest?.data as string
-    );
+    const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest?.data as string);
 
     switch (cosmosMsg.typeUrl) {
       case CCTP_TYPE: {
         signer.registry.register(CCTP_TYPE, MsgDepositForBurn);
 
         cosmosMsg.value.mintRecipient = new Uint8Array(
-          Buffer.from(cosmosMsg.value.mintRecipient, "base64")
+          Buffer.from(cosmosMsg.value.mintRecipient, "base64"),
         );
         msgs.push(cosmosMsg);
 
@@ -96,17 +91,14 @@ export class CosmosHandler {
     return signer.sign(
       signerAddress,
       msgs,
-      calculateFee(
-        Math.trunc(estimatedGas * gasMultiplier),
-        GasPrice.fromString(gasPrice)
-      ),
-      ""
+      calculateFee(Math.trunc(estimatedGas * gasMultiplier), GasPrice.fromString(gasPrice)),
+      "",
     );
   }
 
   async getBalances({
     addresses,
-    cosmosChains
+    cosmosChains,
   }: {
     addresses: CosmosAddress[];
     cosmosChains: CosmosChain[];
@@ -116,15 +108,13 @@ export class CosmosHandler {
     for (const chain of cosmosChains) {
       if (chain.chainType !== ChainType.COSMOS) continue;
 
-      const addressData = addresses.find(
-        address => address.coinType === chain.coinType
-      );
+      const addressData = addresses.find(address => address.coinType === chain.coinType);
 
       if (!addressData) continue;
 
       const cosmosAddress = this.deriveCosmosAddress(
         chain.bech32Config.bech32PrefixAccAddr,
-        addressData.address
+        addressData.address,
       );
 
       try {
@@ -142,8 +132,7 @@ export class CosmosHandler {
             denom,
             chainId: String(chain.chainId),
             decimals:
-              chain.currencies.find(currency => currency.coinDenom === denom)
-                ?.coinDecimals ?? 6
+              chain.currencies.find(currency => currency.coinDenom === denom)?.coinDecimals ?? 6,
           });
         });
       } catch (error) {
@@ -158,10 +147,7 @@ export class CosmosHandler {
     return toBech32(chainPrefix, fromBech32(address).data);
   }
 
-  populateRouteParams(
-    tokensChains: TokensChains,
-    params: RouteRequest
-  ): RouteParamsPopulated {
+  populateRouteParams(tokensChains: TokensChains, params: RouteRequest): RouteParamsPopulated {
     const { fromChain, toChain, fromToken, toToken } = params;
 
     const _fromChain = tokensChains.getChainData(fromChain);
@@ -174,7 +160,7 @@ export class CosmosHandler {
       fromChain: _fromChain,
       toChain: _toChain,
       fromToken: _fromToken,
-      toToken: _toToken
+      toToken: _toToken,
     } as RouteParamsPopulated;
   }
 }

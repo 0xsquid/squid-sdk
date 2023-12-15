@@ -2,17 +2,11 @@ import {
   ChainData,
   Token,
   RouteRequest,
-  RouteResponse as _RouteResponse
+  RouteResponse as _RouteResponse,
 } from "@0xsquid/squid-types";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
-import {
-  EvmWallet,
-  TransactionResponse,
-  RpcProvider,
-  Contract,
-  GasData
-} from "./ethers";
+import { EvmWallet, TransactionResponse, RpcProvider, Contract, GasData } from "./ethers";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 export * from "@0xsquid/squid-types";

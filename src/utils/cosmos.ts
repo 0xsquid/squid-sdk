@@ -2,7 +2,7 @@ import { ChainData, ChainType, CosmosChain } from "@0xsquid/squid-types";
 
 export function getCosmosChainsForChainIds({
   chainIds,
-  chains
+  chains,
 }: {
   chainIds: (string | number)[];
   chains: ChainData[];
@@ -13,6 +13,6 @@ export function getCosmosChainsForChainIds({
     chainIds.length === 0
       ? true
       : // else return only chains that are in chainIds
-        chainIds?.includes(c.chainId)
+        chainIds?.includes(c.chainId),
   ) as CosmosChain[];
 }
