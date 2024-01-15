@@ -885,8 +885,7 @@ export class Squid {
    * Get the amount of tokens needed to swap to a specific amount
    * This is needed in checkout widget where we know the destination amount but not the source amount
    * The user won't modify the source amount, so we need to calculate it
-   * @param param0
-   * @returns
+   * @returns {string} The amount of tokens needed to swap to a specific amount
    */
   public async getFromAmount({
     fromToken,
