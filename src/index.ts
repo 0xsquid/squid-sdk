@@ -13,7 +13,7 @@ import {
 } from "@cosmjs/stargate";
 import axios, { AxiosInstance } from "axios";
 
-import { BigNumber, UnsignedTransaction, ethers } from "ethers";
+import { BigNumber, UnsignedTransaction, ethers, utils } from "ethers";
 
 import {
   Allowance,
@@ -881,7 +881,13 @@ export class Squid {
       ...createWasmAminoConverters()
     });
   }
-
+  /**
+   * Get the amount of tokens needed to swap to a specific amount
+   * This is needed in checkout widget where we know the destination amount but not the source amount
+   * The user won't modify the source amount, so we need to calculate it
+   * @param param0
+   * @returns
+   */
   public async getFromAmount({
     fromToken,
     toAmount,
@@ -894,7 +900,7 @@ export class Squid {
     slippagePercentage?: number;
   }): Promise<string | null> {
     try {
-      // parallelize requests
+      // Get usd prices for both tokens
       const [fromTokenPrice, toTokenPrice] = await Promise.all([
         this.getTokenPrice({
           chainId: fromToken.chainId,
@@ -906,21 +912,43 @@ export class Squid {
         })
       ]);
 
-      // example fromAmount: 10
-      const fromAmount =
-        (toTokenPrice * Number(toAmount ?? 0)) / fromTokenPrice;
+      // Normalize prices to the same decimal count (use the higher decimal count)
+      // We need to do this because the price of a token can be very small (Ex: 0.000001 usdc = 4.0e-10 ETH)
+      // And decimals of fromToken and toToken can be different
+      // And we need to avoid a scientific notation
+      const normalizedDecimalCount = Math.max(
+        fromToken.decimals,
+        toToken.decimals
+      );
+      const fromTokenPriceBN = utils.parseUnits(
+        fromTokenPrice.toString(),
+        normalizedDecimalCount
+      );
+      const toTokenPriceBN = utils.parseUnits(
+        toTokenPrice.toString(),
+        normalizedDecimalCount
+      );
+      const toAmountBN = utils.parseUnits(toAmount, normalizedDecimalCount);
+      const fromAmountBN = toTokenPriceBN.mul(toAmountBN).div(fromTokenPriceBN);
 
-      // fromAmount (10) * slippagePercentage (1.5) / 100 = 0.15
-      const slippage = fromAmount * (slippagePercentage / 100);
+      // Assuming slippage percentage is based on a standard 18 decimal format
+      const slippagePercentageBN = utils.parseUnits(
+        slippagePercentage.toString(),
+        18
+      );
 
-      // fromAmount (10) + slippage (0.15) = 10.15
-      const fromAmountPlusSlippage = fromAmount + slippage;
+      // We adjust by dividing by 10^18.
+      // For instance, with a default slippage of 1.5%, if 'fromAmountBN'
+      // is 100, the calculation would be 100 * 1.5 / 10^18, resulting in the slippage amount in 'fromToken'.
+      const slippageBN = fromAmountBN
+        .mul(slippagePercentageBN)
+        .div(BigNumber.from("1000000000000000000"));
+      const fromAmountPlusSlippageBN = fromAmountBN.add(slippageBN);
 
-      return fromAmountPlusSlippage.toString();
+      return utils.formatUnits(fromAmountPlusSlippageBN, fromToken.decimals);
     } catch (error) {
       return null;
     }
   }
 }
-
 export * from "./types";
