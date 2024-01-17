@@ -9,7 +9,7 @@ import {
 
 type ContractAddress = `0x${string}`;
 
-const CHAINS_WITHOUT_MULTICALL = [314, 3141]; // Filecoin, & Filecoin testnet
+const CHAINS_WITHOUT_MULTICALL = [314, 3141, 2222]; // Filecoin, Filecoin testnet and Kava
 
 const getTokensBalanceSupportingMultiCall = async (
   tokens: TokenData[],
@@ -94,23 +94,12 @@ const getTokensBalanceWithoutMultiCall = async (
 ): Promise<TokenBalance[]> => {
   const balances: (TokenBalance | null)[] = await Promise.all(
     tokens.map(async t => {
-      let balance: TokenBalance | null;
       try {
-        if (t.address === NATIVE_EVM_TOKEN_ADDRESS) {
-          balance = await fetchBalance({
-            token: t,
-            userAddress,
-            rpcUrl: rpcUrlsPerChain[t.chainId]
-          });
-        } else {
-          balance = await fetchBalance({
-            token: t,
-            userAddress,
-            rpcUrl: rpcUrlsPerChain[t.chainId]
-          });
-        }
-
-        return balance;
+        return await fetchBalance({
+          token: t,
+          userAddress,
+          rpcUrl: rpcUrlsPerChain[t.chainId]
+        });
       } catch (error) {
         return null;
       }
@@ -199,6 +188,10 @@ async function fetchBalance({
   userAddress,
   rpcUrl
 }: FetchBalanceParams): Promise<TokenBalance | null> {
+  if (token.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS.toLowerCase()) {
+    return fetchNativeBalance({ token, userAddress, rpcUrl });
+  }
+
   try {
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
@@ -225,6 +218,28 @@ async function fetchBalance({
     };
   } catch (error) {
     console.error("Error fetching token balance:", error);
+    return null;
+  }
+}
+
+async function fetchNativeBalance({
+  userAddress,
+  rpcUrl,
+  token
+}: FetchBalanceParams) {
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const balance = await provider.getBalance(userAddress);
+
+    return {
+      address: token.address,
+      balance: balance.toString(),
+      decimals: token.decimals,
+      symbol: token.symbol,
+      chainId: token.chainId
+    };
+  } catch (error) {
+    console.error("Error fetching native token balance:", error);
     return null;
   }
 }
