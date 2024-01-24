@@ -506,10 +506,6 @@ export class Squid {
       amount: route.params.fromAmount
     });
 
-    // simulate tx to estimate gas cost
-    const estimatedGas = await signer.simulate(signerAddress, msgs, "");
-    const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
-
     // This conversion is needed for Ledger, They only supports Amino messages
     // TODO: At the moment there's a limit on Ledger Nano S models
     // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
@@ -528,6 +524,14 @@ export class Squid {
 
     const aminoMsg = aminoTypes.toAmino(formattedMsg);
     const fromAminoMsg = aminoTypes.fromAmino(aminoMsg);
+
+    // simulate tx to estimate gas cost
+    const estimatedGas = await signer.simulate(
+      signerAddress,
+      [fromAminoMsg],
+      ""
+    );
+    const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
     return (signer as SigningCosmWasmClient).sign(
       signerAddress,
