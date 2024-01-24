@@ -868,11 +868,14 @@ export class Squid {
     };
   }
 
-  private getTimeoutTimestamp(): Long {
+  private getTimeoutTimestamp(): number {
     const PACKET_LIFETIME_NANOS = 3600 * 1_000_000_000; // 1 Hour
 
     const currentTimeNanos = Math.floor(Date.now() * 1_000_000);
-    return Long.fromNumber(currentTimeNanos + PACKET_LIFETIME_NANOS);
+    const timeoutTimestamp = Long.fromNumber(
+      currentTimeNanos + PACKET_LIFETIME_NANOS
+    );
+    return timeoutTimestamp.toNumber();
   }
 
   private getAminoTypeConverters(): AminoTypes {
