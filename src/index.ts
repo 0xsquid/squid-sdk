@@ -91,7 +91,7 @@ export class Squid extends TokensChains {
   // PUBLIC METHODS
 
   async getStatus(params: GetStatus): Promise<StatusResponse> {
-    const { data, headers } = await this.httpInstance.axios.get("/v1/status", {
+    const { data, headers } = await this.httpInstance.axios.get("/v2/status", {
       params,
       headers: {
         ...(this.httpInstance.axios.defaults.headers.common &&
