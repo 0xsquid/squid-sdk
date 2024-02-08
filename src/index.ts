@@ -500,11 +500,13 @@ export class Squid {
       }
     }
 
-    // validating that user has enough balance for the transfer
-    await this.validateCosmosBalance(signer, signerAddress, {
-      denom: route.params.fromToken.address,
-      amount: route.params.fromAmount
-    });
+    if (route.params.fromChain !== "secret-snip") {
+      // validating that user has enough balance for the transfer
+      await this.validateCosmosBalance(signer, signerAddress, {
+        denom: route.params.fromToken.address,
+        amount: route.params.fromAmount
+      });
+    }
 
     // This conversion is needed for Ledger, They only supports Amino messages
     // TODO: At the moment there's a limit on Ledger Nano S models
