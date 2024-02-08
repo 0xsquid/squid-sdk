@@ -500,7 +500,7 @@ export class Squid {
       }
     }
 
-    if (route.params.fromChain !== "secret-snip") {
+    if (route.params.fromChain !== "secret-4") {
       // validating that user has enough balance for the transfer
       await this.validateCosmosBalance(signer, signerAddress, {
         denom: route.params.fromToken.address,
