@@ -928,6 +928,31 @@ export class Squid {
       return null;
     }
   }
+
+  public async checkSignerChainCompatibility(
+    signer: ethers.Signer | ethers.Wallet,
+    route: RouteData
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const signerChainId = await signer.getChainId();
+      const routeChainId = Number(route.params.fromChain);
+
+      if (signerChainId !== routeChainId) {
+        throw new SquidError({
+          message: `Signer is on the wrong chain ID (${signerChainId}). Please use a signer on chain ID: ${routeChainId}`,
+          errorType: ErrorType.ValidationError
+        });
+      }
+
+      return { success: true };
+    } catch (error: unknown) {
+      if (error instanceof SquidError) {
+        return { success: false, error: error.message };
+      } else {
+        throw error; // Rethrow unexpected errors
+      }
+    }
+  }
 }
 
 export * from "./types";

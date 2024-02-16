@@ -1,0 +1,99 @@
+import axios from "axios";
+import "dotenv/config";
+
+import { ethers } from "ethers";
+import { RouteData, Squid } from "../index";
+import { chainsData } from "./constants/chains";
+import { supportedTokens } from "./constants/tokens";
+
+jest.mock("axios");
+
+const privateKey = process.env.privateKey as string;
+const rpcEndPoint = process.env.ethereumRpcEndPoint as string; // be sure that rpc corresponds to env
+const provider = new ethers.providers.JsonRpcProvider(rpcEndPoint);
+
+async function setupTests() {
+  const signer = new ethers.Wallet(privateKey, provider);
+
+  const getMocked = jest.fn().mockResolvedValue({
+    data: {
+      chains: chainsData,
+      tokens: supportedTokens
+    },
+    status: 200
+  });
+  const mockedAxios = (axios.create as jest.Mock).mockReturnValue({
+    get: getMocked,
+    interceptors: {
+      response: {
+        use: jest.fn()
+      }
+    }
+  });
+
+  const signerChainId = await signer.getChainId();
+
+  const getSuccessRouteMocked = jest.fn().mockResolvedValue({
+    params: {
+      fromChain: signerChainId
+    }
+  });
+
+  const getErrorRouteMocked = jest.fn().mockResolvedValue({
+    params: {
+      fromChain: -1
+    }
+  });
+
+  const squidSdk = new Squid();
+
+  const successRoute = await getSuccessRouteMocked();
+  const errorRoute = await getErrorRouteMocked();
+
+  return {
+    signer,
+    squidSdk,
+    successRoute,
+    errorRoute
+  };
+}
+
+describe("SquidSDK - CheckSignerChainCompatibility function", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should return an error message and `false` boolean if the signer and the route are not compatible", async () => {
+    const { signer, squidSdk, errorRoute } = await setupTests();
+
+    const result = await squidSdk.checkSignerChainCompatibility(
+      signer,
+      errorRoute
+    );
+
+    expect(result.success).toEqual(false);
+    expect(result.error).toBeDefined()
+  });
+
+  it("should return true if the signer and the route are compatible", async () => {
+    const { signer, squidSdk, successRoute } = await setupTests();
+
+    const result = await squidSdk.checkSignerChainCompatibility(
+      signer,
+      successRoute
+    );
+
+    expect(result.success).toEqual(true);
+  });
+
+
+  it("should throw a different error if there is an issue with the route", async () => {
+    const { signer, squidSdk } = await setupTests();
+
+    try {
+      await squidSdk.checkSignerChainCompatibility(signer, {} as RouteData);
+    } catch (error) {
+      expect(error).toBeDefined();
+    }
+  });
+});
