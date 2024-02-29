@@ -224,19 +224,25 @@ export class Squid extends TokensChains {
     return response.data.token.usdPrice;
   }
 
-  public async getAllTokensWithPrice(): Promise<Token[]> {
+  /**
+   * Return tokens with USD price
+   * If chainId is provided, it will return only tokens for that chain
+   * if not, it will return all tokens
+   * @param {chainId?: string}
+   * @returns {Promise<Token[]>}
+   */
+  public async getMultipleTokensPrice({
+    chainId,
+  }: {
+    chainId?: string;
+  }): Promise<Token[]> {
     const response = await this.httpInstance.axios.get("/v2/tokens", {
-      params: { usdPrice: true },
+      params: {
+        ...(chainId && { chainId }), // only add chainId to params if it's defined
+        usdPrice: true,
+      },
     });
-
-    return response.data.tokens;
-  }
-
-  public async getAllTokensWithPriceForChain({ chainId }: { chainId: string }): Promise<Token[]> {
-    const response = await this.httpInstance.axios.get("/v2/tokens", {
-      params: { chainId, usdPrice: true },
-    });
-
+  
     return response.data.tokens;
   }
 
