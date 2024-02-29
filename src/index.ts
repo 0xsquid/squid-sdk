@@ -231,18 +231,14 @@ export class Squid extends TokensChains {
    * @param {chainId?: string}
    * @returns {Promise<Token[]>}
    */
-  public async getMultipleTokensPrice({
-    chainId,
-  }: {
-    chainId?: string;
-  }): Promise<Token[]> {
+  public async getMultipleTokensPrice({ chainId }: { chainId?: string }): Promise<Token[]> {
     const response = await this.httpInstance.axios.get("/v2/tokens", {
       params: {
         ...(chainId && { chainId }), // only add chainId to params if it's defined
         usdPrice: true,
       },
     });
-  
+
     return response.data.tokens;
   }
 
