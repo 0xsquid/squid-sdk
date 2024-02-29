@@ -253,7 +253,7 @@ export class Squid extends TokensChains {
   }): Promise<string> {
     // if there is an error getting real-time prices,
     // use the price at the time of initialization
-    const [fromTokenPrice = fromToken.usdPrice, toTokenPrice = toToken.usdPrice] =
+    const [fromTokenPrice = fromToken.usdPrice ?? 0, toTokenPrice = toToken.usdPrice ?? 0] =
       await Promise.all([
         this.getTokenPrice({
           chainId: fromToken.chainId,
