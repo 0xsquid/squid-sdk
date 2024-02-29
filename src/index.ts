@@ -215,13 +215,29 @@ export class Squid extends TokensChains {
     chainId,
   }: {
     tokenAddress: string;
-    chainId: string | number;
-  }) {
-    const response = await this.httpInstance.axios.get("/v2/token-price", {
-      params: { tokenAddress, chainId },
+    chainId: string;
+  }): Promise<number> {
+    const response = await this.httpInstance.axios.get("/v2/tokens", {
+      params: { address: tokenAddress, chainId, usdPrice: true },
     });
 
     return response.data.token.usdPrice;
+  }
+
+  public async getAllTokensWithPrice(): Promise<Token[]> {
+    const response = await this.httpInstance.axios.get("/v2/tokens", {
+      params: { usdPrice: true },
+    });
+
+    return response.data.tokens;
+  }
+
+  public async getAllTokensWithPriceForChain({ chainId }: { chainId: string }): Promise<Token[]> {
+    const response = await this.httpInstance.axios.get("/v2/tokens", {
+      params: { chainId, usdPrice: true },
+    });
+
+    return response.data.tokens;
   }
 
   public async getFromAmount({
