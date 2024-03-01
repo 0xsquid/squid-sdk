@@ -215,13 +215,31 @@ export class Squid extends TokensChains {
     chainId,
   }: {
     tokenAddress: string;
-    chainId: string | number;
-  }) {
-    const response = await this.httpInstance.axios.get("/v2/token-price", {
-      params: { tokenAddress, chainId },
+    chainId: string;
+  }): Promise<number> {
+    const response = await this.httpInstance.axios.get("/v2/tokens", {
+      params: { address: tokenAddress, chainId, usdPrice: true },
     });
 
     return response.data.token.usdPrice;
+  }
+
+  /**
+   * Return tokens with USD price
+   * If chainId is provided, it will return only tokens for that chain
+   * if not, it will return all tokens
+   * @param {chainId?: string}
+   * @returns {Promise<Token[]>}
+   */
+  public async getMultipleTokensPrice({ chainId }: { chainId?: string }): Promise<Token[]> {
+    const response = await this.httpInstance.axios.get("/v2/tokens", {
+      params: {
+        ...(chainId && { chainId }), // only add chainId to params if it's defined
+        usdPrice: true,
+      },
+    });
+
+    return response.data.tokens;
   }
 
   public async getFromAmount({
@@ -237,7 +255,7 @@ export class Squid extends TokensChains {
   }): Promise<string> {
     // if there is an error getting real-time prices,
     // use the price at the time of initialization
-    const [fromTokenPrice = fromToken.usdPrice, toTokenPrice = toToken.usdPrice] =
+    const [fromTokenPrice = fromToken.usdPrice ?? 0, toTokenPrice = toToken.usdPrice ?? 0] =
       await Promise.all([
         this.getTokenPrice({
           chainId: fromToken.chainId,
