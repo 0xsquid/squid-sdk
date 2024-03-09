@@ -9,7 +9,11 @@ import {
 
 type ContractAddress = `0x${string}`;
 
-const CHAINS_WITHOUT_MULTICALL = [314, 3141, 2222]; // Filecoin, Filecoin testnet and Kava
+const CHAINS_WITHOUT_MULTICALL = [
+  314, // Filecoin
+  3141, // Filecoin testnet
+  2222 // Kava
+];
 
 const getTokensBalanceSupportingMultiCall = async (
   tokens: TokenData[],
@@ -50,7 +54,8 @@ const getTokensBalanceSupportingMultiCall = async (
 
   const multicallInstance = new Multicall({
     ethersProvider: provider,
-    tryAggregate: true
+    tryAggregate: true,
+    multicallCustomContractAddress: MULTICALL_ADDRESS
   });
 
   try {
