@@ -13,7 +13,8 @@ const CHAINS_WITHOUT_MULTICALL = [
   314, // Filecoin
   3141, // Filecoin testnet
   2222, // Kava
-  81457 // Blast
+  81457, // Blast
+  252 // Fraxtal
 ];
 
 const getTokensBalanceSupportingMultiCall = async (
