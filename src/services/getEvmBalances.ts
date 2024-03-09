@@ -12,7 +12,7 @@ type ContractAddress = `0x${string}`;
 const CHAINS_WITHOUT_MULTICALL = [
   314, // Filecoin
   3141, // Filecoin testnet
-  2222, // Kava
+  2222 // Kava
 ];
 
 const getTokensBalanceSupportingMultiCall = async (
