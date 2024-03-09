@@ -9,7 +9,12 @@ import {
 
 type ContractAddress = `0x${string}`;
 
-const CHAINS_WITHOUT_MULTICALL = [314, 3141, 2222]; // Filecoin, Filecoin testnet and Kava
+const CHAINS_WITHOUT_MULTICALL = [
+  314, // Filecoin
+  3141, // Filecoin testnet
+  2222, // Kava
+  81457 // Blast
+];
 
 const getTokensBalanceSupportingMultiCall = async (
   tokens: TokenData[],
