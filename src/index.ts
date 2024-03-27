@@ -326,13 +326,10 @@ export class Squid {
       });
     }
 
+    const isEvmChainId = Number(route.params.fromChain) > 0;
+
     // handle cosmos case
-    if (
-      signer instanceof SigningStargateClient ||
-      signer.constructor.name === "SigningStargateClient" ||
-      signer instanceof SigningCosmWasmClient ||
-      signer.constructor.name === "SigningCosmWasmClient"
-    ) {
+    if (!isEvmChainId) {
       return await this.executeRouteCosmos(
         signer as SigningStargateClient,
         signerAddress!,
@@ -382,7 +379,7 @@ export class Squid {
         fromAmount: params.fromAmount,
         fromChain,
         infiniteApproval: executionSettings?.infiniteApproval,
-        signer,
+        signer: signer as ethers.Signer,
         overrides: _overrides
       });
     }
@@ -402,7 +399,7 @@ export class Squid {
       };
     }
 
-    return await signer.sendTransaction(tx);
+    return await (signer as ethers.Signer).sendTransaction(tx);
   }
 
   public getRawTxHex({
