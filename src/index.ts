@@ -1,16 +1,6 @@
-import {
-  SigningCosmWasmClient,
-  createWasmAminoConverters
-} from "@cosmjs/cosmwasm-stargate";
-import { toUtf8 } from "@cosmjs/encoding";
-import {
-  AminoTypes,
-  Coin,
-  GasPrice,
-  SigningStargateClient,
-  calculateFee,
-  createIbcAminoConverters
-} from "@cosmjs/stargate";
+import { AminoConverter, Coin } from "@cosmjs/stargate";
+import { CosmWasmSigningClient as SigningCosmWasmClient } from "@cosmology/cosmjs/cosmwasm-stargate";
+import { RpcQuery } from "@uni-sign/cosmos-query/rpc";
 import axios, { AxiosInstance } from "axios";
 
 import { BigNumber, UnsignedTransaction, ethers } from "ethers";
@@ -44,8 +34,8 @@ import {
   WasmHookMsg
 } from "./types";
 
+import { toUtf8 } from "@cosmjs/encoding";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import Long from "long";
 import { parseRouteResponse } from "./0xsquid/v1/route";
 import { parseSdkInfoResponse } from "./0xsquid/v1/sdk-info";
@@ -236,14 +226,39 @@ export class Squid {
   }
 
   private async validateCosmosBalance(
-    signer: SigningStargateClient | SigningCosmWasmClient,
+    signer: SigningCosmWasmClient,
     signerAddress: string,
-    coin: Coin
+    coin: Coin,
+    chainId: string
   ): Promise<void> {
-    const signerCoinBalance = await signer.getBalance(
-      signerAddress,
-      coin.denom
-    );
+    const chain = getChainData(this.chains as ChainData[], chainId);
+
+    if (!chain) {
+      throw new SquidError({
+        message: `Chain not found for ${chainId}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
+
+    const rpcQuery = new RpcQuery(chain.rpc);
+
+    const { balance: signerCoinBalance } = await rpcQuery.balance({
+      address: signerAddress,
+      denom: coin.denom
+    });
+
+    console.log("signerCoinBalance", signerCoinBalance);
+
+    if (!signerCoinBalance) {
+      throw new SquidError({
+        message: `No balance found for ${coin.denom} on chain ${chainId}`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
+    }
 
     const currentBalance = ethers.BigNumber.from(signerCoinBalance.amount);
     const transferAmount = ethers.BigNumber.from(coin.amount);
@@ -326,15 +341,12 @@ export class Squid {
       });
     }
 
+    const isEvmChainId = Number(route.params.fromChain) > 0;
+
     // handle cosmos case
-    if (
-      signer instanceof SigningStargateClient ||
-      signer.constructor.name === "SigningStargateClient" ||
-      signer instanceof SigningCosmWasmClient ||
-      signer.constructor.name === "SigningCosmWasmClient"
-    ) {
+    if (!isEvmChainId) {
       return await this.executeRouteCosmos(
-        signer as SigningStargateClient,
+        signer as SigningCosmWasmClient,
         signerAddress!,
         route
       );
@@ -382,7 +394,7 @@ export class Squid {
         fromAmount: params.fromAmount,
         fromChain,
         infiniteApproval: executionSettings?.infiniteApproval,
-        signer,
+        signer: signer as ethers.Signer,
         overrides: _overrides
       });
     }
@@ -402,7 +414,7 @@ export class Squid {
       };
     }
 
-    return await signer.sendTransaction(tx);
+    return await (signer as ethers.Signer).sendTransaction(tx);
   }
 
   public getRawTxHex({
@@ -461,7 +473,7 @@ export class Squid {
   }
 
   private async executeRouteCosmos(
-    signer: SigningStargateClient | SigningCosmWasmClient,
+    signer: SigningCosmWasmClient,
     signerAddress: string,
     route: RouteData
   ): Promise<TxRaw> {
@@ -478,7 +490,7 @@ export class Squid {
       }
       case WASM_TYPE: {
         // register execute wasm msg type for signer
-        signer.registry.register(WASM_TYPE, MsgExecuteContract);
+        // signer.registry.register(WASM_TYPE, MsgExecuteContract);
 
         const wasmHook = cosmosMsg.msg as WasmHookMsg;
         msgs.push({
@@ -501,15 +513,23 @@ export class Squid {
     }
 
     // validating that user has enough balance for the transfer
-    await this.validateCosmosBalance(signer, signerAddress, {
-      denom: route.params.fromToken.address,
-      amount: route.params.fromAmount
-    });
+    await this.validateCosmosBalance(
+      signer,
+      signerAddress,
+      {
+        denom: route.params.fromToken.address,
+        amount: route.params.fromAmount
+      },
+      String(route.params.fromChain)
+    );
 
     // This conversion is needed for Ledger, They only supports Amino messages
     // TODO: At the moment there's a limit on Ledger Nano S models
     // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
-    const aminoTypes = this.getAminoTypeConverters();
+    const aminoConverter = this.getAminoTypeConverter(
+      signer,
+      cosmosMsg.msgTypeUrl
+    );
     const firstMsg = msgs[0];
     const formattedMsg = {
       ...firstMsg,
@@ -522,24 +542,32 @@ export class Squid {
       }
     };
 
-    const aminoMsg = aminoTypes.toAmino(formattedMsg);
-    const fromAminoMsg = aminoTypes.fromAmino(aminoMsg);
+    const aminoMsg = aminoConverter.toAmino(formattedMsg);
+    const fromAminoMsg = aminoConverter.fromAmino(aminoMsg);
+
+    // Override add keplr attribute to signer
+    (signer as any).keplr = (signer as any).offlineSigner.keplr;
 
     // simulate tx to estimate gas cost
-    const estimatedGas = await signer.simulate(
-      signerAddress,
-      [fromAminoMsg],
-      ""
-    );
-    const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
+    // const estimatedGas = await signer.simulate(
+    //   signerAddress,
+    //   [fromAminoMsg],
+    //   ""
+    // );
+    // const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
 
-    return (signer as SigningCosmWasmClient).sign(
+    return signer.sign(
       signerAddress,
-      [fromAminoMsg],
-      calculateFee(
-        Math.trunc(estimatedGas * gasMultiplier),
-        GasPrice.fromString(route.transactionRequest!.gasPrice)
-      ),
+      [formattedMsg],
+      {
+        amount: [
+          {
+            denom: route.params.fromToken.ibcDenom,
+            amount: route.transactionRequest.gasLimit
+          }
+        ],
+        gas: route.transactionRequest!.gasLimit
+      },
       ""
     );
   }
@@ -882,11 +910,11 @@ export class Squid {
     return timeoutTimestamp.toNumber();
   }
 
-  private getAminoTypeConverters(): AminoTypes {
-    return new AminoTypes({
-      ...createIbcAminoConverters(),
-      ...createWasmAminoConverters()
-    });
+  private getAminoTypeConverter(
+    signer: SigningCosmWasmClient,
+    msgTypeUrl: string
+  ): AminoConverter {
+    return signer.aminoSigner.getConverterFromTypeUrl(msgTypeUrl);
   }
 
   public async getFromAmount({

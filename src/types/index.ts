@@ -1,4 +1,4 @@
-import { SigningStargateClient } from "@cosmjs/stargate";
+import { CosmWasmSigningClient as SigningCosmWasmClient } from "@cosmology/cosmjs/cosmwasm-stargate";
 import { ethers } from "ethers";
 import { LogLevel } from "../error";
 
@@ -361,7 +361,7 @@ export type OverrideParams = Omit<
 >;
 
 export type ExecuteRoute = {
-  signer: ethers.Wallet | ethers.Signer | SigningStargateClient;
+  signer: ethers.Wallet | ethers.Signer | SigningCosmWasmClient;
   signerAddress?: string;
   route: RouteData;
   executionSettings?: {

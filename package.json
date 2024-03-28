@@ -36,10 +36,11 @@
     "ethereum-multicall": "2.23.0",
     "axios": "^0.27.2",
     "ethers": "^5.7.1",
-    "@cosmjs/encoding": "^0.32.2",
-    "@cosmjs/stargate": "^0.32.2",
+    "@cosmology/cosmjs": "^0.0.5",
+    "@cosmjs/amino": "^0.32.2",
+    "@cosmjs/proto-signing": "^0.32.3",
     "@cosmjs/cosmwasm-stargate": "^0.32.2",
-    "cosmjs-types": "^0.9.0"
+    "@cosmjs/stargate": "^0.32.2"
   },
   "resolutions": {
     "semver": "^7.5.4"
