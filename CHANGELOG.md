@@ -1,5 +1,28 @@
 
 
+## [1.14.16-beta.0](https://github.com/0xsquid/api-sdk/compare/v1.14.1...v1.14.16-beta.0) (2024-03-27)
+
+
+### Features
+
+* add chainId property to evm balances response ([#239](https://github.com/0xsquid/api-sdk/issues/239)) ([e5166c0](https://github.com/0xsquid/api-sdk/commit/e5166c01790ad18f4517e83b20698d190fa60759))
+* support injective network ([#279](https://github.com/0xsquid/api-sdk/issues/279)) ([42f09e6](https://github.com/0xsquid/api-sdk/commit/42f09e64b6dbff391278f27e4acd8172c1edae1a))
+
+
+### Bug Fixes
+
+* bignumber formatting ([#255](https://github.com/0xsquid/api-sdk/issues/255)) ([ea7a775](https://github.com/0xsquid/api-sdk/commit/ea7a7756767f4dd2c0a8b6ca23666e116b6fa0a6))
+* handle ledger amino messages ([#215](https://github.com/0xsquid/api-sdk/issues/215)) ([2ef50f7](https://github.com/0xsquid/api-sdk/commit/2ef50f76d2429cca74c71a1fd1324beff9a90f0c)), closes [#216](https://github.com/0xsquid/api-sdk/issues/216) [#224](https://github.com/0xsquid/api-sdk/issues/224)
+* handle possible undefined value that could throw bignumber error ([#261](https://github.com/0xsquid/api-sdk/issues/261)) ([5886f43](https://github.com/0xsquid/api-sdk/commit/5886f436faef9797d544a94d0200208fd716a363))
+* parse undefined memo sent from api ([#237](https://github.com/0xsquid/api-sdk/issues/237)) ([6d42fdd](https://github.com/0xsquid/api-sdk/commit/6d42fdd45afc33bb81b192fa3e1c42694f1c6ca7))
+* use a different rpc url for each chain ([#230](https://github.com/0xsquid/api-sdk/issues/230)) ([53bfa60](https://github.com/0xsquid/api-sdk/commit/53bfa60b9b314a7412b265fdea6e7de4454e49ea))
+* use all chains when no chains are specified ([#233](https://github.com/0xsquid/api-sdk/issues/233)) ([ca638dd](https://github.com/0xsquid/api-sdk/commit/ca638dd1aaa3395272788880fd0a195be55db525))
+
+
+### Reverts
+
+* Revert "chore: branch cut release for sdk v1.14.9" ([7497aaa](https://github.com/0xsquid/api-sdk/commit/7497aaade74c5af75b12291d8be57f10aa022601))
+
 ## [1.14.15](https://github.com/0xsquid/api-sdk/compare/v1.14.1...v1.14.15) (2024-03-10)
 
 
