@@ -1,7 +1,20 @@
-import { AminoConverter, Coin } from "@cosmjs/stargate";
+import {
+  AminoConverter,
+  Coin,
+  GasPrice,
+  // StdFee,
+  calculateFee
+} from "@cosmjs/stargate";
 import { CosmWasmSigningClient as SigningCosmWasmClient } from "@cosmology/cosmjs/cosmwasm-stargate";
 import { RpcQuery } from "@uni-sign/cosmos-query/rpc";
 import axios, { AxiosInstance } from "axios";
+import { MsgSend } from "@uni-sign/cosmos-msgs/cosmos/bank/v1beta1/tx";
+import { MsgTransfer } from "@uni-sign/cosmos-msgs/ibc/applications/transfer/v1/tx";
+import { AminoSigner } from "@uni-sign/cosmos/amino";
+// import { StdFee as UniSignStdFee } from "@uni-sign/types";
+import { toConverter, toEncoder } from "@uni-sign/cosmos/utils";
+import { toAminoWallet } from "@cosmology/cosmjs/utils";
+import { OfflineAminoSigner } from "@cosmology/cosmjs/types";
 
 import { BigNumber, UnsignedTransaction, ethers } from "ethers";
 
@@ -47,6 +60,7 @@ import { getCosmosBalances } from "./services/getCosmosBalances";
 import { getAllEvmTokensBalance } from "./services/getEvmBalances";
 import { getChainData, getTokenData } from "./utils";
 import { setAxiosInterceptors } from "./utils/setAxiosInterceptors";
+import { defaultSignerConfig } from "@uni-sign/ethereum/defaults";
 
 const baseUrl = "https://testnet.api.0xsquid.com/";
 
@@ -226,7 +240,6 @@ export class Squid {
   }
 
   private async validateCosmosBalance(
-    signer: SigningCosmWasmClient,
     signerAddress: string,
     coin: Coin,
     chainId: string
@@ -248,8 +261,6 @@ export class Squid {
       address: signerAddress,
       denom: coin.denom
     });
-
-    console.log("signerCoinBalance", signerCoinBalance);
 
     if (!signerCoinBalance) {
       throw new SquidError({
@@ -346,7 +357,7 @@ export class Squid {
     // handle cosmos case
     if (!isEvmChainId) {
       return await this.executeRouteCosmos(
-        signer as SigningCosmWasmClient,
+        signer as AminoSigner,
         signerAddress!,
         route
       );
@@ -473,7 +484,7 @@ export class Squid {
   }
 
   private async executeRouteCosmos(
-    signer: SigningCosmWasmClient,
+    signer: AminoSigner,
     signerAddress: string,
     route: RouteData
   ): Promise<TxRaw> {
@@ -514,7 +525,6 @@ export class Squid {
 
     // validating that user has enough balance for the transfer
     await this.validateCosmosBalance(
-      signer,
       signerAddress,
       {
         denom: route.params.fromToken.address,
@@ -526,10 +536,10 @@ export class Squid {
     // This conversion is needed for Ledger, They only supports Amino messages
     // TODO: At the moment there's a limit on Ledger Nano S models
     // This limit prevents WASM_TYPE messages to be signed (because payload message is too big)
-    const aminoConverter = this.getAminoTypeConverter(
-      signer,
-      cosmosMsg.msgTypeUrl
-    );
+    // const aminoConverter = this.getAminoTypeConverter(
+    //   signer,
+    //   cosmosMsg.msgTypeUrl
+    // );
     const firstMsg = msgs[0];
     const formattedMsg = {
       ...firstMsg,
@@ -542,11 +552,10 @@ export class Squid {
       }
     };
 
-    const aminoMsg = aminoConverter.toAmino(formattedMsg);
-    const fromAminoMsg = aminoConverter.fromAmino(aminoMsg);
+    // const aminoMsg = aminoConverter.toAmino(formattedMsg);
+    // const fromAminoMsg = aminoConverter.fromAmino(aminoMsg);
 
     // Override add keplr attribute to signer
-    (signer as any).keplr = (signer as any).offlineSigner.keplr;
 
     // simulate tx to estimate gas cost
     // const estimatedGas = await signer.simulate(
@@ -555,21 +564,61 @@ export class Squid {
     //   ""
     // );
     // const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
+    if (!route.transactionRequest)
+      throw new SquidError({
+        message: `transactionRequest property is missing in route object`,
+        errorType: ErrorType.ValidationError,
+        logging: this.config.logging,
+        logLevel: this.config.logLevel
+      });
 
-    return signer.sign(
-      signerAddress,
+    const fromChain = getChainData(
+      this.chains as ChainData[],
+      route.params.fromChain
+    );
+
+    // if (!signer.offlineSigner) {
+    //   throw new SquidError({
+    //     message: `Offline signer is required for cosmos transactions`,
+    //     errorType: ErrorType.ValidationError,
+    //     logging: this.config.logging,
+    //     logLevel: this.config.logLevel
+    //   });
+    // }
+    // const aminoWallet = toAminoWallet(
+    //   signer.offlineSigner as OfflineAminoSigner,
+    //   String(route.params.fromChain)
+    // );
+
+    // const aminoSigner = await AminoSigner.fromWallet(
+    //   aminoWallet,
+    //   [(toEncoder(MsgSend), toEncoder(MsgTransfer))],
+    //   [toConverter(MsgSend), toConverter(MsgTransfer)],
+    //   fromChain?.rpc ?? "",
+    //   defaultSignerConfig
+    // );
+
+    // const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
+
+    // const stdFee: UniSignStdFee = calculateFee(
+    //   Math.trunc(Number(route.transactionRequest.gasPrice) * gasMultiplier),
+    //   GasPrice.fromString(route.transactionRequest!.gasPrice)
+    // ) as UniSignStdFee;
+
+    const signed = await signer.sign(
       [formattedMsg],
       {
         amount: [
           {
-            denom: route.params.fromToken.ibcDenom,
-            amount: route.transactionRequest.gasLimit
+            denom: route.params.fromToken.address,
+            amount: "200000"
           }
         ],
-        gas: route.transactionRequest!.gasLimit
+        gas: "200000"
       },
       ""
     );
+    return signed.tx;
   }
 
   public async isRouteApproved({ route, sender }: IsRouteApproved): Promise<{

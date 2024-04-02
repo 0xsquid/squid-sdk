@@ -1,6 +1,7 @@
 import { CosmWasmSigningClient as SigningCosmWasmClient } from "@cosmology/cosmjs/cosmwasm-stargate";
 import { ethers } from "ethers";
 import { LogLevel } from "../error";
+import { AminoSigner } from "@uni-sign/cosmos/amino";
 
 export enum ChainName {
   ACRECHAIN = "acre",
@@ -361,7 +362,7 @@ export type OverrideParams = Omit<
 >;
 
 export type ExecuteRoute = {
-  signer: ethers.Wallet | ethers.Signer | SigningCosmWasmClient;
+  signer: ethers.Wallet | ethers.Signer | AminoSigner | SigningCosmWasmClient;
   signerAddress?: string;
   route: RouteData;
   executionSettings?: {
