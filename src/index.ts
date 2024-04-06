@@ -542,14 +542,6 @@ export class Squid {
         GasPrice.fromString(route.transactionRequest!.gasPrice)
       );
 
-      console.log({
-        signerAddress,
-        fromAminoMsg,
-        fee,
-        estimatedGas,
-        gasMultiplier
-      });
-
       return (signer as SigningCosmWasmClient).signAndBroadcast(
         signerAddress,
         [fromAminoMsg],
