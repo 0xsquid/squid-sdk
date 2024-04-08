@@ -535,13 +535,12 @@ export class Squid {
       ""
     );
     const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
+    const fee = calculateFee(
+      Math.trunc(estimatedGas * gasMultiplier),
+      GasPrice.fromString(route.transactionRequest!.gasPrice)
+    );
 
     if (useBroadcast) {
-      const fee = calculateFee(
-        Math.trunc(estimatedGas * gasMultiplier),
-        GasPrice.fromString(route.transactionRequest!.gasPrice)
-      );
-
       return (signer as SigningCosmWasmClient).signAndBroadcast(
         signerAddress,
         [fromAminoMsg],
@@ -549,13 +548,11 @@ export class Squid {
         ""
       );
     }
+
     return (signer as SigningCosmWasmClient).sign(
       signerAddress,
       [fromAminoMsg],
-      calculateFee(
-        Math.trunc(estimatedGas * gasMultiplier),
-        GasPrice.fromString(route.transactionRequest!.gasPrice)
-      ),
+      fee,
       ""
     );
   }
