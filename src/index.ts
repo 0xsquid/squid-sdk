@@ -6,6 +6,7 @@ import { toUtf8 } from "@cosmjs/encoding";
 import {
   AminoTypes,
   Coin,
+  DeliverTxResponse,
   GasPrice,
   SigningStargateClient,
   calculateFee,
@@ -313,8 +314,11 @@ export class Squid {
     signerAddress,
     route,
     executionSettings,
-    overrides
-  }: ExecuteRoute): Promise<ethers.providers.TransactionResponse | TxRaw> {
+    overrides,
+    useBroadcast = false
+  }: ExecuteRoute): Promise<
+    ethers.providers.TransactionResponse | TxRaw | DeliverTxResponse
+  > {
     this.validateInit();
 
     if (!route.transactionRequest) {
@@ -326,17 +330,15 @@ export class Squid {
       });
     }
 
+    const isEvmChainId = Number(route.params.fromChain) > 0;
+
     // handle cosmos case
-    if (
-      signer instanceof SigningStargateClient ||
-      signer.constructor.name === "SigningStargateClient" ||
-      signer instanceof SigningCosmWasmClient ||
-      signer.constructor.name === "SigningCosmWasmClient"
-    ) {
+    if (!isEvmChainId) {
       return await this.executeRouteCosmos(
         signer as SigningStargateClient,
         signerAddress!,
-        route
+        route,
+        useBroadcast
       );
     }
 
@@ -382,7 +384,7 @@ export class Squid {
         fromAmount: params.fromAmount,
         fromChain,
         infiniteApproval: executionSettings?.infiniteApproval,
-        signer,
+        signer: signer as ethers.Signer,
         overrides: _overrides
       });
     }
@@ -402,7 +404,7 @@ export class Squid {
       };
     }
 
-    return await signer.sendTransaction(tx);
+    return await (signer as ethers.Signer).sendTransaction(tx);
   }
 
   public getRawTxHex({
@@ -463,8 +465,9 @@ export class Squid {
   private async executeRouteCosmos(
     signer: SigningStargateClient | SigningCosmWasmClient,
     signerAddress: string,
-    route: RouteData
-  ): Promise<TxRaw> {
+    route: RouteData,
+    useBroadcast = false
+  ): Promise<TxRaw | DeliverTxResponse> {
     const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest!.data);
     const msgs = [];
     switch (cosmosMsg.msgTypeUrl) {
@@ -532,14 +535,24 @@ export class Squid {
       ""
     );
     const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
+    const fee = calculateFee(
+      Math.trunc(estimatedGas * gasMultiplier),
+      GasPrice.fromString(route.transactionRequest!.gasPrice)
+    );
+
+    if (useBroadcast) {
+      return (signer as SigningCosmWasmClient).signAndBroadcast(
+        signerAddress,
+        [fromAminoMsg],
+        fee,
+        ""
+      );
+    }
 
     return (signer as SigningCosmWasmClient).sign(
       signerAddress,
       [fromAminoMsg],
-      calculateFee(
-        Math.trunc(estimatedGas * gasMultiplier),
-        GasPrice.fromString(route.transactionRequest!.gasPrice)
-      ),
+      fee,
       ""
     );
   }
