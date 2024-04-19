@@ -950,21 +950,19 @@ export class Squid {
       const toAmountBN = utils.parseUnits(toAmount, normalizedDecimalCount);
       const fromAmountBN = toTokenPriceBN.mul(toAmountBN).div(fromTokenPriceBN);
 
-      // Assuming slippage percentage is based on a standard 18 decimal format
-      const slippagePercentageBN = utils.parseUnits(
-        slippagePercentage.toString(),
-        18
+      // Slippage percentage is multiplied by 1000 to convert it into an integer form that represents the fraction.
+      // because BigNumber cannot handle floating points directly.
+      const slippageFractionBN = BigNumber.from(
+        Math.floor(slippagePercentage * 1000)
       );
 
-      // We adjust by dividing by 10^18.
-      // For instance, with a default slippage of 1.5%, if 'fromAmountBN'
-      // is 100, the calculation would be 100 * 1.5 / 10^18, resulting in the slippage amount in 'fromToken'.
-      const slippageBN = fromAmountBN
-        .mul(slippagePercentageBN)
-        .div(BigNumber.from("1000000000000000000"));
-      const fromAmountPlusSlippageBN = fromAmountBN.add(slippageBN);
+      // For example, a 10.5% slippage is represented here as 10,500 (after scaling),
+      // and dividing by 100,000 effectively applies the 10.5% to the fromAmountBN.
+      const slippageBN = fromAmountBN.mul(slippageFractionBN).div(100000);
 
-      return utils.formatUnits(fromAmountPlusSlippageBN, fromToken.decimals);
+      const totalFromAmountBN = fromAmountBN.add(slippageBN);
+
+      return utils.formatUnits(totalFromAmountBN, fromToken.decimals);
     } catch (error) {
       return null;
     }
