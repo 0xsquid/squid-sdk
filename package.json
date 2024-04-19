@@ -1,6 +1,6 @@
 {
   "name": "@0xsquid/sdk",
-  "version": "1.14.12",
+  "version": "1.14.16-beta.0",
   "description": "🛠 An SDK for building applications on top of 0xsquid",
   "repository": {
     "type": "git",
@@ -33,13 +33,13 @@
     "release:dry": "release-it --dry-run"
   },
   "dependencies": {
-    "ethereum-multicall": "2.21.0",
+    "ethereum-multicall": "2.23.0",
     "axios": "^0.27.2",
     "ethers": "^5.7.1",
-    "@cosmjs/encoding": "^0.31.0",
-    "@cosmjs/stargate": "^0.31.3",
-    "@cosmjs/cosmwasm-stargate": "^0.31.3",
-    "cosmjs-types": "^0.8.0"
+    "@cosmjs/encoding": "^0.32.2",
+    "@cosmjs/stargate": "^0.32.2",
+    "@cosmjs/cosmwasm-stargate": "^0.32.2",
+    "cosmjs-types": "^0.9.0"
   },
   "resolutions": {
     "semver": "^7.5.4"
