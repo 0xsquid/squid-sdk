@@ -44,6 +44,17 @@ describe("SquidSdk approve method", () => {
       expect(Number(fromAmount)).toBeGreaterThan(0);
     });
 
+    it("should return null if slippage is negative ", async () => {
+      const fromAmount = await squid.getFromAmount({
+        fromToken: ETHMainnet,
+        toToken: USDCArbitrum,
+        toAmount: "0.0001",
+        slippagePercentage: -1
+      });
+
+      expect(fromAmount).toBe(null);
+    });
+
     it("calculates the correct fromAmount is toAmount is high", async () => {
       const fromAmount = await squid.getFromAmount({
         fromToken: ETHMainnet,

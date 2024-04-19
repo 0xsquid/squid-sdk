@@ -901,10 +901,14 @@ export class Squid {
       ...createWasmAminoConverters()
     });
   }
+
   /**
    * Get the amount of tokens needed to swap to a specific amount
-   * This is needed in checkout widget where we know the destination amount but not the source amount
-   * The user won't modify the source amount, so we need to calculate it
+   * For example this can be needed in the purchase of an item where we know the destination amount but not the source amount
+   * @param fromToken
+   * @param toToken
+   * @param toAmount The price of the item, Ex: "0.1" for 0.1 ETH if the toToken is ETH
+   * @param slippagePercentage The slippage percentage to apply to the fromAmount
    * @returns {string} The amount of tokens needed to swap to a specific amount
    */
   public async getFromAmount({
@@ -918,6 +922,11 @@ export class Squid {
     toAmount: string;
     slippagePercentage?: number;
   }): Promise<string | null> {
+    if (slippagePercentage < 0) {
+      console.error("Invalid slippagePercentage: Cannot be negative.");
+      return null;
+    }
+
     try {
       // Get usd prices for both tokens
       const [fromTokenPrice, toTokenPrice] = await Promise.all([
@@ -931,10 +940,9 @@ export class Squid {
         })
       ]);
 
-      // Normalize prices to the same decimal count (use the higher decimal count)
-      // We need to do this because the price of a token can be very small (Ex: 0.000001 usdc = 4.0e-10 ETH)
-      // And decimals of fromToken and toToken can be different
-      // And we need to avoid a scientific notation
+      // Normalize prices to account for different decimal counts between tokens.
+      // This ensures calculations are consistent and prevents issues with scientific notation
+      // that could arise from small price values or different token decimals.
       const normalizedDecimalCount = Math.max(
         fromToken.decimals,
         toToken.decimals
@@ -964,6 +972,7 @@ export class Squid {
 
       return utils.formatUnits(totalFromAmountBN, fromToken.decimals);
     } catch (error) {
+      console.error("Failed to calculate fromAmount:", error);
       return null;
     }
   }
