@@ -1,7 +1,12 @@
+import { Squid } from "../../index";
+
 const mockValidateNativeBalance = jest.fn().mockResolvedValue({ isApproved: true });
 const mockValidateTokenBalance = jest.fn().mockResolvedValue({ isApproved: true });
 const mockValidateAllowance = jest.fn().mockResolvedValue("100000000000000000");
 const mockGetGasData = jest.fn().mockResolvedValue({ gasLimit: "100" });
+
+const testIntegratorId = "test-api";
+const testBaseUrl = "https://api.uatsquidrouter.com/";
 
 jest.mock("./utils", () => ({
   Utils: class Utils {
@@ -9,6 +14,22 @@ jest.mock("./utils", () => ({
     validateTokenBalance = mockValidateTokenBalance;
     validateAllowance = mockValidateAllowance;
     getGasData = mockGetGasData;
+
+    getTokensBalanceSupportingMultiCall =
+      jest.requireActual("./utils").Utils.prototype.getTokensBalanceSupportingMultiCall;
+    getTokensBalanceWithoutMultiCall =
+      jest.requireActual("./utils").Utils.prototype.getTokensBalanceWithoutMultiCall;
+  },
+}));
+
+jest.mock("ethers", () => ({
+  ...jest.requireActual("ethers"),
+  ethers: {
+    ...jest.requireActual("ethers").ethers,
+    Contract: class Contract {
+      getEthBalance = jest.fn().mockResolvedValue("100000000000000");
+      balanceOf = jest.fn().mockResolvedValue("100000000");
+    },
   },
 }));
 
@@ -75,6 +96,91 @@ describe("EvmHandler", () => {
   describe("approveRoute", () => {
     it("", () => {
       // expect();
+    });
+  });
+
+  describe("getBalances", () => {
+    let squid: Squid;
+
+    beforeAll(() => {
+      squid = new Squid({
+        integratorId: testIntegratorId,
+        baseUrl: testBaseUrl,
+      });
+
+      return squid.init();
+    });
+
+    it("returns balances for native tokens", async () => {
+      const ethToken = squid.tokens.find(t => t.symbol === "ETH" && t.chainId === "1");
+      const avaxToken = squid.tokens.find(t => t.symbol === "AVAX" && t.chainId === "43114");
+      const ethereumChain = squid.chains.find(c => c.chainId === "1");
+      const avalancheChain = squid.chains.find(c => c.chainId === "43114");
+
+      if (!ethToken || !avaxToken) throw new Error("Tokens not found");
+      if (!ethereumChain || !avalancheChain) throw new Error("Chain not found");
+
+      const balances = await handler.getBalances(
+        [ethToken, avaxToken],
+        "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664",
+        {
+          "1": ethereumChain.rpc,
+          "43114": avalancheChain.rpc,
+        },
+      );
+
+      expect(balances).toEqual([
+        {
+          symbol: ethToken.symbol,
+          address: ethToken.address,
+          decimals: ethToken.decimals,
+          chainId: ethToken.chainId,
+          balance: "100000000000000",
+        },
+        {
+          symbol: avaxToken.symbol,
+          address: avaxToken.address,
+          decimals: avaxToken.decimals,
+          chainId: avaxToken.chainId,
+          balance: "100000000000000",
+        },
+      ]);
+    });
+
+    it("returns balances for non-native tokens", async () => {
+      const usdcToken = squid.tokens.find(t => t.symbol === "USDC" && t.chainId === "42161");
+      const wethToken = squid.tokens.find(t => t.symbol === "WETH" && t.chainId === "137");
+      const polygonChain = squid.chains.find(c => c.chainId === "137");
+      const arbitrumChain = squid.chains.find(c => c.chainId === "42161");
+
+      if (!usdcToken || !wethToken) throw new Error("Tokens not found");
+      if (!polygonChain || !arbitrumChain) throw new Error("Chains not found");
+
+      const balances = await handler.getBalances(
+        [usdcToken, wethToken],
+        "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664",
+        {
+          "137": polygonChain.rpc,
+          "42161": arbitrumChain.rpc,
+        },
+      );
+
+      expect(balances).toEqual([
+        {
+          symbol: wethToken.symbol,
+          address: wethToken.address,
+          decimals: wethToken.decimals,
+          chainId: wethToken.chainId,
+          balance: "100000000",
+        },
+        {
+          symbol: usdcToken.symbol,
+          address: usdcToken.address,
+          decimals: usdcToken.decimals,
+          chainId: usdcToken.chainId,
+          balance: "100000000",
+        },
+      ]);
     });
   });
 });
