@@ -33,7 +33,7 @@ describe("TokensChains", () => {
     });
 
     it("should throw error if chain not found", async () => {
-      expect(() => tokenChains.getChainData("9999999")).toThrowError()
+      expect(() => tokenChains.getChainData("9999999")).toThrowError();
     });
   });
 
@@ -49,7 +49,7 @@ describe("TokensChains", () => {
     });
 
     it("should throw error if token not found", async () => {
-      expect(() => tokenChains.getTokenData("0x", "1")).toThrowError()
+      expect(() => tokenChains.getTokenData("0x", "1")).toThrowError();
     });
   });
 });
