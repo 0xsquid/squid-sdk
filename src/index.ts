@@ -14,7 +14,7 @@ import {
 } from "@cosmjs/stargate";
 import axios, { AxiosInstance } from "axios";
 
-import { BigNumber, UnsignedTransaction, ethers } from "ethers";
+import { BigNumber, UnsignedTransaction, ethers, utils } from "ethers";
 
 import {
   Allowance,
@@ -902,6 +902,15 @@ export class Squid {
     });
   }
 
+  /**
+   * Get the amount of tokens needed to swap to a specific amount
+   * For example this can be needed in the purchase of an item where we know the destination amount but not the source amount
+   * @param fromToken
+   * @param toToken
+   * @param toAmount The price of the item, Ex: "0.1" for 0.1 ETH if the toToken is ETH
+   * @param slippagePercentage The slippage percentage to apply to the fromAmount
+   * @returns {string} The amount of tokens needed to swap to a specific amount
+   */
   public async getFromAmount({
     fromToken,
     toAmount,
@@ -913,8 +922,13 @@ export class Squid {
     toAmount: string;
     slippagePercentage?: number;
   }): Promise<string | null> {
+    if (slippagePercentage < 0) {
+      console.error("Invalid slippagePercentage: Cannot be negative.");
+      return null;
+    }
+
     try {
-      // parallelize requests
+      // Get usd prices for both tokens
       const [fromTokenPrice, toTokenPrice] = await Promise.all([
         this.getTokenPrice({
           chainId: fromToken.chainId,
@@ -926,21 +940,41 @@ export class Squid {
         })
       ]);
 
-      // example fromAmount: 10
-      const fromAmount =
-        (toTokenPrice * Number(toAmount ?? 0)) / fromTokenPrice;
+      // Normalize prices to account for different decimal counts between tokens.
+      // This ensures calculations are consistent and prevents issues with scientific notation
+      // that could arise from small price values or different token decimals.
+      const normalizedDecimalCount = Math.max(
+        fromToken.decimals,
+        toToken.decimals
+      );
+      const fromTokenPriceBN = utils.parseUnits(
+        fromTokenPrice.toString(),
+        normalizedDecimalCount
+      );
+      const toTokenPriceBN = utils.parseUnits(
+        toTokenPrice.toString(),
+        normalizedDecimalCount
+      );
+      const toAmountBN = utils.parseUnits(toAmount, normalizedDecimalCount);
+      const fromAmountBN = toTokenPriceBN.mul(toAmountBN).div(fromTokenPriceBN);
 
-      // fromAmount (10) * slippagePercentage (1.5) / 100 = 0.15
-      const slippage = fromAmount * (slippagePercentage / 100);
+      // Slippage percentage is multiplied by 1000 to convert it into an integer form that represents the fraction.
+      // because BigNumber cannot handle floating points directly.
+      const slippageFractionBN = BigNumber.from(
+        Math.floor(slippagePercentage * 1000)
+      );
 
-      // fromAmount (10) + slippage (0.15) = 10.15
-      const fromAmountPlusSlippage = fromAmount + slippage;
+      // For example, a 10.5% slippage is represented here as 10,500 (after scaling),
+      // and dividing by 100,000 effectively applies the 10.5% to the fromAmountBN.
+      const slippageBN = fromAmountBN.mul(slippageFractionBN).div(100000);
 
-      return fromAmountPlusSlippage.toString();
+      const totalFromAmountBN = fromAmountBN.add(slippageBN);
+
+      return utils.formatUnits(totalFromAmountBN, fromToken.decimals);
     } catch (error) {
+      console.error("Failed to calculate fromAmount:", error);
       return null;
     }
   }
 }
-
 export * from "./types";
