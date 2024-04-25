@@ -6,13 +6,13 @@ const testIntegratorId = "test-api";
 const testBaseUrl = "https://api.uatsquidrouter.com/";
 
 describe("Squid", () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     squid = new Squid({
       baseUrl: testBaseUrl,
       integratorId: testIntegratorId,
     });
 
-    return squid.init();
+    return await squid.init();
   });
 
   describe("getTokenPrice", () => {
@@ -97,6 +97,41 @@ describe("Squid", () => {
         });
       } catch (error) {
         expect(error.response.status).toEqual(400);
+      }
+    });
+  });
+
+  describe("getStatus", () => {
+    jest.setTimeout(10000); // increase timeout for slow tests to 10 seconds
+
+    it("should return 500 error if transactionId is invalid", async () => {
+      try {
+        await squid.getStatus({
+          requestId: "1643a99ae59c3f5164ed120812f00e38",
+          integratorId: testIntegratorId,
+          transactionId: "0x",
+        });
+
+        expect(true).toBe(false); // should fail before reaching here
+      } catch (error) {
+        expect(error.response.status).toEqual(500);
+        expect(error.response.data.message).toEqual("No transaction found in axelarscan");
+      }
+    });
+
+    it("should return 400 error if transactionId is missing", async () => {
+      try {
+        await squid.getStatus({
+          requestId: "0x",
+          integratorId: testIntegratorId,
+          transactionId: "",
+        });
+
+        expect(true).toBe(false); // should fail before reaching here
+      } catch (error) {
+        expect(error.response.status).toEqual(400);
+        expect(error.response.data.message).toEqual("transactionId is a required field");
+        expect(error.response.data.type).toEqual("SCHEMA_VALIDATION_ERROR");
       }
     });
   });
