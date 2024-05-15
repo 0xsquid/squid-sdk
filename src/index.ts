@@ -534,7 +534,7 @@ export class Squid {
       [fromAminoMsg],
       ""
     );
-    const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.3;
+    const gasMultiplier = Number(route.transactionRequest!.maxFeePerGas) || 1.5;
     const fee = calculateFee(
       Math.trunc(estimatedGas * gasMultiplier),
       GasPrice.fromString(route.transactionRequest!.gasPrice)
