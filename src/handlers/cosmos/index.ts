@@ -14,6 +14,7 @@ import {
   ChainType,
   CCTP_TYPE,
   RouteRequest,
+  IBC_TRANSFER_TYPE,
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { MsgDepositForBurn } from "./cctpProto";
@@ -78,6 +79,11 @@ export class CosmosHandler {
 
         break;
       }
+
+      case IBC_TRANSFER_TYPE:
+        msgs.push(cosmosMsg);
+
+        break;
 
       default:
         throw new Error(`Cosmos message ${cosmosMsg.typeUrl} not supported`);
