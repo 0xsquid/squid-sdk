@@ -1,6 +1,6 @@
 export * from "./cctpProto";
 
-import { fromBech32, toBech32 } from "@cosmjs/encoding";
+import { fromBech32, toBech32, toUtf8 } from "@cosmjs/encoding";
 import { calculateFee, Coin, GasPrice, StargateClient } from "@cosmjs/stargate";
 
 import {
@@ -15,8 +15,10 @@ import {
   CCTP_TYPE,
   RouteRequest,
   IBC_TRANSFER_TYPE,
+  WASM_TYPE,
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { MsgDepositForBurn } from "./cctpProto";
 import { TokensChains } from "../../utils/TokensChains";
 
@@ -81,6 +83,15 @@ export class CosmosHandler {
       }
 
       case IBC_TRANSFER_TYPE:
+        msgs.push(cosmosMsg);
+
+        break;
+
+      case WASM_TYPE:
+        // register execute wasm msg type for signer
+        signer.registry.register(WASM_TYPE, MsgExecuteContract);
+
+        cosmosMsg.value.msg = toUtf8(cosmosMsg.value.msg);
         msgs.push(cosmosMsg);
 
         break;
