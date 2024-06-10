@@ -42,7 +42,7 @@
     "semver": "^7.5.4"
   },
   "devDependencies": {
-    "@0xsquid/squid-types": "0.1.75",
+    "@0xsquid/squid-types": "0.1.78",
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",
