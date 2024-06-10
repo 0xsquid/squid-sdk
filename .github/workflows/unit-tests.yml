@@ -9,7 +9,7 @@ jobs:
     name: Unit tests
     strategy:
       matrix:
-        node: ["16.x"]
+        node: ["18.x"]
 
     runs-on: ubuntu-latest
 
