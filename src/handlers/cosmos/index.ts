@@ -105,11 +105,18 @@ export class CosmosHandler {
     const gasMultiplier = Number(route.transactionRequest?.maxFeePerGas) || 1.3;
     const gasPrice = route.transactionRequest?.gasPrice as string;
 
+    let memo = "";
+    if (data.route.transactionRequest?.requestId) {
+      memo = JSON.stringify({
+        squidRequestId: data.route.transactionRequest?.requestId,
+      });
+    }
+
     return signer.sign(
       signerAddress,
       msgs,
       calculateFee(Math.trunc(estimatedGas * gasMultiplier), GasPrice.fromString(gasPrice)),
-      "",
+      memo,
     );
   }
 
