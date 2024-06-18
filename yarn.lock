@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@0.1.78":
-  version "0.1.78"
-  resolved "https://registry.npmjs.org/@0xsquid/squid-types/-/squid-types-0.1.78.tgz#6bfe6c3bce005b7feffda9a5048cec7f01ab74ad"
-  integrity sha512-bO9ezyLjHUYvGP+q9WKx3Qtnn7ZaitGj3FMylagRUJkI01wXlZiZID0eIKMQnL4j8U3GUs7HhCx5pSgalB7zfw==
+"@0xsquid/squid-types@0.1.80":
+  version "0.1.80"
+  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.80.tgz#c669861b15e221b9a70dee667e1f23720f55dfb5"
+  integrity sha512-Nj98/LUBiZTGRa7DQAGv3KNOiJ3NGtAiKYwK0pzrK/lcB6l+t6Q8qnD+m93DJ7ximzR+0AQsA2aa8C1phjk5BA==
   dependencies:
     "@axelar-network/axelarjs-sdk" "^0.16.1"
     "@ethersproject/providers" "^5.7.2"
