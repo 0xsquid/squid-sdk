@@ -1,5 +1,25 @@
 
 
+## [2.8.18](https://github.com/0xsquid/api-sdk/compare/v2.8.1-beta.0...v2.8.18) (2024-06-24)
+
+
+### Features
+
+* add a timeout to Config and Squid ([#254](https://github.com/0xsquid/api-sdk/issues/254)) ([dc62cc0](https://github.com/0xsquid/api-sdk/commit/dc62cc0b841968df57d0a144ef3b869b0f45a985))
+* add chainId property to evm balances response ([#240](https://github.com/0xsquid/api-sdk/issues/240)) ([ed4fe74](https://github.com/0xsquid/api-sdk/commit/ed4fe74a895a075364f5f585e4a7a464a94efffd))
+* fetch token prices at runtime ([#244](https://github.com/0xsquid/api-sdk/issues/244)) ([49f3284](https://github.com/0xsquid/api-sdk/commit/49f32847ef315e93db009ab4662feb8756860abb))
+* improve types for hooks ([#311](https://github.com/0xsquid/api-sdk/issues/311)) ([cb446a4](https://github.com/0xsquid/api-sdk/commit/cb446a4d9561e991e4eafd1a878287052cb89345))
+* new sdk method to get usd prices ([#290](https://github.com/0xsquid/api-sdk/issues/290)) ([7ca1047](https://github.com/0xsquid/api-sdk/commit/7ca10471b3eb80aad73d708d6ecc39964f8ccc07))
+
+
+### Bug Fixes
+
+* ethers v5 wallet type ([#268](https://github.com/0xsquid/api-sdk/issues/268)) ([140e248](https://github.com/0xsquid/api-sdk/commit/140e248d79dac9c6a20b230fa68ea079c2cde5d8))
+* node version for workflows ([89da21a](https://github.com/0xsquid/api-sdk/commit/89da21acf0401abeb317211394656638a05711f4))
+* preHook fundToken alloance and approval ([28c5eab](https://github.com/0xsquid/api-sdk/commit/28c5eab30c6b8f8c8544035f6398c7cddea967af))
+* update types for slippage optional ([6f9cc05](https://github.com/0xsquid/api-sdk/commit/6f9cc0597bb0bd99683736d11612a65741b5c77c))
+* use all chains when no chains are specified ([#234](https://github.com/0xsquid/api-sdk/issues/234)) ([46195d1](https://github.com/0xsquid/api-sdk/commit/46195d103ad89912a9f2bfff05cfd5869b36cbca))
+
 ## [2.8.17](https://github.com/0xsquid/api-sdk/compare/v2.8.1-beta.0...v2.8.17) (2024-06-24)
 
 
