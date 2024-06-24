@@ -326,7 +326,7 @@ export class EvmHandler extends Utils {
       // to avoid changing the entire approach, we only inject the address on the contract instance for on chain validation
       // need to be considered that fundToken is unknown and we probably do not support
       fromTokenContract = ethersAdapter.contract(
-        preHook ? preHook.fundToken : _fromToken.address, 
+        preHook ? preHook.fundToken : _fromToken.address,
         erc20Abi,
         signer || fromProvider,
       );
