@@ -170,7 +170,7 @@ export class EvmHandler extends Utils {
     ]);
 
     const approveTx = await (data.signer as EvmWallet).sendTransaction({
-      to: params.fromToken.address,
+      to: params.preHook ? params.preHook.fundToken : params.fromToken.address,
       data: approveData,
       ...overrides,
     });
@@ -309,7 +309,7 @@ export class EvmHandler extends Utils {
     params: RouteRequest,
     signer?: EvmWallet,
   ): RouteParamsPopulated {
-    const { fromChain, toChain, fromToken, toToken } = params;
+    const { fromChain, toChain, fromToken, toToken, preHook } = params;
 
     const _fromChain = tokensChains.getChainData(fromChain);
     const _toChain = tokensChains.getChainData(toChain);
@@ -322,8 +322,11 @@ export class EvmHandler extends Utils {
     let fromTokenContract;
 
     if (!fromIsNative) {
+      // case preHook, we need to check balance / allowance instead of fromToken
+      // to avoid changing the entire approach, we only inject the address on the contract instance for on chain validation
+      // need to be considered that fundToken is unknown and we probably do not support
       fromTokenContract = ethersAdapter.contract(
-        _fromToken.address,
+        preHook ? preHook.fundToken : _fromToken.address,
         erc20Abi,
         signer || fromProvider,
       );

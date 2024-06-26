@@ -1,6 +1,6 @@
 export * from "./cctpProto";
 
-import { fromBech32, toBech32 } from "@cosmjs/encoding";
+import { fromBech32, toBech32, toUtf8 } from "@cosmjs/encoding";
 import { calculateFee, Coin, GasPrice, StargateClient } from "@cosmjs/stargate";
 
 import {
@@ -14,8 +14,11 @@ import {
   ChainType,
   CCTP_TYPE,
   RouteRequest,
+  IBC_TRANSFER_TYPE,
+  WASM_TYPE,
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { MsgDepositForBurn } from "./cctpProto";
 import { TokensChains } from "../../utils/TokensChains";
 
@@ -79,6 +82,20 @@ export class CosmosHandler {
         break;
       }
 
+      case IBC_TRANSFER_TYPE:
+        msgs.push(cosmosMsg);
+
+        break;
+
+      case WASM_TYPE:
+        // register execute wasm msg type for signer
+        signer.registry.register(WASM_TYPE, MsgExecuteContract);
+
+        cosmosMsg.value.msg = toUtf8(cosmosMsg.value.msg);
+        msgs.push(cosmosMsg);
+
+        break;
+
       default:
         throw new Error(`Cosmos message ${cosmosMsg.typeUrl} not supported`);
     }
@@ -88,11 +105,18 @@ export class CosmosHandler {
     const gasMultiplier = Number(route.transactionRequest?.maxFeePerGas) || 1.3;
     const gasPrice = route.transactionRequest?.gasPrice as string;
 
+    let memo = "";
+    if (data.route.transactionRequest?.requestId) {
+      memo = JSON.stringify({
+        squidRequestId: data.route.transactionRequest?.requestId,
+      });
+    }
+
     return signer.sign(
       signerAddress,
       msgs,
       calculateFee(Math.trunc(estimatedGas * gasMultiplier), GasPrice.fromString(gasPrice)),
-      "",
+      memo,
     );
   }
 
