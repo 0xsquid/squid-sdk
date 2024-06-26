@@ -1,4 +1,3 @@
-import { SlippageMode } from "@0xsquid/squid-types";
 import { Squid } from "./index";
 
 let squid: Squid;
@@ -67,14 +66,11 @@ describe("Squid", () => {
         toChain: "56",
         fromToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
         toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-        fromAddress: "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664",
-        toAddress: "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664",
+        fromAddress: "0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5",
+        toAddress: "0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5",
         fromAmount: "5000000000000",
-        slippageConfig: {
-          slippage: 1.5,
-          autoMode: SlippageMode.NORMAL,
-        },
-      });
+        slippage: 1.5,
+      })
 
       expect(route.estimate).toBeDefined();
       expect(route.params).toBeDefined();
@@ -90,10 +86,7 @@ describe("Squid", () => {
           fromToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
           toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
           fromAmount: "5000000000000",
-          slippageConfig: {
-            slippage: 1.5,
-            autoMode: SlippageMode.NORMAL,
-          },
+          slippage: 1.5,
         });
       } catch (error) {
         expect(error.response.status).toEqual(400);
@@ -104,7 +97,7 @@ describe("Squid", () => {
   describe("getStatus", () => {
     jest.setTimeout(10000); // increase timeout for slow tests to 10 seconds
 
-    it("should return 500 error if transactionId is invalid", async () => {
+    it("should return 404 error if transactionId is invalid", async () => {
       try {
         await squid.getStatus({
           requestId: "1643a99ae59c3f5164ed120812f00e38",
@@ -114,7 +107,7 @@ describe("Squid", () => {
 
         expect(true).toBe(false); // should fail before reaching here
       } catch (error) {
-        expect(error.response.status).toEqual(500);
+        expect(error.response.status).toEqual(404);
         expect(error.response.data.message).toEqual("No transaction found in axelarscan");
       }
     });
