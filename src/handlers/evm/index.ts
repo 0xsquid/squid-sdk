@@ -170,7 +170,7 @@ export class EvmHandler extends Utils {
     ]);
 
     const approveTx = await (data.signer as EvmWallet).sendTransaction({
-      to: params.fromToken.address,
+      to: params.preHook ? params.preHook.fundToken : params.fromToken.address,
       data: approveData,
       ...overrides,
     });
