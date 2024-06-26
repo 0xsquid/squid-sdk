@@ -70,7 +70,7 @@ describe("Squid", () => {
         toAddress: "0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5",
         fromAmount: "5000000000000",
         slippage: 1.5,
-      })
+      });
 
       expect(route.estimate).toBeDefined();
       expect(route.params).toBeDefined();
