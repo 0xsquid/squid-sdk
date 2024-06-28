@@ -138,15 +138,25 @@ export class Utils {
       );
 
       const getTokenData = async () => {
-        const balanceInWei =
-          await contract[isNativeToken ? "getEthBalance" : "balanceOf"](userAddress);
+        const { decimals, symbol, address, chainId } = token;
+
+        let balance: string;
+
+        try {
+          const balanceInWei =
+            await contract[isNativeToken ? "getEthBalance" : "balanceOf"](userAddress);
+
+          balance = balanceInWei.toString();
+        } catch (error) {
+          balance = "0";
+        }
 
         return {
-          balance: balanceInWei.toString(),
-          symbol: token.symbol,
-          address: token.address,
-          decimals: token.decimals,
-          chainId: token.chainId,
+          balance,
+          symbol,
+          address,
+          decimals,
+          chainId,
         };
       };
 
