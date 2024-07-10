@@ -2,14 +2,16 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@0.1.80":
-  version "0.1.80"
-  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.80.tgz#c669861b15e221b9a70dee667e1f23720f55dfb5"
-  integrity sha512-Nj98/LUBiZTGRa7DQAGv3KNOiJ3NGtAiKYwK0pzrK/lcB6l+t6Q8qnD+m93DJ7ximzR+0AQsA2aa8C1phjk5BA==
+"@0xsquid/squid-types@0.1.85":
+  version "0.1.85"
+  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.85.tgz#586c65b5361fe81eb97e2eb9d15f460e8c59ceef"
+  integrity sha512-LTn5GM0yPnLqyDBAYOB1kRPYoClPK/gmaPC0Axp4Z1KrTWh3a1yac4+eqmZYsSKr7zZOrBcid7/OchsVUEW2YA==
   dependencies:
     "@axelar-network/axelarjs-sdk" "^0.16.1"
     "@ethersproject/providers" "^5.7.2"
+    long "^5.2.3"
     typescript "*"
+    ws "^8.18.0"
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
@@ -7678,6 +7680,11 @@ ws@^8.13.0:
   version "8.16.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.16.0.tgz#d1cd774f36fbc07165066a60e40323eab6446fd4"
   integrity sha512-HS0c//TP7Ina87TfiPUz1rQzMhHrl/SG2guqRcTOIUYD2q8uhUdNHZYJUaQ8aTGPzCh+c6oawMKW35nFl1dxyQ==
+
+ws@^8.18.0:
+  version "8.18.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.18.0.tgz#0d7505a6eafe2b0e712d232b42279f53bc289bbc"
+  integrity sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==
 
 ws@~8.11.0:
   version "8.11.0"
