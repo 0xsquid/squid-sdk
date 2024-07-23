@@ -181,7 +181,7 @@ export class Utils {
       tokens.map(async t => {
         let balance: TokenBalance | null;
         try {
-          if (t.address === NATIVE_EVM_TOKEN_ADDRESS) {
+          if (t.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS.toLowerCase()) {
             balance = await this.fetchBalance({
               token: t,
               userAddress,
