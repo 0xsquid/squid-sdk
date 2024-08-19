@@ -88,7 +88,7 @@ const getTokensBalanceSupportingMultiCall = async (
   } catch (error) {
     return tokens.map(t => ({
       ...t,
-      balance: "0",
+      balance: "0"
     }));
   }
 };
@@ -183,7 +183,7 @@ export const getAllEvmTokensBalance = async (
     console.error(error);
     return evmTokens.map(t => ({
       ...t,
-      balance: "0",
+      balance: "0"
     }));
   }
 };
