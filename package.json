@@ -18,7 +18,7 @@
     "lint:fix": "yarn lint --fix",
     "format": "prettier --ignore-path .gitignore --write --log-level error \"**/*.+(js|ts|json)\"",
     "prepare": "husky install",
-    "test": "jest ./*/*.spec.ts --verbose",
+    "test": "jest --testMatch \"**/*.spec.ts\" --verbose",
     "build": "tsc",
     "integration": "npx ts-node src/scripts/basic-test-script.ts",
     "release": "release-it",
