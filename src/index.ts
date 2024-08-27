@@ -1,25 +1,26 @@
 /* eslint-disable no-case-declarations */
 import {
   ChainType,
-  RouteRequest,
-  RouteResponse,
-  StatusResponse,
-  EvmWallet,
-  Token,
-  TokenBalance,
   CosmosAddress,
   CosmosBalance,
+  EvmWallet,
+  RouteRequest,
+  RouteResponse,
   SquidData,
+  StatusResponse,
+  Token,
+  TokenBalance,
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
-import { Config, GetStatus, ExecuteRoute, TransactionResponses } from "./types";
+import { Config, ExecuteRoute, GetStatus, TransactionResponses } from "./types";
 
+import { CosmosHandler, EvmHandler } from "./handlers";
 import { TokensChains } from "./utils/TokensChains";
-import { EvmHandler, CosmosHandler } from "./handlers";
 
-import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
 import { getCosmosChainsForChainIds } from "./utils/cosmos";
+import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
+import { isValidNumber } from "./utils/numbers";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -221,7 +222,17 @@ export class Squid extends TokensChains {
       params: { address: tokenAddress, chainId, usdPrice: true },
     });
 
-    return response.data.token.usdPrice;
+    const token = response.data.tokens.find(
+      (t: Token) => t.address.toLowerCase() === tokenAddress.toLowerCase(),
+    );
+
+    if (!token || !isValidNumber(token.usdPrice)) {
+      throw new Error(
+        `Valid token price not found for address ${tokenAddress} on chain ${chainId}`,
+      );
+    }
+
+    return Number(token.usdPrice);
   }
 
   /**
@@ -239,7 +250,7 @@ export class Squid extends TokensChains {
       },
     });
 
-    return response.data.tokens;
+    return response.data.tokens.filter((token: Token) => isValidNumber(token.usdPrice));
   }
 
   public async getFromAmount({

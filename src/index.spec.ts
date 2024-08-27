@@ -1,4 +1,5 @@
 import { Squid } from "./index";
+import { isValidNumber } from "./utils/numbers";
 
 let squid: Squid;
 const testIntegratorId = "test-api";
@@ -53,9 +54,7 @@ describe("Squid", () => {
         chainId: "1",
       });
 
-      expect(tokensWithPrice.every(tokenPrice => typeof tokenPrice.usdPrice === "number")).toBe(
-        true,
-      );
+      expect(tokensWithPrice.every(tokenPrice => isValidNumber(tokenPrice.usdPrice))).toBe(true);
     });
   });
 
