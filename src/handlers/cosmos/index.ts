@@ -23,6 +23,15 @@ import { MsgDepositForBurn } from "./cctpProto";
 import { TokensChains } from "../../utils/TokensChains";
 
 export class CosmosHandler {
+  public static normalizeIbcAddress = (address: string): string => {
+    if (!address.startsWith("ibc")) {
+      return address;
+    }
+
+    const [prefix, denom] = address.split("/");
+    return `${prefix}/${denom.toUpperCase()}`;
+  };
+
   async validateBalance({
     data,
     params,
@@ -33,7 +42,7 @@ export class CosmosHandler {
     const { signerAddress } = data;
     const signer = data.signer as CosmosSigner;
     const coin = {
-      denom: params.fromToken.address,
+      denom: CosmosHandler.normalizeIbcAddress(params.fromToken.address),
       amount: params.fromAmount,
     } as Coin;
 
