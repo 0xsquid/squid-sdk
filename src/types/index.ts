@@ -43,7 +43,7 @@ export type ExecuteRoute = {
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
   signerAddress?: string; // cosmos specific
-  useBroadcast?: boolean,
+  useBroadcast?: boolean;
 };
 
 export type RouteResponse = _RouteResponse & {
