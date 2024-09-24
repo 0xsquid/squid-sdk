@@ -84,7 +84,9 @@ export class CosmosHandler {
       }
 
       case IBC_TRANSFER_TYPE:
-        cosmosMsg.value.timeoutTimestamp = Long.fromValue(cosmosMsg.value.timeoutTimestamp).toNumber()
+        cosmosMsg.value.timeoutTimestamp = Long.fromValue(
+          cosmosMsg.value.timeoutTimestamp,
+        ).toNumber();
         msgs.push(cosmosMsg);
 
         break;

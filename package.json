@@ -27,13 +27,13 @@
     "release:dry": "release-it --dry-run"
   },
   "dependencies": {
-    "@cosmjs/encoding": "^0.32.4",
-    "@cosmjs/stargate": "^0.32.4",
-    "@cosmjs/cosmwasm-stargate": "^0.32.2",
+    "@cosmjs/encoding": "0.32.4",
+    "@cosmjs/stargate": "0.32.4",
+    "@cosmjs/cosmwasm-stargate": "0.32.4",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
     "axios": "^1.5.0",
-    "cosmjs-types": "^0.9.0",
+    "cosmjs-types": "0.9.0",
     "ethers": "6.8.1",
     "ethers-multicall-provider": "^5.0.0",
     "lodash": "^4.17.21",
