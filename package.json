@@ -40,7 +40,8 @@
     "long": "^5.2.3"
   },
   "resolutions": {
-    "semver": "^7.5.4"
+    "semver": "^7.5.4",
+    "long": "^5.2.3"
   },
   "devDependencies": {
     "@0xsquid/squid-types": "0.1.85",
