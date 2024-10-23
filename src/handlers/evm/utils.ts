@@ -46,11 +46,20 @@ export class Utils {
       throw new Error(`Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`);
     }
 
+    let tokenSymbol;
+
+    try {
+      tokenSymbol = await (fromTokenContract as Contract).symbol();
+    } catch (error) {
+      console.error("failed to get token symbol");
+    }
+
     return {
       isApproved: true,
-      message: `User has the expected balance ${amount} of ${await (
-        fromTokenContract as Contract
-      ).symbol()}`,
+      message:
+        tokenSymbol == null
+          ? `User has the expected balance ${amount}`
+          : `User has the expected balance ${amount} of ${tokenSymbol}`,
     };
   }
 
