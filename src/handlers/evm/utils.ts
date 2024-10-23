@@ -56,7 +56,10 @@ export class Utils {
 
     return {
       isApproved: true,
-      message: `User has the expected balance ${amount} of ${tokenSymbol}`,
+      message:
+        tokenSymbol != null
+          ? `User has the expected balance ${amount}`
+          : `User has the expected balance ${amount} of ${tokenSymbol}`,
     };
   }
 
