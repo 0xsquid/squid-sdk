@@ -37,13 +37,16 @@
     "ethers": "6.8.1",
     "ethers-multicall-provider": "^5.0.0",
     "lodash": "^4.17.21",
-    "long": "^5.2.3"
+    "long": "^5.2.3",
+    "@solana/web3.js": "1.95.3",
+    "@project-serum/anchor": "^0.26.0",
+    "bs58": "^6.0.0"
   },
   "resolutions": {
     "semver": "^7.5.4"
   },
   "devDependencies": {
-    "@0xsquid/squid-types": "0.1.85",
+    "@0xsquid/squid-types": "0.1.117",
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",
