@@ -1,12 +1,15 @@
 /* eslint-disable no-case-declarations */
 import {
+  ChainflipDepositAddressData,
   ChainType,
   CosmosAddress,
   CosmosBalance,
+  DepositAddressResponse,
   EvmWallet,
+  OnChainExecutionData,
   RouteRequest,
   RouteResponse,
-  SquidData,
+  SquidDataType,
   StatusResponse,
   Token,
   TokenBalance,
@@ -131,6 +134,21 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
+    switch (data.route.transactionRequest?.type) {
+      case SquidDataType.OnChainExecition:
+        return await this.executeOnChainTx(data);
+
+      case SquidDataType.ChainflipDepositAddress:
+        return await this.requestDepositAddress(data);
+
+      default:
+        throw new Error(
+          `Unsupported transaction request type - ${data.route.transactionRequest?.type}`,
+        );
+    }
+  }
+
+  private async executeOnChainTx(data: ExecuteRoute): Promise<TransactionResponses> {
     const fromChain = this.getChainData(data.route.params.fromChain);
     switch (fromChain.chainType) {
       case ChainType.EVM:
@@ -155,6 +173,22 @@ export class Squid extends TokensChains {
     }
   }
 
+  private async requestDepositAddress(route: ExecuteRoute): Promise<TransactionResponses> {
+    const depositAddressRequest = route.route.transactionRequest as ChainflipDepositAddressData;
+
+    // request deposit address from api
+    const { data, status } = await this.httpInstance.post(
+      "v2/deposit-address",
+      depositAddressRequest,
+    );
+
+    if (status != 200) {
+      throw new Error(data.error);
+    }
+
+    return data as DepositAddressResponse;
+  }
+
   async isRouteApproved({
     route,
     sender,
@@ -176,7 +210,7 @@ export class Squid extends TokensChains {
         return await this.handlers.evm.isRouteApproved({
           sender,
           params,
-          target: (route.transactionRequest as SquidData).target,
+          target: (route.transactionRequest as OnChainExecutionData).target,
         });
 
       default:
