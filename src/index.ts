@@ -135,7 +135,7 @@ export class Squid extends TokensChains {
     this.validateTransactionRequest(data.route);
 
     switch (data.route.transactionRequest?.type) {
-      case SquidDataType.OnChainExecition:
+      case SquidDataType.OnChainExecution:
         return await this.executeOnChainTx(data);
 
       case SquidDataType.ChainflipDepositAddress:
