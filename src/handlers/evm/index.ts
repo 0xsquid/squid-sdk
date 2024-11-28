@@ -5,9 +5,9 @@ import {
   Contract,
   EvmWallet,
   ExecuteRoute,
+  OnChainExecutionData,
   RouteParamsPopulated,
   RouteRequest,
-  SquidData,
   Token,
   TokenBalance,
   TransactionRequest,
@@ -37,11 +37,11 @@ export class EvmHandler extends Utils {
       route: { transactionRequest },
       overrides,
     } = data;
-    const { target, value, data: _data } = transactionRequest as SquidData;
+    const { target, value, data: _data } = transactionRequest as OnChainExecutionData;
     const signer = data.signer as WalletV6;
 
     const gasData = this.getGasData({
-      transactionRequest: data.route.transactionRequest as SquidData,
+      transactionRequest: data.route.transactionRequest as OnChainExecutionData,
       overrides,
     });
 
@@ -126,7 +126,7 @@ export class EvmHandler extends Utils {
     const hasAllowance = await this.validateAllowance({
       fromTokenContract: params.fromTokenContract as Contract,
       sender: address,
-      router: (data.route.transactionRequest as SquidData).target,
+      router: (data.route.transactionRequest as OnChainExecutionData).target,
       amount: BigInt(params.fromAmount),
     });
 
@@ -150,7 +150,7 @@ export class EvmHandler extends Utils {
       executionSettings,
       overrides,
     } = data;
-    const { target } = transactionRequest as SquidData;
+    const { target } = transactionRequest as OnChainExecutionData;
     const { fromIsNative, fromAmount } = params;
     const fromTokenContract = params.fromTokenContract as Contract;
 
@@ -224,10 +224,10 @@ export class EvmHandler extends Utils {
     route,
     overrides,
   }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
-    const { target, data, value } = route.transactionRequest as SquidData;
+    const { target, data, value } = route.transactionRequest as OnChainExecutionData;
 
     const gasData = this.getGasData({
-      transactionRequest: route.transactionRequest as SquidData,
+      transactionRequest: route.transactionRequest as OnChainExecutionData,
       overrides,
     });
 

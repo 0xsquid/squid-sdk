@@ -16,6 +16,7 @@ import {
   RouteRequest,
   IBC_TRANSFER_TYPE,
   WASM_TYPE,
+  OnChainExecutionData,
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
@@ -64,12 +65,14 @@ export class CosmosHandler {
     await this.validateBalance({ data, params });
 
     const { route } = data;
+    const transactionRequest = route.transactionRequest as OnChainExecutionData;
+
     const signerAddress = data.signerAddress as string;
     const signer = data.signer as CosmosSigner;
 
     const msgs = [];
 
-    const cosmosMsg: CosmosMsg = JSON.parse(route.transactionRequest?.data as string);
+    const cosmosMsg: CosmosMsg = JSON.parse(transactionRequest?.data as string);
 
     switch (cosmosMsg.typeUrl) {
       case CCTP_TYPE: {
@@ -105,16 +108,16 @@ export class CosmosHandler {
     }
 
     let memo = "";
-    if (data.route.transactionRequest?.requestId) {
+    if (transactionRequest?.requestId) {
       memo = JSON.stringify({
-        squidRequestId: data.route.transactionRequest?.requestId,
+        squidRequestId: transactionRequest?.requestId,
       });
     }
 
     // simulate tx to estimate gas cost
     const estimatedGas = await signer.simulate(signerAddress, msgs, memo);
-    const gasMultiplier = Number(route.transactionRequest?.maxFeePerGas) || 1.5;
-    const gasPrice = route.transactionRequest?.gasPrice as string;
+    const gasMultiplier = Number(transactionRequest?.maxFeePerGas) || 1.5;
+    const gasPrice = transactionRequest?.gasPrice as string;
 
     return signer.sign(
       signerAddress,
