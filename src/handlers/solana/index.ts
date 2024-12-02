@@ -1,6 +1,6 @@
 import { Wallet, web3 } from "@project-serum/anchor";
 import { Connection, VersionedTransaction } from "@solana/web3.js";
-import { ExecuteRoute, SolanaSigner, SolanaTxResponse } from "types";
+import { ExecuteRoute, OnChainExecutionData, SolanaSigner, SolanaTxResponse } from "types";
 
 export class SolanaHandler {
   async executeRoute({ data }: { data: ExecuteRoute }): Promise<SolanaTxResponse> {
@@ -10,7 +10,7 @@ export class SolanaHandler {
     const connection = new Connection(web3.clusterApiUrl("mainnet-beta"), "confirmed");
 
     // currently we support signing only for Jupiter
-    const swapRequest = route.transactionRequest!.data;
+    const swapRequest = (route.transactionRequest! as OnChainExecutionData).data;
 
     // build tx object
     const swapTransactionBuf = Buffer.from(swapRequest, "base64");
