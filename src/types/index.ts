@@ -62,7 +62,11 @@ export type SolanaTxResponse = {
   tx: string;
 };
 
-export type TransactionResponses = TransactionResponse | TxRaw | DepositAddressResponse | SolanaTxResponse;
+export type TransactionResponses =
+  | TransactionResponse
+  | TxRaw
+  | DepositAddressResponse
+  | SolanaTxResponse;
 
 export type GetStatus = {
   transactionId: string;
