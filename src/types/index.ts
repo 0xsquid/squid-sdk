@@ -3,6 +3,7 @@ import {
   Token,
   RouteRequest,
   RouteResponse as _RouteResponse,
+  DepositAddressResponse,
 } from "@0xsquid/squid-types";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
@@ -61,7 +62,7 @@ export type SolanaTxResponse = {
   tx: string;
 };
 
-export type TransactionResponses = TransactionResponse | TxRaw | SolanaTxResponse;
+export type TransactionResponses = TransactionResponse | TxRaw | DepositAddressResponse | SolanaTxResponse;
 
 export type GetStatus = {
   transactionId: string;

@@ -1,4 +1,4 @@
-import { ChainData, SquidData, Token } from "@0xsquid/squid-types";
+import { ChainData, OnChainExecutionData, Token } from "@0xsquid/squid-types";
 
 import { OverrideParams, Contract, GasData, RpcProvider, TokenBalance } from "../../types";
 import { MulticallWrapper } from "ethers-multicall-provider";
@@ -83,7 +83,7 @@ export class Utils {
     transactionRequest,
     overrides,
   }: {
-    transactionRequest: SquidData & { setGasPrice?: boolean };
+    transactionRequest: OnChainExecutionData & { setGasPrice?: boolean };
     overrides?: OverrideParams;
   }): GasData => {
     const {
