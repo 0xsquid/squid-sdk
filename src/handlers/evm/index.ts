@@ -1,5 +1,5 @@
-import { EthersAdapter } from "../../adapter/EthersAdapter";
 import erc20Abi from "../../abi/erc20.json";
+import { EthersAdapter } from "../../adapter/EthersAdapter";
 
 import {
   Contract,
@@ -20,8 +20,8 @@ import {
   NATIVE_EVM_TOKEN_ADDRESS,
   uint256MaxValue,
 } from "../../constants";
-import { Utils } from "./utils";
 import { TokensChains } from "../../utils/TokensChains";
+import { Utils } from "./utils";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -32,6 +32,7 @@ export class EvmHandler extends Utils {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
+    bypassBalanceChecks?: boolean;
   }): Promise<TransactionResponse> {
     const {
       route: { transactionRequest },
@@ -45,13 +46,15 @@ export class EvmHandler extends Utils {
       overrides,
     });
 
-    await this.validateBalanceAndApproval({
-      data: {
-        ...data,
-        overrides: gasData,
-      },
-      params,
-    });
+    if (!data.bypassBalanceChecks) {
+      await this.validateBalanceAndApproval({
+        data: {
+          ...data,
+          overrides: gasData,
+        },
+        params,
+      });
+    }
 
     const tx = {
       to: target,
