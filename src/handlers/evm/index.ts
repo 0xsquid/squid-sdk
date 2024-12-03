@@ -1,5 +1,5 @@
-import erc20Abi from "../../abi/erc20.json";
 import { EthersAdapter } from "../../adapter/EthersAdapter";
+import erc20Abi from "../../abi/erc20.json";
 
 import {
   Contract,
@@ -20,8 +20,8 @@ import {
   NATIVE_EVM_TOKEN_ADDRESS,
   uint256MaxValue,
 } from "../../constants";
-import { TokensChains } from "../../utils/TokensChains";
 import { Utils } from "./utils";
+import { TokensChains } from "../../utils/TokensChains";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -45,10 +45,13 @@ export class EvmHandler extends Utils {
       overrides,
     });
 
-    const hasAllowance = await this.validateTokenAllowance({ data, params });
-    if (!hasAllowance) {
-      await this.approveRoute({ data, params });
-    }
+    await this.validateBalanceAndApproval({
+      data: {
+        ...data,
+        overrides: gasData,
+      },
+      params,
+    });
 
     const tx = {
       to: target,
@@ -89,6 +92,50 @@ export class EvmHandler extends Utils {
         sender,
       });
     }
+  }
+
+  async validateBalanceAndApproval({
+    data,
+    params,
+  }: {
+    data: ExecuteRoute;
+    params: RouteParamsPopulated;
+  }): Promise<boolean> {
+    const wallet = data.signer as EvmWallet;
+
+    // support of multiple signers type and versions
+    let address = (wallet as any).address;
+
+    // ethers v5 & v6 support
+    try {
+      address = await wallet.getAddress();
+    } catch (error) {
+      // do nothing
+    }
+
+    // validate balance
+    await this.validateBalance({
+      sender: address,
+      params,
+    });
+
+    if (params.fromIsNative) {
+      return true;
+    }
+
+    const hasAllowance = await this.validateAllowance({
+      fromTokenContract: params.fromTokenContract as Contract,
+      sender: address,
+      router: (data.route.transactionRequest as OnChainExecutionData).target,
+      amount: BigInt(params.fromAmount),
+    });
+
+    // approve token spent if necessary
+    if (!hasAllowance) {
+      await this.approveRoute({ data, params });
+    }
+
+    return true;
   }
 
   async approveRoute({
