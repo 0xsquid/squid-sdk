@@ -1,16 +1,16 @@
 import {
-  ChainData,
-  Token,
-  RouteRequest,
   RouteResponse as _RouteResponse,
+  ChainData,
   DepositAddressResponse,
+  RouteRequest,
+  Token,
 } from "@0xsquid/squid-types";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
-import { EvmWallet, TransactionResponse, RpcProvider, Contract, GasData } from "./ethers";
-import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
-import { VersionedTransaction } from "@solana/web3.js";
 import { Wallet } from "@project-serum/anchor";
+import { VersionedTransaction } from "@solana/web3.js";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
+import { Contract, EvmWallet, GasData, RpcProvider, TransactionResponse } from "./ethers";
 
 export * from "@0xsquid/squid-types";
 export * from "./cosmos";
@@ -50,6 +50,7 @@ export type ExecuteRoute = {
   route: _RouteResponse["route"];
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
+  bypassBalanceChecks?: boolean;
   signerAddress?: string; // cosmos specific
 };
 
