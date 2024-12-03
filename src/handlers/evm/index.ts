@@ -32,7 +32,6 @@ export class EvmHandler extends Utils {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
-    bypassBalanceChecks?: boolean;
   }): Promise<TransactionResponse> {
     const {
       route: { transactionRequest },
