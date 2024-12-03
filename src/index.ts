@@ -158,7 +158,10 @@ export class Squid extends TokensChains {
           data.signer as EvmWallet,
         );
 
-        return this.handlers.evm.executeRoute({ data, params: evmParams });
+        return this.handlers.evm.executeRoute({
+          data,
+          params: evmParams,
+        });
 
       case ChainType.COSMOS:
         const cosmosParams = this.handlers.cosmos.populateRouteParams(this, data.route.params);
