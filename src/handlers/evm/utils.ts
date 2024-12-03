@@ -1,9 +1,18 @@
 import { ChainData, OnChainExecutionData, Token } from "@0xsquid/squid-types";
 
-import { OverrideParams, Contract, GasData, RpcProvider, TokenBalance } from "../../types";
-import { MulticallWrapper } from "ethers-multicall-provider";
 import { Provider, ethers } from "ethers";
-import { multicallAbi, MULTICALL_ADDRESS, NATIVE_EVM_TOKEN_ADDRESS } from "../../constants";
+import { MulticallWrapper } from "ethers-multicall-provider";
+import { MULTICALL_ADDRESS, NATIVE_EVM_TOKEN_ADDRESS, multicallAbi } from "../../constants";
+import {
+  Contract,
+  EvmWallet,
+  ExecuteRoute,
+  GasData,
+  OverrideParams,
+  RouteParamsPopulated,
+  RpcProvider,
+  TokenBalance,
+} from "../../types";
 
 export class Utils {
   async validateNativeBalance({
@@ -247,5 +256,33 @@ export class Utils {
     } catch (error) {
       return null;
     }
+  }
+
+  async validateTokenAllowance({
+    params,
+    data,
+  }: {
+    params: RouteParamsPopulated;
+    data: ExecuteRoute;
+  }): Promise<boolean> {
+    if (params.fromIsNative) {
+      return true;
+    }
+
+    const wallet = data.signer as EvmWallet;
+    let address = (wallet as any).address;
+
+    try {
+      address = await wallet.getAddress();
+    } catch (error) {
+      // do nothing
+    }
+
+    return await this.validateAllowance({
+      fromTokenContract: params.fromTokenContract as Contract,
+      sender: address,
+      router: (data.route.transactionRequest as OnChainExecutionData).target,
+      amount: BigInt(params.fromAmount),
+    });
   }
 }
