@@ -5,6 +5,10 @@ import {
   CosmosAddress,
   CosmosBalance,
   DepositAddressResponse,
+  Config,
+  ExecuteRoute,
+  GetStatus,
+  TransactionResponses,
   EvmWallet,
   OnChainExecutionData,
   RouteRequest,
@@ -13,10 +17,10 @@ import {
   StatusResponse,
   Token,
   TokenBalance,
+  TransactionResponse,
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
-import { Config, ExecuteRoute, GetStatus, TransactionResponses } from "./types";
 
 import { CosmosHandler, EvmHandler, SolanaHandler } from "./handlers";
 import { TokensChains } from "./utils/TokensChains";
@@ -225,7 +229,7 @@ export class Squid extends TokensChains {
     }
   }
 
-  async approveRoute(data: ExecuteRoute): Promise<boolean> {
+  async approveRoute(data: ExecuteRoute): Promise<TransactionResponse | null> {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
