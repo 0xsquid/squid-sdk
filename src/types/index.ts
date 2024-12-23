@@ -33,6 +33,7 @@ export type OverrideParams = GasData;
 
 export type ExecutionSettings = {
   infiniteApproval?: boolean;
+  approvalWaitTime?: number;
 };
 
 export type CosmosSigner = SigningStargateClient;
