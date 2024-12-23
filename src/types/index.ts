@@ -7,6 +7,8 @@ import {
 } from "@0xsquid/squid-types";
 import { SigningStargateClient } from "@cosmjs/stargate";
 
+import { Wallet } from "@project-serum/anchor";
+import { VersionedTransaction } from "@solana/web3.js";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { Contract, EvmWallet, GasData, RpcProvider, TransactionResponse } from "./ethers";
 
@@ -37,8 +39,14 @@ export type ExecutionSettings = {
 
 export type CosmosSigner = SigningStargateClient;
 
+export interface PhantomSigner {
+  signAndSendTransaction(tx: VersionedTransaction): { signature: string };
+}
+
+export type SolanaSigner = Wallet | PhantomSigner;
+
 export type ExecuteRoute = {
-  signer: EvmWallet | CosmosSigner;
+  signer: EvmWallet | CosmosSigner | SolanaSigner;
   route: _RouteResponse["route"];
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
@@ -51,7 +59,15 @@ export type RouteResponse = _RouteResponse & {
   integratorId?: string;
 };
 
-export type TransactionResponses = TransactionResponse | TxRaw | DepositAddressResponse;
+export type SolanaTxResponse = {
+  tx: string;
+};
+
+export type TransactionResponses =
+  | TransactionResponse
+  | TxRaw
+  | DepositAddressResponse
+  | SolanaTxResponse;
 
 export type GetStatus = {
   transactionId: string;
