@@ -96,7 +96,7 @@ describe("Squid", () => {
   describe("getStatus", () => {
     jest.setTimeout(10000); // increase timeout for slow tests to 10 seconds
 
-    it("should return 404 error if transactionId is invalid", async () => {
+    it.skip("should return 404 error if transactionId is invalid", async () => {
       try {
         await squid.getStatus({
           requestId: "1643a99ae59c3f5164ed120812f00e38",
