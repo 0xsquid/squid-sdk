@@ -22,7 +22,7 @@ import {
 } from "../../constants";
 import { TokensChains } from "../../utils/TokensChains";
 import { Utils } from "./utils";
-import { sleep } from "utils/evm";
+import { sleep } from "../../utils/evm";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -182,8 +182,8 @@ export class EvmHandler extends Utils {
       ...overrides,
     });
 
-    if (executionSettings?.approvalWaitTime != null) {
-      await sleep(executionSettings.approvalWaitTime);
+    if (executionSettings?.approvalWaitMs != null) {
+      await sleep(executionSettings.approvalWaitMs);
     }
 
     await approveTx.wait();
