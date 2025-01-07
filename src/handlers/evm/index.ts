@@ -146,7 +146,7 @@ export class EvmHandler extends Utils {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
-  }): Promise<boolean> {
+  }): Promise<TransactionResponse | null> {
     const {
       route: { transactionRequest },
       executionSettings,
@@ -157,7 +157,7 @@ export class EvmHandler extends Utils {
     const fromTokenContract = params.fromTokenContract as Contract;
 
     if (fromIsNative) {
-      return true;
+      return null;
     }
 
     let amountToApprove = BigInt(uint256MaxValue);
@@ -175,15 +175,11 @@ export class EvmHandler extends Utils {
       amountToApprove,
     ]);
 
-    const approveTx = await (data.signer as EvmWallet).sendTransaction({
+    return (data.signer as EvmWallet).sendTransaction({
       to: params.preHook ? params.preHook.fundToken : params.fromToken.address,
       data: approveData,
       ...overrides,
     });
-
-    await approveTx.wait();
-
-    return true;
   }
 
   async isRouteApproved({
