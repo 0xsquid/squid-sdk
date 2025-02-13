@@ -180,7 +180,7 @@ export class Squid extends TokensChains {
 
           // bypass approval because it works different for sending evmos tokens
           data.bypassBalanceChecks = true;
-  
+
           return this.handlers.evm.executeRoute({
             data,
             params: evmParams,
