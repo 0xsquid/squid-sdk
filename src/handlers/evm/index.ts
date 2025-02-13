@@ -3,6 +3,7 @@ import { EthersAdapter } from "../../adapter/EthersAdapter";
 
 import {
   Contract,
+  CosmosChain,
   EvmWallet,
   ExecuteRoute,
   OnChainExecutionData,
@@ -323,7 +324,7 @@ export class EvmHandler extends Utils {
     const fromIsNative = _fromToken.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS;
     let fromTokenContract;
 
-    if (!fromIsNative) {
+    if (!fromIsNative && !(_fromChain as CosmosChain).isEvmos) {
       // case preHook, we need to check balance / allowance instead of fromToken
       // to avoid changing the entire approach, we only inject the address on the contract instance for on chain validation
       // need to be considered that fundToken is unknown and we probably do not support

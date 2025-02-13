@@ -18,6 +18,7 @@ import {
   Token,
   TokenBalance,
   TransactionResponse,
+  CosmosChain,
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
@@ -169,6 +170,23 @@ export class Squid extends TokensChains {
         });
 
       case ChainType.COSMOS:
+        if ((fromChain as CosmosChain).isEvmos) {
+          // for evmos chains we should use usual EVM signing
+          const evmParams = this.handlers.evm.populateRouteParams(
+            this,
+            data.route.params,
+            data.signer as EvmWallet,
+          );
+
+          // bypass approval because it works different for sending evmos tokens
+          data.bypassBalanceChecks = true;
+  
+          return this.handlers.evm.executeRoute({
+            data,
+            params: evmParams,
+          });
+        }
+
         const cosmosParams = this.handlers.cosmos.populateRouteParams(this, data.route.params);
 
         return this.handlers.cosmos.executeRoute({
