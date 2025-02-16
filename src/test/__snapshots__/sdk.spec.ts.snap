@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://facebook.github.io/jest/docs/snapshot-testing.html
 
 exports[`Squid should instance Squid as expected 1`] = `
 Squid {
