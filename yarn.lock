@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@0.1.137":
-  version "0.1.137"
-  resolved "https://registry.npmjs.org/@0xsquid/squid-types/-/squid-types-0.1.137.tgz#d25a4e127fc5a3810edfc3dd51e174ac8968f1d9"
-  integrity sha512-RDLiTMtVWStq1O2BhrnciUy+2IorsIupTlyC/cgoOgQdahyjaLBmLZk8wj5iFN64z88tEZaH4NUKEAmH1E54hQ==
+"@0xsquid/squid-types@0.1.138":
+  version "0.1.138"
+  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.138.tgz#15fac6ea0c6fc6801153cfe685fd968e91e362ba"
+  integrity sha512-uMaMaOHCHpVX4mtQIuUe7fYZxEFa3+cM6claKKt97WbSryaB+iclJN3RFsYEMr19Z/BU1zhvjjBw9BMmOqMeMQ==
   dependencies:
     long "^5.2.4"
     typescript "*"
