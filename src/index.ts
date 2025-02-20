@@ -1,25 +1,34 @@
 /* eslint-disable no-case-declarations */
 import {
+  ChainflipDepositAddressData,
   ChainType,
-  RouteRequest,
-  RouteResponse,
-  StatusResponse,
-  EvmWallet,
-  Token,
-  TokenBalance,
   CosmosAddress,
   CosmosBalance,
-  SquidData,
+  DepositAddressResponse,
+  Config,
+  ExecuteRoute,
+  GetStatus,
+  TransactionResponses,
+  EvmWallet,
+  OnChainExecutionData,
+  RouteRequest,
+  RouteResponse,
+  SquidDataType,
+  StatusResponse,
+  Token,
+  TokenBalance,
+  TransactionResponse,
+  CosmosChain,
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
-import { Config, GetStatus, ExecuteRoute, TransactionResponses } from "./types";
 
+import { CosmosHandler, EvmHandler, SolanaHandler } from "./handlers";
 import { TokensChains } from "./utils/TokensChains";
-import { EvmHandler, CosmosHandler } from "./handlers";
 
-import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
 import { getCosmosChainsForChainIds } from "./utils/cosmos";
+import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
+import { isValidNumber } from "./utils/numbers";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
 
@@ -28,6 +37,7 @@ export class Squid extends TokensChains {
   private handlers = {
     evm: new EvmHandler(),
     cosmos: new CosmosHandler(),
+    solana: new SolanaHandler(),
   };
 
   public initialized = false;
@@ -130,6 +140,21 @@ export class Squid extends TokensChains {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
+    switch (data.route.transactionRequest?.type) {
+      case SquidDataType.OnChainExecution:
+        return await this.executeOnChainTx(data);
+
+      case SquidDataType.ChainflipDepositAddress:
+        return await this.requestDepositAddress(data);
+
+      default:
+        throw new Error(
+          `Unsupported transaction request type - ${data.route.transactionRequest?.type}`,
+        );
+    }
+  }
+
+  private async executeOnChainTx(data: ExecuteRoute): Promise<TransactionResponses> {
     const fromChain = this.getChainData(data.route.params.fromChain);
     switch (fromChain.chainType) {
       case ChainType.EVM:
@@ -139,9 +164,29 @@ export class Squid extends TokensChains {
           data.signer as EvmWallet,
         );
 
-        return this.handlers.evm.executeRoute({ data, params: evmParams });
+        return this.handlers.evm.executeRoute({
+          data,
+          params: evmParams,
+        });
 
       case ChainType.COSMOS:
+        if ((fromChain as CosmosChain).isEvmos) {
+          // for evmos chains we should use usual EVM signing
+          const evmParams = this.handlers.evm.populateRouteParams(
+            this,
+            data.route.params,
+            data.signer as EvmWallet,
+          );
+
+          // bypass approval because it works different for sending evmos tokens
+          data.bypassBalanceChecks = true;
+
+          return this.handlers.evm.executeRoute({
+            data,
+            params: evmParams,
+          });
+        }
+
         const cosmosParams = this.handlers.cosmos.populateRouteParams(this, data.route.params);
 
         return this.handlers.cosmos.executeRoute({
@@ -149,9 +194,28 @@ export class Squid extends TokensChains {
           params: cosmosParams,
         });
 
+      case ChainType.SOLANA:
+        return this.handlers.solana.executeRoute({ data });
+
       default:
         throw new Error(`Method not supported given chain type ${fromChain.chainType}`);
     }
+  }
+
+  private async requestDepositAddress(route: ExecuteRoute): Promise<TransactionResponses> {
+    const depositAddressRequest = route.route.transactionRequest as ChainflipDepositAddressData;
+
+    // request deposit address from api
+    const { data, status } = await this.httpInstance.post(
+      "v2/deposit-address",
+      depositAddressRequest,
+    );
+
+    if (status != 200) {
+      throw new Error(data.error);
+    }
+
+    return data as DepositAddressResponse;
   }
 
   async isRouteApproved({
@@ -175,7 +239,7 @@ export class Squid extends TokensChains {
         return await this.handlers.evm.isRouteApproved({
           sender,
           params,
-          target: (route.transactionRequest as SquidData).target,
+          target: (route.transactionRequest as OnChainExecutionData).target,
         });
 
       default:
@@ -183,7 +247,7 @@ export class Squid extends TokensChains {
     }
   }
 
-  async approveRoute(data: ExecuteRoute): Promise<boolean> {
+  async approveRoute(data: ExecuteRoute): Promise<TransactionResponse | null> {
     this.validateInit();
     this.validateTransactionRequest(data.route);
 
@@ -221,7 +285,17 @@ export class Squid extends TokensChains {
       params: { address: tokenAddress, chainId, usdPrice: true },
     });
 
-    return response.data.token.usdPrice;
+    const token = response.data.tokens.find(
+      (t: Token) => t.address.toLowerCase() === tokenAddress.toLowerCase(),
+    );
+
+    if (!token || !isValidNumber(token.usdPrice)) {
+      throw new Error(
+        `Valid token price not found for address ${tokenAddress} on chain ${chainId}`,
+      );
+    }
+
+    return Number(token.usdPrice);
   }
 
   /**
@@ -239,7 +313,7 @@ export class Squid extends TokensChains {
       },
     });
 
-    return response.data.tokens;
+    return response.data.tokens.filter((token: Token) => isValidNumber(token.usdPrice));
   }
 
   public async getFromAmount({

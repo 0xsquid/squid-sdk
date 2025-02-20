@@ -1,4 +1,4 @@
-import { ChainData, SquidData, Token } from "@0xsquid/squid-types";
+import { ChainData, OnChainExecutionData, Token } from "@0xsquid/squid-types";
 
 import { OverrideParams, Contract, GasData, RpcProvider, TokenBalance } from "../../types";
 import { MulticallWrapper } from "ethers-multicall-provider";
@@ -46,11 +46,20 @@ export class Utils {
       throw new Error(`Insufficient funds for account: ${sender} on chain ${fromChain.chainId}`);
     }
 
+    let tokenSymbol;
+
+    try {
+      tokenSymbol = await (fromTokenContract as Contract).symbol();
+    } catch (error) {
+      console.error("failed to get token symbol");
+    }
+
     return {
       isApproved: true,
-      message: `User has the expected balance ${amount} of ${await (
-        fromTokenContract as Contract
-      ).symbol()}`,
+      message:
+        tokenSymbol == null
+          ? `User has the expected balance ${amount}`
+          : `User has the expected balance ${amount} of ${tokenSymbol}`,
     };
   }
 
@@ -74,7 +83,7 @@ export class Utils {
     transactionRequest,
     overrides,
   }: {
-    transactionRequest: SquidData & { setGasPrice?: boolean };
+    transactionRequest: OnChainExecutionData & { setGasPrice?: boolean };
     overrides?: OverrideParams;
   }): GasData => {
     const {
@@ -181,7 +190,7 @@ export class Utils {
       tokens.map(async t => {
         let balance: TokenBalance | null;
         try {
-          if (t.address === NATIVE_EVM_TOKEN_ADDRESS) {
+          if (t.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS.toLowerCase()) {
             balance = await this.fetchBalance({
               token: t,
               userAddress,

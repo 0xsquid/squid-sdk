@@ -1,13 +1,14 @@
-import { EthersAdapter } from "../../adapter/EthersAdapter";
 import erc20Abi from "../../abi/erc20.json";
+import { EthersAdapter } from "../../adapter/EthersAdapter";
 
 import {
   Contract,
+  CosmosChain,
   EvmWallet,
   ExecuteRoute,
+  OnChainExecutionData,
   RouteParamsPopulated,
   RouteRequest,
-  SquidData,
   Token,
   TokenBalance,
   TransactionRequest,
@@ -15,9 +16,13 @@ import {
   WalletV6,
 } from "../../types";
 
-import { CHAINS_WITHOUT_MULTICALL, nativeTokenConstant, uint256MaxValue } from "../../constants";
-import { Utils } from "./utils";
+import {
+  CHAINS_WITHOUT_MULTICALL,
+  NATIVE_EVM_TOKEN_ADDRESS,
+  uint256MaxValue,
+} from "../../constants";
 import { TokensChains } from "../../utils/TokensChains";
+import { Utils } from "./utils";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -33,21 +38,23 @@ export class EvmHandler extends Utils {
       route: { transactionRequest },
       overrides,
     } = data;
-    const { target, value, data: _data } = transactionRequest as SquidData;
+    const { target, value, data: _data } = transactionRequest as OnChainExecutionData;
     const signer = data.signer as WalletV6;
 
     const gasData = this.getGasData({
-      transactionRequest: data.route.transactionRequest as SquidData,
+      transactionRequest: data.route.transactionRequest as OnChainExecutionData,
       overrides,
     });
 
-    await this.validateBalanceAndApproval({
-      data: {
-        ...data,
-        overrides: gasData,
-      },
-      params,
-    });
+    if (!data.bypassBalanceChecks) {
+      await this.validateBalanceAndApproval({
+        data: {
+          ...data,
+          overrides: gasData,
+        },
+        params,
+      });
+    }
 
     const tx = {
       to: target,
@@ -122,7 +129,7 @@ export class EvmHandler extends Utils {
     const hasAllowance = await this.validateAllowance({
       fromTokenContract: params.fromTokenContract as Contract,
       sender: address,
-      router: (data.route.transactionRequest as SquidData).target,
+      router: (data.route.transactionRequest as OnChainExecutionData).target,
       amount: BigInt(params.fromAmount),
     });
 
@@ -140,18 +147,18 @@ export class EvmHandler extends Utils {
   }: {
     data: ExecuteRoute;
     params: RouteParamsPopulated;
-  }): Promise<boolean> {
+  }): Promise<TransactionResponse | null> {
     const {
       route: { transactionRequest },
       executionSettings,
       overrides,
     } = data;
-    const { target } = transactionRequest as SquidData;
+    const { target } = transactionRequest as OnChainExecutionData;
     const { fromIsNative, fromAmount } = params;
     const fromTokenContract = params.fromTokenContract as Contract;
 
     if (fromIsNative) {
-      return true;
+      return null;
     }
 
     let amountToApprove = BigInt(uint256MaxValue);
@@ -169,15 +176,11 @@ export class EvmHandler extends Utils {
       amountToApprove,
     ]);
 
-    const approveTx = await (data.signer as EvmWallet).sendTransaction({
+    return (data.signer as EvmWallet).sendTransaction({
       to: params.preHook ? params.preHook.fundToken : params.fromToken.address,
       data: approveData,
       ...overrides,
     });
-
-    await approveTx.wait();
-
-    return true;
   }
 
   async isRouteApproved({
@@ -220,10 +223,10 @@ export class EvmHandler extends Utils {
     route,
     overrides,
   }: Omit<ExecuteRoute, "signer"> & { nonce: number }): string {
-    const { target, data, value } = route.transactionRequest as SquidData;
+    const { target, data, value } = route.transactionRequest as OnChainExecutionData;
 
     const gasData = this.getGasData({
-      transactionRequest: route.transactionRequest as SquidData,
+      transactionRequest: route.transactionRequest as OnChainExecutionData,
       overrides,
     });
 
@@ -318,10 +321,10 @@ export class EvmHandler extends Utils {
 
     const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
 
-    const fromIsNative = _fromToken.address === nativeTokenConstant;
+    const fromIsNative = _fromToken.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS;
     let fromTokenContract;
 
-    if (!fromIsNative) {
+    if (!fromIsNative && !(_fromChain as CosmosChain).isEvmos) {
       // case preHook, we need to check balance / allowance instead of fromToken
       // to avoid changing the entire approach, we only inject the address on the contract instance for on chain validation
       // need to be considered that fundToken is unknown and we probably do not support

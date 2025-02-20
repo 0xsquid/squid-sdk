@@ -1,3 +1,4 @@
+import { TransactionResponse as TransactionResponseV5 } from "@ethersproject/abstract-provider";
 import { Signer } from "@ethersproject/abstract-signer";
 import { Wallet } from "@ethersproject/wallet";
 import { ethers } from "ethers";
@@ -13,7 +14,7 @@ export type WalletV6 = ethers.Signer | ethers.Wallet;
 export type EvmWallet = WalletV6 | WalletV5;
 
 export type Transaction = ethers.Transaction;
-export type TransactionResponse = ethers.TransactionResponse;
+export type TransactionResponse = ethers.TransactionResponse | TransactionResponseV5;
 export type TransactionRequest = ethers.TransactionRequest;
 
 export type GasData = {
