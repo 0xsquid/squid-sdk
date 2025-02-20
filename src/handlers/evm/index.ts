@@ -15,7 +15,11 @@ import {
   WalletV6,
 } from "../../types";
 
-import { CHAINS_WITHOUT_MULTICALL, nativeTokenConstant, uint256MaxValue } from "../../constants";
+import {
+  CHAINS_WITHOUT_MULTICALL,
+  NATIVE_EVM_TOKEN_ADDRESS,
+  uint256MaxValue,
+} from "../../constants";
 import { Utils } from "./utils";
 import { TokensChains } from "../../utils/TokensChains";
 
@@ -318,7 +322,7 @@ export class EvmHandler extends Utils {
 
     const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
 
-    const fromIsNative = _fromToken.address === nativeTokenConstant;
+    const fromIsNative = _fromToken.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS;
     let fromTokenContract;
 
     if (!fromIsNative) {
