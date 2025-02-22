@@ -23,7 +23,7 @@ import {
 } from "../../constants";
 import { TokensChains } from "../../utils/TokensChains";
 import { Utils } from "./utils";
-import { isEvmosChain } from "utils/evm";
+import { isEvmosChain } from "../../utils/evm";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -169,7 +169,7 @@ export class EvmHandler extends Utils {
     }
 
     if (isEvmosChain(params.fromChain)) {
-      const channel: string | undefined = (data.route.estimate.actions[0].data as any)?.ibcChannel;
+      const channel: string | undefined = (data.route.estimate.actions[0]?.data as any)?.ibcChannel;
 
       if (!channel) {
         throw new Error("IBC Channel not found in route actions");
@@ -181,6 +181,13 @@ export class EvmHandler extends Utils {
         data.signer as EvmWallet,
       );
 
+      // important(very) to use original address here, otherwise won't work
+      const tokenToApprove = estimate.actions[0]?.fromToken.originalAddress;
+
+      if (!tokenToApprove) {
+        throw new Error(`Invalid token address: ${tokenToApprove}`);
+      }
+
       const approveData = fromTokenContract.interface.encodeFunctionData("approve", [
         target,
         [
@@ -189,9 +196,8 @@ export class EvmHandler extends Utils {
             sourceChannel: channel,
             spendLimit: [
               {
-                // important(very) to use original address here, otherwise wont work
-                denom: estimate.actions[0].fromToken.originalAddress!,
-                amount: params.fromAmount,
+                denom: tokenToApprove,
+                amount: amountToApprove,
               },
             ],
             allowList: [],
