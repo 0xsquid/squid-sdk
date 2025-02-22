@@ -18,7 +18,6 @@ import {
   Token,
   TokenBalance,
   TransactionResponse,
-  CosmosChain,
 } from "./types";
 
 import HttpAdapter from "./adapter/HttpAdapter";
@@ -27,7 +26,7 @@ import { CosmosHandler, EvmHandler, SolanaHandler } from "./handlers";
 import { TokensChains } from "./utils/TokensChains";
 
 import { getCosmosChainsForChainIds } from "./utils/cosmos";
-import { getChainRpcUrls, getEvmTokensForChainIds } from "./utils/evm";
+import { getChainRpcUrls, getEvmTokensForChainIds, isEvmosChain } from "./utils/evm";
 import { isValidNumber } from "./utils/numbers";
 
 const baseUrl = "https://testnet.api.squidrouter.com/";
@@ -170,7 +169,7 @@ export class Squid extends TokensChains {
         });
 
       case ChainType.COSMOS:
-        if ((fromChain as CosmosChain).isEvmos) {
+        if (isEvmosChain(fromChain)) {
           // for evmos chains we should use usual EVM signing
           const evmParams = this.handlers.evm.populateRouteParams(
             this,

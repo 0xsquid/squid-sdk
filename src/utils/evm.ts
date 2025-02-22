@@ -1,4 +1,4 @@
-import { ChainData, Token } from "@0xsquid/squid-types";
+import { ChainData, CosmosChain, Token } from "@0xsquid/squid-types";
 
 export function getEvmTokensForChainIds({
   chainIds,
@@ -24,4 +24,8 @@ export function getChainRpcUrls({ chains }: { chains: ChainData[] }): Record<str
     }),
     {},
   );
+}
+
+export function isEvmosChain(chain: ChainData): boolean {
+  return (chain as CosmosChain)?.isEvmos ?? false;
 }

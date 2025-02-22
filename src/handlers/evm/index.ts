@@ -1,9 +1,9 @@
 import erc20Abi from "../../abi/erc20.json";
+import ics20Abi from "../../abi/ics20.json";
 import { EthersAdapter } from "../../adapter/EthersAdapter";
 
 import {
   Contract,
-  CosmosChain,
   EvmWallet,
   ExecuteRoute,
   OnChainExecutionData,
@@ -23,6 +23,7 @@ import {
 } from "../../constants";
 import { TokensChains } from "../../utils/TokensChains";
 import { Utils } from "./utils";
+import { isEvmosChain } from "utils/evm";
 
 const ethersAdapter = new EthersAdapter();
 
@@ -149,15 +150,15 @@ export class EvmHandler extends Utils {
     params: RouteParamsPopulated;
   }): Promise<TransactionResponse | null> {
     const {
-      route: { transactionRequest },
+      route: { transactionRequest, estimate },
       executionSettings,
       overrides,
     } = data;
     const { target } = transactionRequest as OnChainExecutionData;
     const { fromIsNative, fromAmount } = params;
-    const fromTokenContract = params.fromTokenContract as Contract;
+    const fromTokenContract = params.fromTokenContract;
 
-    if (fromIsNative) {
+    if (fromIsNative || !fromTokenContract) {
       return null;
     }
 
@@ -167,20 +168,59 @@ export class EvmHandler extends Utils {
       amountToApprove = BigInt(fromAmount);
     }
 
-    // Probably strange issue with ethers v6
-    // https://github.com/ethers-io/ethers.js/issues/3830
-    // Need to manually encode approve, instead of calling fromTokenContract.approve
-    // TODO: Find a way to have it work with .approve method
-    const approveData = fromTokenContract.interface.encodeFunctionData("approve", [
-      target,
-      amountToApprove,
-    ]);
+    if (isEvmosChain(params.fromChain)) {
+      const channel: string | undefined = (data.route.estimate.actions[0].data as any)?.ibcChannel;
 
-    return (data.signer as EvmWallet).sendTransaction({
-      to: params.preHook ? params.preHook.fundToken : params.fromToken.address,
-      data: approveData,
-      ...overrides,
-    });
+      if (!channel) {
+        throw new Error("IBC Channel not found in route actions");
+      }
+
+      const fromTokenContract = ethersAdapter.contract(
+        params.fromToken.address,
+        ics20Abi,
+        data.signer as EvmWallet,
+      );
+
+      const approveData = fromTokenContract.interface.encodeFunctionData("approve", [
+        target,
+        [
+          {
+            sourcePort: "transfer",
+            sourceChannel: channel,
+            spendLimit: [
+              {
+                // important(very) to use original address here, otherwise wont work
+                denom: estimate.actions[0].fromToken.originalAddress!,
+                amount: params.fromAmount,
+              },
+            ],
+            allowList: [],
+            allowedPacketData: ["*"],
+          },
+        ],
+      ]);
+
+      return (data.signer as EvmWallet).sendTransaction({
+        to: params.fromToken.address,
+        data: approveData,
+        ...overrides,
+      });
+    } else {
+      // Probably strange issue with ethers v6
+      // https://github.com/ethers-io/ethers.js/issues/3830
+      // Need to manually encode approve, instead of calling fromTokenContract.approve
+      // TODO: Find a way to have it work with .approve method
+      const approveData = fromTokenContract.interface.encodeFunctionData("approve", [
+        target,
+        amountToApprove,
+      ]);
+
+      return (data.signer as EvmWallet).sendTransaction({
+        to: params.preHook ? params.preHook.fundToken : params.fromToken.address,
+        data: approveData,
+        ...overrides,
+      });
+    }
   }
 
   async isRouteApproved({
@@ -192,14 +232,14 @@ export class EvmHandler extends Utils {
     target: string;
     params: RouteParamsPopulated;
   }) {
-    const result = await this.validateBalance({ sender, params });
-
     if (params.fromIsNative) {
       return {
         isApproved: true,
         message: "Not required for native token",
       };
     }
+
+    const result = await this.validateBalance({ sender, params });
 
     const hasAllowance = await this.validateAllowance({
       fromTokenContract: params.fromTokenContract as Contract,
@@ -322,9 +362,9 @@ export class EvmHandler extends Utils {
     const fromProvider = ethersAdapter.rpcProvider(_fromChain.rpc);
 
     const fromIsNative = _fromToken.address.toLowerCase() === NATIVE_EVM_TOKEN_ADDRESS;
-    let fromTokenContract;
+    let fromTokenContract: Contract | undefined;
 
-    if (!fromIsNative && !(_fromChain as CosmosChain).isEvmos) {
+    if (!fromIsNative && !isEvmosChain(_fromChain)) {
       // case preHook, we need to check balance / allowance instead of fromToken
       // to avoid changing the entire approach, we only inject the address on the contract instance for on chain validation
       // need to be considered that fundToken is unknown and we probably do not support
