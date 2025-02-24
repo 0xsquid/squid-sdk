@@ -44,19 +44,19 @@ jobs:
         if: ${{ !contains('["major","minor", "patch", "premajor", "preminor", "prerelease", "prepatch"]', github.event.inputs.release-type) }}
 
       - name: Checkout ${{ github.event.inputs.branch-name }} for ${{ github.event.inputs.release-type }} release
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ github.event.inputs.branch-name != 'main' }}
         with:
           ref: ${{ github.event.inputs.branch-name }}
-          node-version: 18.x
+          node-version: 20.x
           fetch-depth: 0
 
       - name: Checkout main for ${{ github.event.inputs.release-type }} release
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: ${{ github.event.inputs.branch-name == 'main' }}
         with:
           ref: main
-          node-version: 18.x
+          node-version: 20.x
           fetch-depth: 0
 
       - name: Authenticate with private NPM package
