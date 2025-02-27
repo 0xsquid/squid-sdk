@@ -165,7 +165,7 @@ export class CosmosHandler {
 
   createCctpAminoConverters(): AminoConverters {
     return {
-      CCTP_TYPE: {
+      "/circle.cctp.v1.MsgDepositForBurn": {
         aminoType: "cctp/DepositForBurn",
         toAmino({ from, amount, destinationDomain, mintRecipient, burnToken }) {
           return { from, amount, destinationDomain, mintRecipient, burnToken };
