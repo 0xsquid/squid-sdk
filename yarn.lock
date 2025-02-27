@@ -966,6 +966,22 @@
     "@cosmjs/math" "^0.33.0"
     "@cosmjs/utils" "^0.33.0"
 
+"@cosmjs/cosmwasm-stargate@0.33.0":
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/@cosmjs/cosmwasm-stargate/-/cosmwasm-stargate-0.33.0.tgz#4b00b57758a3a1fc3beb6c0ce9484c445189a9d6"
+  integrity sha512-YJahXTLrfZ0evtSFcy5Aa4oorEAAHwe0ss6JVteiiNNDT7jHliONz5WOlg2/N7KLxoWCkVWcOpWJR4xZ/N3YEQ==
+  dependencies:
+    "@cosmjs/amino" "^0.33.0"
+    "@cosmjs/crypto" "^0.33.0"
+    "@cosmjs/encoding" "^0.33.0"
+    "@cosmjs/math" "^0.33.0"
+    "@cosmjs/proto-signing" "^0.33.0"
+    "@cosmjs/stargate" "^0.33.0"
+    "@cosmjs/tendermint-rpc" "^0.33.0"
+    "@cosmjs/utils" "^0.33.0"
+    cosmjs-types "^0.9.0"
+    pako "^2.0.2"
+
 "@cosmjs/crypto@^0.33.0":
   version "0.33.0"
   resolved "https://registry.npmjs.org/@cosmjs/crypto/-/crypto-0.33.0.tgz#98d00cb8a3f6ce763a4aa5870dc62e860ba2e48b"
@@ -1025,7 +1041,7 @@
     ws "^7"
     xstream "^11.14.0"
 
-"@cosmjs/stargate@0.33.0":
+"@cosmjs/stargate@0.33.0", "@cosmjs/stargate@^0.33.0":
   version "0.33.0"
   resolved "https://registry.npmjs.org/@cosmjs/stargate/-/stargate-0.33.0.tgz#21e58c50a462e4ada4d43fbb9bbf2ade46f81543"
   integrity sha512-Ti/2RRl+LKTNUrOqj6TpGnTRcbmQ5zD4Ujx/PDNPHEexyuwbz+tMcF8Y1kKPWQ1g4wWxLYO4tKY4Gm0J3c5hWA==
@@ -5838,9 +5854,9 @@ package-json@^10.0.0:
     registry-url "^6.0.1"
     semver "^7.6.0"
 
-pako@^2.0.3:
+pako@^2.0.2, pako@^2.0.3:
   version "2.1.0"
-  resolved "https://registry.npmjs.org/pako/-/pako-2.1.0.tgz#266cc37f98c7d883545d11335c00fbd4062c9a86"
+  resolved "https://registry.yarnpkg.com/pako/-/pako-2.1.0.tgz#266cc37f98c7d883545d11335c00fbd4062c9a86"
   integrity sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==
 
 parent-module@^1.0.0:

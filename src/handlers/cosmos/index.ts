@@ -1,7 +1,15 @@
 export * from "./cctpProto";
 
 import { fromBech32, toBech32, toUtf8 } from "@cosmjs/encoding";
-import { calculateFee, Coin, GasPrice, StargateClient } from "@cosmjs/stargate";
+import {
+  AminoConverters,
+  AminoTypes,
+  calculateFee,
+  Coin,
+  createIbcAminoConverters,
+  GasPrice,
+  StargateClient,
+} from "@cosmjs/stargate";
 
 import {
   CosmosSigner,
@@ -23,6 +31,7 @@ import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { MsgDepositForBurn } from "./cctpProto";
 import { TokensChains } from "../../utils/TokensChains";
 import Long from "long";
+import { createWasmAminoConverters } from "@cosmjs/cosmwasm-stargate";
 
 export class CosmosHandler {
   async validateBalance({
@@ -34,10 +43,7 @@ export class CosmosHandler {
   }): Promise<boolean> {
     const { signerAddress } = data;
     const signer = data.signer as CosmosSigner;
-    const coin = {
-      denom: params.fromToken.address,
-      amount: params.fromAmount,
-    } as Coin;
+    const coin = { denom: params.fromToken.address, amount: params.fromAmount } as Coin;
 
     if (!signerAddress) {
       throw new Error("signerAddress not provided");
@@ -109,22 +115,66 @@ export class CosmosHandler {
 
     let memo = "";
     if (transactionRequest?.requestId) {
-      memo = JSON.stringify({
-        squidRequestId: transactionRequest?.requestId,
-      });
+      memo = JSON.stringify({ squidRequestId: transactionRequest?.requestId });
     }
 
+    const aminoTypes = this.getAminoTypeConverters();
+    const firstMsg = msgs[0];
+    const formattedMsg = {
+      ...firstMsg,
+      value: {
+        ...firstMsg.value,
+        // Memo cannot be undefined, otherwise amino converter throws error
+        memo: (firstMsg.value as any).memo || "",
+        // Timeout wasn't formatted in the right way, so getting it manually
+        timeoutTimestamp: this.getTimeoutTimestamp(),
+      },
+    };
+
+    const aminoMsg = aminoTypes.toAmino(formattedMsg);
+    const fromAminoMsg = aminoTypes.fromAmino(aminoMsg);
+
     // simulate tx to estimate gas cost
-    const estimatedGas = await signer.simulate(signerAddress, msgs, memo);
+    const estimatedGas = await signer.simulate(signerAddress, [fromAminoMsg], memo);
     const gasMultiplier = Number(transactionRequest?.maxFeePerGas) || 1.5;
     const gasPrice = transactionRequest?.gasPrice as string;
 
     return signer.sign(
       signerAddress,
-      msgs,
+      [fromAminoMsg],
       calculateFee(Math.trunc(estimatedGas * gasMultiplier), GasPrice.fromString(gasPrice)),
       memo,
     );
+  }
+
+  getAminoTypeConverters(): AminoTypes {
+    return new AminoTypes({
+      ...createIbcAminoConverters(),
+      ...createWasmAminoConverters(),
+      ...this.createCctpAminoConverters(),
+    });
+  }
+
+  getTimeoutTimestamp(): number {
+    const PACKET_LIFETIME_NANOS = 3600 * 1_000_000_000; // 1 Hour
+
+    const currentTimeNanos = Math.floor(Date.now() * 1_000_000);
+    const timeoutTimestamp = Long.fromNumber(currentTimeNanos + PACKET_LIFETIME_NANOS);
+    return timeoutTimestamp.toNumber();
+  }
+
+  createCctpAminoConverters(): AminoConverters {
+    return {
+      CCTP_TYPE: {
+        aminoType: "cctp/DepositForBurn",
+        toAmino({ from, amount, destinationDomain, mintRecipient, burnToken }) {
+          return { from, amount, destinationDomain, mintRecipient, burnToken };
+        },
+        fromAmino({ from, amount, destinationDomain, mintRecipient, burnToken }) {
+          return { from, amount, destinationDomain, mintRecipient, burnToken };
+        },
+      },
+    };
   }
 
   async getBalances({
