@@ -32,6 +32,7 @@ import { MsgDepositForBurn } from "./cctpProto";
 import { TokensChains } from "../../utils/TokensChains";
 import Long from "long";
 import { createWasmAminoConverters } from "@cosmjs/cosmwasm-stargate";
+import { bytesFromBase64 } from "cosmjs-types/helpers";
 
 export class CosmosHandler {
   async validateBalance({
@@ -171,7 +172,13 @@ export class CosmosHandler {
           return { from, amount, destinationDomain, mintRecipient, burnToken };
         },
         fromAmino({ from, amount, destinationDomain, mintRecipient, burnToken }) {
-          return { from, amount, destinationDomain, mintRecipient, burnToken };
+          return {
+            from,
+            amount,
+            destinationDomain,
+            mintRecipient: bytesFromBase64(mintRecipient),
+            burnToken,
+          };
         },
       },
     };
