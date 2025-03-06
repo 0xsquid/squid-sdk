@@ -32,7 +32,7 @@ import { MsgDepositForBurn } from "./cctpProto";
 import { TokensChains } from "../../utils/TokensChains";
 import Long from "long";
 import { createWasmAminoConverters } from "@cosmjs/cosmwasm-stargate";
-import { bytesFromBase64 } from "cosmjs-types/helpers";
+import { base64FromBytes, bytesFromBase64 } from "cosmjs-types/helpers";
 
 export class CosmosHandler {
   async validateBalance({
@@ -169,7 +169,13 @@ export class CosmosHandler {
       "/circle.cctp.v1.MsgDepositForBurn": {
         aminoType: "cctp/DepositForBurn",
         toAmino({ from, amount, destinationDomain, mintRecipient, burnToken }) {
-          return { from, amount, destinationDomain, mintRecipient, burnToken };
+          return {
+            from,
+            amount,
+            destinationDomain,
+            mintRecipient: base64FromBytes(mintRecipient),
+            burnToken,
+          };
         },
         fromAmino({ from, amount, destinationDomain, mintRecipient, burnToken }) {
           return {
