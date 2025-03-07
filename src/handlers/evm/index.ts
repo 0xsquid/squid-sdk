@@ -60,6 +60,7 @@ export class EvmHandler extends Utils {
       data: _data,
       value,
       ...gasData,
+      chainId: Number(params.fromChain.chainId),
     } as TransactionRequest;
 
     return await signer.sendTransaction(tx);
@@ -178,6 +179,7 @@ export class EvmHandler extends Utils {
     return (data.signer as EvmWallet).sendTransaction({
       to: params.preHook ? params.preHook.fundToken : params.fromToken.address,
       data: approveData,
+      chainId: Number(params.fromChain.chainId),
       ...overrides,
     });
   }
