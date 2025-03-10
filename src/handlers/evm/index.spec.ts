@@ -61,6 +61,9 @@ describe("EvmHandler", () => {
   } as unknown as ExecuteRoute;
   const params = {
     fromAmount: "10000000000000000",
+    fromChain: {
+      chainId: "1",
+    },
   } as unknown as RouteParamsPopulated;
 
   describe("executeRoute method", () => {

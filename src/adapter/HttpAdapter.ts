@@ -9,7 +9,7 @@ export default class HttpAdapter {
   constructor(config: RequestConfig) {
     this.axios = axios.create({
       ...omit(config, ["config"]),
-      baseURL: config?.baseUrl,
+      baseURL: config?.baseURL,
       timeout: config?.timeout,
     });
 
@@ -20,7 +20,7 @@ export default class HttpAdapter {
 
   setConfig(config: RequestConfig) {
     if (!config) throw new Error("config object undefined");
-    this.axios = axios.create({ ...config, baseURL: config.baseUrl });
+    this.axios = axios.create(config);
   }
 
   get = async (url: string, config?: { [key: string]: any }): Promise<HttpResponse> => {

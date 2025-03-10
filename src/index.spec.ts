@@ -67,7 +67,7 @@ describe("Squid", () => {
         toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
         fromAddress: "0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5",
         toAddress: "0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5",
-        fromAmount: "5000000000000",
+        fromAmount: "1000000000000000000",
         slippage: 1.5,
       });
 

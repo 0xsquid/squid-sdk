@@ -53,7 +53,7 @@ export class Squid extends TokensChains {
     }
 
     this.httpInstance = new HttpAdapter({
-      baseUrl: config?.baseUrl || baseUrl,
+      baseURL: config?.baseUrl || baseUrl,
       config,
       headers: {
         "x-integrator-id": config.integratorId,
@@ -69,7 +69,7 @@ export class Squid extends TokensChains {
 
   setConfig(config: Config) {
     this.httpInstance = new HttpAdapter({
-      baseUrl: config?.baseUrl || baseUrl,
+      baseURL: config?.baseUrl || baseUrl,
       config,
       headers: {
         "x-integrator-id": config.integratorId || "squid-sdk",
