@@ -36,12 +36,12 @@ const buildParam = (
 export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
   const privateKey = process.env.privateKey as string;
   const ethereumRpc = process.env.ethereumRpcEndPoint as string;
-  const avalanceRpc = process.env.avalanceRpcEndPoint as string;
+  const avalancheRpc = process.env.avalancheRpcEndPoint as string;
   const moonbeamRpc = process.env.moonbeamRpcEndPoint as string;
   const polygonRpc = process.env.polygonRpcEndPoint as string;
 
   assert.notEqual(ethereumRpc, undefined, ".env: ethereumRpcEndPoint missing");
-  assert.notEqual(avalanceRpc, undefined, ".env: avalanceRpcEndPoint missing");
+  assert.notEqual(avalancheRpc, undefined, ".env: avalancheRpcEndPoint missing");
   assert.notEqual(moonbeamRpc, undefined, ".env: moonbeamRpcEndPoint missing");
   assert.notEqual(polygonRpc, undefined, ".env: polygonRpcEndPoint missing");
   assert.notEqual(privateKey, undefined, ".env: privateKey missing");
@@ -55,7 +55,7 @@ export const getSignerForChain = (chain: ChainName): ethers.Wallet => {
       signer = new ethers.Wallet(privateKey, provider);
       break;
     case ChainName.AVALANCHE:
-      provider = new ethers.providers.JsonRpcProvider(avalanceRpc);
+      provider = new ethers.providers.JsonRpcProvider(avalancheRpc);
       signer = new ethers.Wallet(privateKey, provider);
       break;
     case ChainName.MOONBEAM:
@@ -97,7 +97,7 @@ export const getSendTrade = (
   assert.equal(
     srcSquidExecutable,
     destSquidExecutable,
-    "source and destination squid executable address missmatch"
+    "source and destination squid executable address mismatch"
   );
 
   const toAddress = getSignerForChain(destChainName)?.address as string;
@@ -145,7 +145,7 @@ export const getTradeSend = (
     assert.equal(
       srcSquidExecutable,
       destSquidExecutable,
-      "source and destination squid executable address missmatch"
+      "source and destination squid executable address mismatch"
     );
   }
   const toAddress = recipientAdd
@@ -192,7 +192,7 @@ export const getTradeSendTrade = (
   assert.equal(
     srcSquidExecutable,
     destSquidExecutable,
-    "source and destination squid executable address missmatch"
+    "source and destination squid executable address mismatch"
   );
 
   const toAddress = getSignerForChain(destChainName)?.address as string;
@@ -238,7 +238,7 @@ export const getSendOnly = (
     assert.equal(
       srcSquidExecutable,
       destSquidExecutable,
-      "source and destination squid executable address missmatch"
+      "source and destination squid executable address mismatch"
     );
   }
 
