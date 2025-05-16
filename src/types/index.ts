@@ -11,14 +11,12 @@ import { Wallet } from "@project-serum/anchor";
 import { VersionedTransaction } from "@solana/web3.js";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { Contract, EvmWallet, GasData, RpcProvider, TransactionResponse } from "./ethers";
-import type {
-  SuiSignAndExecuteTransactionOutput,
-  WalletWithRequiredFeatures as SuiStandardWallet,
-} from "@mysten/wallet-standard";
+import { SuiTxResponse, SuiSigner } from "./sui";
 
 export * from "@0xsquid/squid-types";
 export * from "./cosmos";
 export * from "./ethers";
+export * from "./sui";
 export * from "./http";
 
 export type LogLevel = "info" | "error" | "debug";
@@ -50,7 +48,7 @@ export interface PhantomSigner {
 export type SolanaSigner = Wallet | PhantomSigner;
 
 export type ExecuteRoute = {
-  signer: EvmWallet | CosmosSigner | SolanaSigner | SuiStandardWallet;
+  signer: EvmWallet | CosmosSigner | SolanaSigner | SuiSigner;
   route: _RouteResponse["route"];
   executionSettings?: ExecutionSettings;
   overrides?: OverrideParams;
@@ -72,7 +70,7 @@ export type TransactionResponses =
   | TxRaw
   | DepositAddressResponse
   | SolanaTxResponse
-  | SuiSignAndExecuteTransactionOutput;
+  | SuiTxResponse;
 
 export type GetStatus = {
   transactionId: string;

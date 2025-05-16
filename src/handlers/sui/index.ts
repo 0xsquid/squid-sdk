@@ -1,26 +1,25 @@
-import { ExecuteRoute, OnChainExecutionData } from "types";
+import { ExecuteRoute, OnChainExecutionData, SuiTxResponse, SuiSigner } from "types";
 import { Transaction } from "@mysten/sui/transactions";
-import type {
-  WalletWithRequiredFeatures as SuiStandardWallet,
-  SuiSignAndExecuteTransactionOutput,
-} from "@mysten/wallet-standard";
+import { getSuiChain } from "utils/sui";
 
 export class SuiHandler {
-  async executeRoute({
-    data,
-  }: {
-    data: ExecuteRoute;
-  }): Promise<SuiSignAndExecuteTransactionOutput> {
+  async executeRoute({ data }: { data: ExecuteRoute }): Promise<SuiTxResponse> {
     const { route } = data;
-    const signer = data.signer as SuiStandardWallet;
+    const fromChainId = route.params.fromChain;
+    const suiChain = getSuiChain(fromChainId);
 
-    const txJson = (route.transactionRequest! as OnChainExecutionData).data;
+    if (!suiChain) {
+      throw new Error(`No Sui chain found for chainId ${fromChainId}`);
+    }
+
+    const signer = data.signer as SuiSigner;
+    const txJson = (route.transactionRequest as OnChainExecutionData).data;
     const tx = Transaction.from(txJson);
 
-    return await signer.features["sui:signAndExecuteTransaction"]?.signAndExecuteTransaction({
+    return await signer.features["sui:signAndExecuteTransaction"].signAndExecuteTransaction({
       transaction: tx,
       account: signer.accounts[0],
-      chain: signer.chains[0],
-    })!;
+      chain: suiChain,
+    });
   }
 }
