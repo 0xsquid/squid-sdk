@@ -5,7 +5,7 @@ import {
 } from "@mysten/wallet-standard";
 
 /**
- * Only required feature is `sui:signTransaction`
+ * Only required feature is `sui:signAndExecuteTransaction`
  */
 export type SuiSigner = WalletWithFeatures<SuiSignAndExecuteTransactionFeature>;
 
