@@ -76,6 +76,7 @@ export type GetStatus = {
   transactionId: string;
   requestId?: string;
   integratorId?: string;
+  quoteId?: string;
 };
 
 export type RouteParamsPopulated = Omit<
