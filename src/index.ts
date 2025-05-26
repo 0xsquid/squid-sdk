@@ -22,7 +22,7 @@ import {
 
 import HttpAdapter from "./adapter/HttpAdapter";
 
-import { CosmosHandler, EvmHandler, SolanaHandler, SuiHandler } from "./handlers";
+import { CosmosHandler, EvmHandler, SolanaHandler, StellarHandler, SuiHandler } from "./handlers";
 import { TokensChains } from "./utils/TokensChains";
 
 import { getCosmosChainsForChainIds } from "./utils/cosmos";
@@ -38,6 +38,7 @@ export class Squid extends TokensChains {
     cosmos: new CosmosHandler(),
     solana: new SolanaHandler(),
     sui: new SuiHandler(),
+    stellar: new StellarHandler(),
   };
 
   public initialized = false;
@@ -182,6 +183,9 @@ export class Squid extends TokensChains {
 
       case ChainType.SUI:
         return this.handlers.sui.executeRoute({ data });
+
+      case ChainType.STELLAR:
+        return this.handlers.stellar.executeRoute({ data, rpcUrl: fromChain.rpc });
 
       default:
         throw new Error(`Method not supported given chain type ${fromChain.chainType}`);
