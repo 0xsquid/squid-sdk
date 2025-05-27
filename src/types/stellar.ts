@@ -3,4 +3,4 @@ import { Api } from "@stellar/stellar-sdk/lib/rpc/api";
 
 export type StellarSigner = Keypair;
 
-export type StellarResponse = Api.SendTransactionResponse;
+export type StellarTxResponse = Api.SendTransactionResponse;
