@@ -1,6 +1,6 @@
 import { ExecuteRoute, OnChainExecutionData, SuiTxResponse, SuiSigner } from "types";
 import { Transaction } from "@mysten/sui/transactions";
-import { getSuiChain } from "utils/sui";
+import { SUI_MAINNET_CHAIN, SUI_TESTNET_CHAIN, SuiChain } from "@mysten/wallet-standard";
 
 export class SuiHandler {
   async executeRoute({ data }: { data: ExecuteRoute }): Promise<SuiTxResponse> {
@@ -21,5 +21,16 @@ export class SuiHandler {
       account: signer.accounts[0],
       chain: suiChain,
     });
+  }
+}
+
+function getSuiChain(chainId: string): SuiChain | null {
+  switch (chainId) {
+    case "sui-mainnet":
+      return SUI_MAINNET_CHAIN;
+    case "sui-testnet":
+      return SUI_TESTNET_CHAIN;
+    default:
+      return null;
   }
 }
