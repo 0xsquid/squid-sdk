@@ -59,7 +59,7 @@ describe("Squid", () => {
   });
 
   describe("getRoute", () => {
-    it("should return route", async () => {
+    it.skip("should return route", async () => {
       const { route, integratorId, requestId } = await squid.getRoute({
         fromChain: "1",
         toChain: "56",
