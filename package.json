@@ -1,6 +1,6 @@
 {
   "name": "@0xsquid/sdk",
-  "version": "2.9.4",
+  "version": "2.10.0",
   "description": "🛠 An SDK for building applications on top of 0xsquid",
   "repository": {
     "type": "git",
@@ -46,7 +46,7 @@
     "axios": "^1.8.2"
   },
   "devDependencies": {
-    "@0xsquid/squid-types": "^0.1.160",
+    "@0xsquid/squid-types": "0.1.162",
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",

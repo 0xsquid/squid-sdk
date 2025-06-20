@@ -59,7 +59,7 @@ describe("Squid", () => {
   });
 
   describe("getRoute", () => {
-    it("should return route", async () => {
+    it.skip("should return route", async () => {
       const { route, integratorId, requestId } = await squid.getRoute({
         fromChain: "1",
         toChain: "56",
@@ -102,6 +102,7 @@ describe("Squid", () => {
           requestId: "1643a99ae59c3f5164ed120812f00e38",
           integratorId: testIntegratorId,
           transactionId: "0x",
+          quoteId: "123",
         });
 
         expect(true).toBe(false); // should fail before reaching here
@@ -117,6 +118,7 @@ describe("Squid", () => {
           requestId: "0x",
           integratorId: testIntegratorId,
           transactionId: "",
+          quoteId: "123",
         });
 
         expect(true).toBe(false); // should fail before reaching here

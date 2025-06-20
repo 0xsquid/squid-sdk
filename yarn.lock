@@ -15,10 +15,10 @@
     "@gql.tada/internal" "^1.0.0"
     graphql "^15.5.0 || ^16.0.0 || ^17.0.0"
 
-"@0xsquid/squid-types@^0.1.160":
-  version "0.1.160"
-  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.160.tgz#2fb8e545bb75b27087c325d987d2e453d0a0e9e2"
-  integrity sha512-SV9FwutVQ/VF/T43gAWq/Vaq5fUQaMiu91D6eZ8cO87Z7Nf6i2gMBE2ujxC2aeD3wly1FXucavVQYvUW0TewWw==
+"@0xsquid/squid-types@0.1.162":
+  version "0.1.162"
+  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.162.tgz#c9748d744f07681cbce217553485d4d0726b91e0"
+  integrity sha512-2LMIjkjqdiWgIug5DuHa0EwfYRR34mQRjr+pLUbQb20QnWnK8g7QH975Cxgeq2BsdsvFseNVIM+X/iHD4ETaog==
   dependencies:
     long "^5.2.4"
     typescript "*"
