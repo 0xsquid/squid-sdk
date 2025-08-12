@@ -44,7 +44,7 @@ jobs:
         if: ${{ !contains('["major","minor", "patch", "premajor", "preminor", "prerelease", "prepatch"]', github.event.inputs.release-type) }}
 
       - name: Checkout ${{ github.event.inputs.branch-name }} for ${{ github.event.inputs.release-type }} release
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ github.event.inputs.branch-name != 'main' }}
         with:
           ref: ${{ github.event.inputs.branch-name }}
@@ -52,7 +52,7 @@ jobs:
           fetch-depth: 0
 
       - name: Checkout main for ${{ github.event.inputs.release-type }} release
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: ${{ github.event.inputs.branch-name == 'main' }}
         with:
           ref: main
