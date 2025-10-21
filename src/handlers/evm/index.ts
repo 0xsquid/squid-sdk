@@ -8,6 +8,7 @@ import {
   OnChainExecutionData,
   RouteParamsPopulated,
   RouteRequest,
+  SquidDataType,
   Token,
   TokenBalance,
   TransactionRequest,
@@ -122,7 +123,11 @@ export class EvmHandler extends Utils {
       params,
     });
 
-    if (params.fromIsNative) {
+    const skipAllowanceCheck =
+      params.fromIsNative ||
+      data.route.transactionRequest?.type === SquidDataType.DepositAddressCalldata;
+
+    if (skipAllowanceCheck) {
       return true;
     }
 
