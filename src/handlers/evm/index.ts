@@ -123,9 +123,14 @@ export class EvmHandler extends Utils {
       params,
     });
 
+    const isDepositAddressTx =
+      data.route.transactionRequest?.type === SquidDataType.DepositAddressCalldata;
+
     const skipAllowanceCheck =
       params.fromIsNative ||
-      data.route.transactionRequest?.type === SquidDataType.DepositAddressCalldata;
+      // The transaction type `DepositAddressCalldata` involves a token transfer,
+      // and thus doesn't require approval
+      isDepositAddressTx;
 
     if (skipAllowanceCheck) {
       return true;
