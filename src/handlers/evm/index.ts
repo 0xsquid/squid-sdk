@@ -124,7 +124,12 @@ export class EvmHandler extends Utils {
     });
 
     const isDepositAddressTx =
-      data.route.transactionRequest?.type === SquidDataType.DepositAddressCalldata;
+      data.route.transactionRequest &&
+      [
+        SquidDataType.DepositAddressCalldata,
+        SquidDataType.DepositAddressWithSignature,
+        SquidDataType.DepositAddressWithMemo,
+      ].includes(data.route.transactionRequest.type);
 
     const skipAllowanceCheck =
       params.fromIsNative ||
