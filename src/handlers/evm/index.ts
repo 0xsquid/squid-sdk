@@ -67,6 +67,20 @@ export class EvmHandler extends Utils {
     return await signer.sendTransaction(tx);
   }
 
+  async signMessage({ data }: { data: ExecuteRoute }): Promise<string> {
+    const {
+      route: { transactionRequest },
+    } = data;
+    const { signatureRequired: orderHash } = transactionRequest as OnChainExecutionData;
+    const signer = data.signer as WalletV6;
+
+    if (!orderHash || !this.isValidOrderHash(orderHash)) {
+      throw new Error("Invalid order hash");
+    }
+
+    return signer.signMessage(orderHash);
+  }
+
   async validateBalance({
     sender,
     params,

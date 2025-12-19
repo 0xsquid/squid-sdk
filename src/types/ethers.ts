@@ -10,7 +10,9 @@ export type WalletV6 = ethers.Signer | ethers.Wallet;
 export type EvmWallet = WalletV6;
 
 export type Transaction = ethers.Transaction;
-export type TransactionResponse = ethers.TransactionResponse;
+export type TransactionResponse = ethers.TransactionResponse & {
+  depositTxVerificationSignature?: string;
+};
 export type TransactionRequest = ethers.TransactionRequest;
 
 export type GasData = {
