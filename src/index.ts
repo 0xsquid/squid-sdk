@@ -149,6 +149,8 @@ export class Squid extends TokensChains {
         const signature = await this.getRouteSignature(data);
         const tx = await this.executeOnChainTx(data);
 
+        // Object.assign is used here instead of the spread operator
+        // to preserve prototype methods like tx.wait()
         return Object.assign(tx, { depositTxVerificationSignature: signature });
 
       case SquidDataType.ChainflipDepositAddress:
