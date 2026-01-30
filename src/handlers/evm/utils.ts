@@ -254,11 +254,6 @@ export class Utils {
    * Validates hash prefix and length.
    */
   isValidOrderHash(hash: string): boolean {
-    return (
-      typeof hash === "string" &&
-      hash.startsWith("0x") &&
-      hash.length === 66 &&
-      /^0x[0-9a-fA-F]{64}$/.test(hash)
-    );
+    return typeof hash === "string" && /^0x[0-9a-fA-F]{64}$/.test(hash);
   }
 }
