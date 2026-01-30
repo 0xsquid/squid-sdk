@@ -248,4 +248,12 @@ export class Utils {
       return null;
     }
   }
+
+  /**
+   * Minimal validation to ensure the given string is a well-formed order hash
+   * Validates hash prefix and length.
+   */
+  isValidOrderHash(hash: string): boolean {
+    return typeof hash === "string" && /^0x[0-9a-fA-F]{64}$/.test(hash);
+  }
 }

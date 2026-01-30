@@ -145,6 +145,14 @@ export class Squid extends TokensChains {
       case SquidDataType.DepositAddressCalldata:
         return await this.executeOnChainTx(data);
 
+      case SquidDataType.DepositAddressWithSignature:
+        const signature = await this.getRouteSignature(data);
+        const tx = await this.executeOnChainTx(data);
+
+        // Object.assign is used here instead of the spread operator
+        // to preserve prototype methods like tx.wait()
+        return Object.assign(tx, { depositTxVerificationSignature: signature });
+
       case SquidDataType.ChainflipDepositAddress:
         return await this.requestDepositAddress(data);
 
@@ -203,6 +211,25 @@ export class Squid extends TokensChains {
     }
 
     return data as DepositAddressResponse;
+  }
+
+  private async getRouteSignature(data: ExecuteRoute): Promise<string> {
+    const { route } = data;
+
+    if (route.transactionRequest?.type !== SquidDataType.DepositAddressWithSignature) {
+      throw new Error("Unexpected route type");
+    }
+
+    const fromChain = this.getChainData(data.route.params.fromChain);
+    switch (fromChain.chainType) {
+      case ChainType.EVM:
+        return this.handlers.evm.signMessage({
+          data,
+        });
+
+      default:
+        throw new Error(`Method not supported given chain type ${fromChain.chainType}`);
+    }
   }
 
   async isRouteApproved({
