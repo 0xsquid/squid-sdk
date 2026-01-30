@@ -1,5 +1,7 @@
 # Changelog
 
+## 2.11.0 (2025-12-11)
+
 ## 2.10.3-beta-deposit-with-signature.1 (2025-12-17)
 
 ### Features
