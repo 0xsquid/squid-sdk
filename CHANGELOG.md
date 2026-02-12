@@ -1,5 +1,7 @@
 # Changelog
 
+## [2.12.1-beta-onchain-exec-with-sig.1](https://github.com/0xsquid/api-sdk/compare/v2.12.1-beta-onchain-exec-with-sig.0...v2.12.1-beta-onchain-exec-with-sig.1) (2026-02-12)
+
 ## 2.12.1-beta-onchain-exec-with-sig.0 (2026-02-12)
 
 ### Features
