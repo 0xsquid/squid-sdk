@@ -8,6 +8,7 @@ import {
   OnChainExecutionData,
   RouteParamsPopulated,
   RouteRequest,
+  SquidDataType,
   Token,
   TokenBalance,
   TransactionRequest,
@@ -136,8 +137,16 @@ export class EvmHandler extends Utils {
       params,
     });
 
-    const skipAllowanceCheck =
-      params.fromIsNative || this.isDepositAddressTx(data.route.transactionRequest?.type);
+    // Deposit transactions involve ERC-20 transfers and thus don't need allowance
+    const isDepositAddressTx =
+      data.route.transactionRequest &&
+      [
+        SquidDataType.DepositAddressCalldata,
+        SquidDataType.DepositAddressWithSignature,
+        SquidDataType.DepositAddressWithMemo,
+      ].includes(data.route.transactionRequest.type);
+
+    const skipAllowanceCheck = params.fromIsNative || isDepositAddressTx;
 
     if (skipAllowanceCheck) {
       return true;
