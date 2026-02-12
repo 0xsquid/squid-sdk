@@ -223,8 +223,18 @@ export class Squid extends TokensChains {
   private async getRouteSignature(data: ExecuteRoute): Promise<string> {
     const { route } = data;
 
-    if (route.transactionRequest?.type !== SquidDataType.DepositAddressWithSignature) {
-      throw new Error("Unexpected route type");
+    const isSignatureRequiredRoute = [
+      SquidDataType.DepositAddressWithSignature,
+      // TODO: update types
+      // SquidDataType.OnChainExecutionWithSignature
+      "ON_CHAIN_EXECUTION_WITH_SIGNATURE",
+    ];
+
+    if (
+      !route.transactionRequest ||
+      !isSignatureRequiredRoute.includes(route.transactionRequest.type)
+    ) {
+      throw new Error(`Unexpected route type: ${route.transactionRequest?.type}`);
     }
 
     const fromChain = this.getChainData(data.route.params.fromChain);
