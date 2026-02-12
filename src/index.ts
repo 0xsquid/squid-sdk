@@ -142,24 +142,31 @@ export class Squid extends TokensChains {
 
     switch (data.route.transactionRequest?.type) {
       case SquidDataType.OnChainExecution:
-      case SquidDataType.DepositAddressCalldata:
+      case SquidDataType.DepositAddressCalldata: {
         return await this.executeOnChainTx(data);
+      }
 
       case SquidDataType.DepositAddressWithSignature:
+      // @ts-expect-error TODO: update types
+      // case SquidDataType.OnChainExecutionWithSignature:
+      case "ON_CHAIN_EXECUTION_WITH_SIGNATURE": {
         const signature = await this.getRouteSignature(data);
         const tx = await this.executeOnChainTx(data);
 
         // Object.assign is used here instead of the spread operator
         // to preserve prototype methods like tx.wait()
         return Object.assign(tx, { depositTxVerificationSignature: signature });
+      }
 
-      case SquidDataType.ChainflipDepositAddress:
+      case SquidDataType.ChainflipDepositAddress: {
         return await this.requestDepositAddress(data);
+      }
 
-      default:
+      default: {
         throw new Error(
           `Unsupported transaction request type - ${data.route.transactionRequest?.type}`,
         );
+      }
     }
   }
 

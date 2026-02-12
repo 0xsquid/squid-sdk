@@ -8,7 +8,6 @@ import {
   OnChainExecutionData,
   RouteParamsPopulated,
   RouteRequest,
-  SquidDataType,
   Token,
   TokenBalance,
   TransactionRequest,
@@ -137,19 +136,8 @@ export class EvmHandler extends Utils {
       params,
     });
 
-    const isDepositAddressTx =
-      data.route.transactionRequest &&
-      [
-        SquidDataType.DepositAddressCalldata,
-        SquidDataType.DepositAddressWithSignature,
-        SquidDataType.DepositAddressWithMemo,
-      ].includes(data.route.transactionRequest.type);
-
     const skipAllowanceCheck =
-      params.fromIsNative ||
-      // The transaction type `DepositAddressCalldata` involves a token transfer,
-      // and thus doesn't require approval
-      isDepositAddressTx;
+      params.fromIsNative || this.isDepositAddressTx(data.route.transactionRequest?.type);
 
     if (skipAllowanceCheck) {
       return true;

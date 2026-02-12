@@ -1,11 +1,24 @@
-import { ChainData, OnChainExecutionData, Token } from "@0xsquid/squid-types";
+import { ChainData, OnChainExecutionData, SquidDataType, Token } from "@0xsquid/squid-types";
 
 import { OverrideParams, Contract, GasData, RpcProvider, TokenBalance } from "../../types";
 import { MulticallWrapper } from "ethers-multicall-provider";
 import { Provider, ethers } from "ethers";
 import { multicallAbi, MULTICALL_ADDRESS, NATIVE_EVM_TOKEN_ADDRESS } from "../../constants";
 
+/**
+ * Transaction types that involve a token transfer instead of a call to a contract
+ */
+const DEPOSIT_ADDRESS_TYPES = new Set<SquidDataType>([
+  SquidDataType.DepositAddressCalldata,
+  SquidDataType.DepositAddressWithSignature,
+  SquidDataType.DepositAddressWithMemo,
+]);
+
 export class Utils {
+  isDepositAddressTx(type?: SquidDataType): boolean {
+    return !!type && DEPOSIT_ADDRESS_TYPES.has(type);
+  }
+
   async validateNativeBalance({
     fromProvider,
     sender,
