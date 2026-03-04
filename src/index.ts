@@ -147,9 +147,7 @@ export class Squid extends TokensChains {
       }
 
       case SquidDataType.DepositAddressWithSignature:
-      // @ts-expect-error TODO: update types
-      // case SquidDataType.OnChainExecutionWithSignature:
-      case "ON_CHAIN_EXECUTION_WITH_SIGNATURE": {
+      case SquidDataType.OnChainExecutionWithSignature: {
         const signature = await this.getRouteSignature(data);
         const tx = await this.executeOnChainTx(data);
 
@@ -225,9 +223,7 @@ export class Squid extends TokensChains {
 
     const isSignatureRequiredRoute = [
       SquidDataType.DepositAddressWithSignature,
-      // TODO: update types
-      // SquidDataType.OnChainExecutionWithSignature
-      "ON_CHAIN_EXECUTION_WITH_SIGNATURE",
+      SquidDataType.OnChainExecutionWithSignature,
     ];
 
     if (
