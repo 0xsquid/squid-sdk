@@ -137,6 +137,7 @@ export class EvmHandler extends Utils {
       params,
     });
 
+    // Deposit transactions involve ERC-20 transfers and thus don't need allowance
     const isDepositAddressTx =
       data.route.transactionRequest &&
       [
@@ -145,11 +146,7 @@ export class EvmHandler extends Utils {
         SquidDataType.DepositAddressWithMemo,
       ].includes(data.route.transactionRequest.type);
 
-    const skipAllowanceCheck =
-      params.fromIsNative ||
-      // The transaction type `DepositAddressCalldata` involves a token transfer,
-      // and thus doesn't require approval
-      isDepositAddressTx;
+    const skipAllowanceCheck = params.fromIsNative || isDepositAddressTx;
 
     if (skipAllowanceCheck) {
       return true;
