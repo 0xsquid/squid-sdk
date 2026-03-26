@@ -13,10 +13,10 @@ import {
   CosmosAddress,
   ChainType,
   CCTP_TYPE,
-  RouteRequest,
   IBC_TRANSFER_TYPE,
   WASM_TYPE,
   OnChainExecutionData,
+  RouteResponse,
 } from "../../types";
 import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
@@ -178,20 +178,26 @@ export class CosmosHandler {
     return toBech32(chainPrefix, fromBech32(address).data);
   }
 
-  populateRouteParams(tokensChains: TokensChains, params: RouteRequest): RouteParamsPopulated {
-    const { fromChain, toChain, fromToken, toToken } = params;
+  populateRouteParams(
+    tokensChains: TokensChains,
+    route: RouteResponse["route"],
+  ): RouteParamsPopulated {
+    const { fromChain, toChain, fromToken, toToken } = route.params;
 
     const _fromChain = tokensChains.getChainData(fromChain);
     const _toChain = tokensChains.getChainData(toChain);
     const _fromToken = tokensChains.getTokenData(fromToken, fromChain);
     const _toToken = tokensChains.getTokenData(toToken, toChain);
 
+    const fromAmount = route.params.fromAmount || route.estimate.fromAmount;
+
     return {
-      ...params,
+      ...route.params,
       fromChain: _fromChain,
       toChain: _toChain,
       fromToken: _fromToken,
       toToken: _toToken,
+      fromAmount,
     } as RouteParamsPopulated;
   }
 }
