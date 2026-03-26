@@ -1,6 +1,6 @@
 {
   "name": "@0xsquid/sdk",
-  "version": "2.13.0",
+  "version": "2.13.1-beta-optional-from-amount.0",
   "description": "🛠 An SDK for building applications on top of 0xsquid",
   "repository": {
     "type": "git",
