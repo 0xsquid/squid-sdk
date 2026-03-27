@@ -33,6 +33,10 @@ on:
           - alpha
           - beta
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   cut-release:
     if: github.repository_owner == '0xsquid' && contains(fromJSON('["0x0Koda", "rajat43", "odcey", "genaroibc"]'), github.actor)
