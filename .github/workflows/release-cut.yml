@@ -35,13 +35,13 @@ on:
 
 jobs:
   cut-release:
-    if: contains('["0x0Koda", "rajat43", "jmdev3", "odcey"]', github.actor)
+    if: github.repository_owner == '0xsquid' && contains(fromJSON('["0x0Koda", "rajat43", "odcey"]'), github.actor)
     name: Create release branch and PRs into develop/main
     runs-on: ubuntu-latest
     steps:
       - name: Exit if release type argument is invalid
         run: exit 1
-        if: ${{ !contains('["major","minor", "patch", "premajor", "preminor", "prerelease", "prepatch"]', github.event.inputs.release-type) }}
+        if: ${{ !contains(fromJSON('["major", "minor", "patch", "premajor", "preminor", "prerelease", "prepatch"]'), github.event.inputs.release-type) }}
 
       - name: Checkout ${{ github.event.inputs.branch-name }} for ${{ github.event.inputs.release-type }} release
         uses: actions/checkout@v3
