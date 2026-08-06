@@ -112,21 +112,23 @@ describe("Squid", () => {
       }
     });
 
-    it("should return 400 error if transactionId is missing", async () => {
-      try {
-        await squid.getStatus({
+    it("should return 400 error if neither transactionId nor quoteId is provided", async () => {
+      await expect(
+        squid.getStatus({
           requestId: "0x",
           integratorId: testIntegratorId,
           transactionId: "",
-          quoteId: "123",
-        });
-
-        expect(true).toBe(false); // should fail before reaching here
-      } catch (error) {
-        expect(error.response.status).toEqual(400);
-        expect(error.response.data.message).toEqual("transactionId is a required field");
-        expect(error.response.data.type).toEqual("SCHEMA_VALIDATION_ERROR");
-      }
+          quoteId: "",
+        }),
+      ).rejects.toMatchObject({
+        response: {
+          status: 400,
+          data: {
+            message: "Either transactionId or quoteId is required",
+            type: "SCHEMA_VALIDATION_ERROR",
+          },
+        },
+      });
     });
   });
 });
