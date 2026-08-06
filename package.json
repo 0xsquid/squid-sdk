@@ -43,7 +43,8 @@
   "resolutions": {
     "semver": "^7.5.4",
     "axios": "^1.10.0",
-    "form-data": "^4.0.4"
+    "form-data": "^4.0.4",
+    "@wallet-standard/errors": "0.1.1"
   },
   "devDependencies": {
     "@0xsquid/squid-types": "0.1.216",
