@@ -29,8 +29,8 @@
   "dependencies": {
     "@cosmjs/encoding": "0.33.0",
     "@cosmjs/stargate": "0.33.0",
-    "@mysten/sui": "1.21.2",
-    "@mysten/wallet-standard": "0.14.0",
+    "@mysten/sui": "1.45.2",
+    "@mysten/wallet-standard": "0.19.9",
     "@project-serum/anchor": "^0.26.0",
     "axios": "^1.10.0",
     "cosmjs-types": "0.9.0",
@@ -43,7 +43,8 @@
   "resolutions": {
     "semver": "^7.5.4",
     "axios": "^1.10.0",
-    "form-data": "^4.0.4"
+    "form-data": "^4.0.4",
+    "@wallet-standard/errors": "0.1.1"
   },
   "devDependencies": {
     "@0xsquid/squid-types": "0.1.216",
