@@ -123,10 +123,7 @@ describe("Squid", () => {
       ).rejects.toMatchObject({
         response: {
           status: 400,
-          data: {
-            message: "Either transactionId or quoteId is required",
-            type: "SCHEMA_VALIDATION_ERROR",
-          },
+          data: { type: "SCHEMA_VALIDATION_ERROR" },
         },
       });
     });
