@@ -22,29 +22,29 @@ describe("Squid", () => {
         chainId: "1",
       });
 
-      expect(typeof tokenPrice).toEqual("number");
+      expect(typeof tokenPrice).toBe("number");
     });
 
     it("should return 400 error if token address is invalid", async () => {
-      try {
-        await squid.getTokenPrice({
+      await expect(
+        squid.getTokenPrice({
           tokenAddress: "0x",
           chainId: "1",
-        });
-      } catch (error) {
-        expect(error.response.status).toEqual(400);
-      }
+        })
+      ).rejects.toMatchObject({
+        response: { status: 400 },
+      });
     });
 
     it("should return 400 error if chain id is invalid", async () => {
-      try {
-        await squid.getTokenPrice({
+      await expect(
+        squid.getTokenPrice({
           tokenAddress: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
           chainId: "",
-        });
-      } catch (error) {
-        expect(error.response.status).toEqual(400);
-      }
+        })
+      ).rejects.toMatchObject({
+        response: { status: 400 },
+      });
     });
   });
 
@@ -78,18 +78,18 @@ describe("Squid", () => {
     });
 
     it("should return 400 error if from or to address not provided", async () => {
-      try {
-        await squid.getRoute({
+      await expect(
+        squid.getRoute({
           fromChain: "1",
           toChain: "56",
           fromToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
           toToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
           fromAmount: "5000000000000",
           slippage: 1.5,
-        });
-      } catch (error) {
-        expect(error.response.status).toEqual(400);
-      }
+        })
+      ).rejects.toMatchObject({
+        response: { status: 400 },
+      });
     });
   });
 
