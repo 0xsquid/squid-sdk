@@ -7,7 +7,7 @@ import {
   ExecuteRoute,
   OnChainExecutionData,
   RouteParamsPopulated,
-  RouteRequest,
+  RouteResponse,
   SquidDataType,
   Token,
   TokenBalance,
@@ -336,10 +336,10 @@ export class EvmHandler extends Utils {
 
   populateRouteParams(
     tokensChains: TokensChains,
-    params: RouteRequest,
+    route: RouteResponse["route"],
     signer?: EvmWallet,
   ): RouteParamsPopulated {
-    const { fromChain, toChain, fromToken, toToken, preHook } = params;
+    const { fromChain, toChain, fromToken, toToken, preHook } = route.params;
 
     const _fromChain = tokensChains.getChainData(fromChain);
     const _toChain = tokensChains.getChainData(toChain);
@@ -362,8 +362,10 @@ export class EvmHandler extends Utils {
       );
     }
 
+    const fromAmount = route.params.fromAmount || route.estimate.fromAmount;
+
     return {
-      ...params,
+      ...route.params,
       fromChain: _fromChain,
       toChain: _toChain,
       fromToken: _fromToken,
@@ -371,6 +373,7 @@ export class EvmHandler extends Utils {
       fromTokenContract,
       fromProvider,
       fromIsNative,
+      fromAmount,
     };
   }
 }

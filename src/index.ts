@@ -174,7 +174,7 @@ export class Squid extends TokensChains {
       case ChainType.EVM:
         const evmParams = this.handlers.evm.populateRouteParams(
           this,
-          data.route.params,
+          data.route,
           data.signer as EvmWallet,
         );
 
@@ -184,7 +184,7 @@ export class Squid extends TokensChains {
         });
 
       case ChainType.COSMOS:
-        const cosmosParams = this.handlers.cosmos.populateRouteParams(this, data.route.params);
+        const cosmosParams = this.handlers.cosmos.populateRouteParams(this, data.route);
 
         return this.handlers.cosmos.executeRoute({
           data,
@@ -261,7 +261,7 @@ export class Squid extends TokensChains {
     const fromChain = this.getChainData(route.params.fromChain);
     switch (fromChain.chainType) {
       case ChainType.EVM:
-        const params = this.handlers.evm.populateRouteParams(this, route.params);
+        const params = this.handlers.evm.populateRouteParams(this, route);
 
         return await this.handlers.evm.isRouteApproved({
           sender,
@@ -283,7 +283,7 @@ export class Squid extends TokensChains {
       case ChainType.EVM:
         const params = this.handlers.evm.populateRouteParams(
           this,
-          data.route.params,
+          data.route,
           data.signer as EvmWallet,
         );
 

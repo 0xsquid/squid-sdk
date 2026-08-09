@@ -82,7 +82,7 @@ export type GetStatus = {
 
 export type RouteParamsPopulated = Omit<
   RouteRequest,
-  "fromChain" | "toChain" | "fromToken" | "toToken"
+  "fromChain" | "toChain" | "fromToken" | "toToken" | "fromAmount"
 > & {
   fromChain: ChainData;
   toChain: ChainData;
@@ -91,6 +91,7 @@ export type RouteParamsPopulated = Omit<
   fromTokenContract: Contract | undefined;
   fromProvider: RpcProvider;
   fromIsNative: boolean;
+  fromAmount: string;
 };
 
 // TO BE REMOVED AFTER V2 STATUS API IS DONE

@@ -1,6 +1,6 @@
 {
   "name": "@0xsquid/sdk",
-  "version": "2.13.0",
+  "version": "2.13.1-beta-optional-from-amount.0",
   "description": "🛠 An SDK for building applications on top of 0xsquid",
   "repository": {
     "type": "git",
@@ -47,7 +47,7 @@
     "@wallet-standard/errors": "0.1.1"
   },
   "devDependencies": {
-    "@0xsquid/squid-types": "0.1.216",
+    "@0xsquid/squid-types": "0.1.220",
     "@babel/core": "^7.18.10",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",
